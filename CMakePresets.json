@@ -9,8 +9,7 @@
             "name" : "clang-tidy",
             "binaryDir": "build",
             "cacheVariables": {
-                "CMAKE_CXX_CLANG_TIDY": "clang-tidy;-fix-errors;--header-filter=${sourceDir}/.*\\.hpp",
-                "CMAKE_EXPORT_COMPILE_COMMANDS" : true
+                "CMAKE_CXX_CLANG_TIDY": "clang-tidy;--header-filter=${sourceDir}/.*\\.hpp"
             }
         }
     ]
