@@ -1,0 +1,17 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 21
+    },
+    "configurePresets" : [
+        {
+            "name" : "clang-tidy",
+            "binaryDir": "build",
+            "cacheVariables": {
+                "CMAKE_CXX_CLANG_TIDY": "clang-tidy;-fix-errors;--header-filter=${sourceDir}/.*\\.hpp",
+                "CMAKE_EXPORT_COMPILE_COMMANDS" : true
+            }
+        }
+    ]
+}
