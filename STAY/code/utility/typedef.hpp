@@ -6,6 +6,8 @@
 namespace stay
 {
     using RWin = sf::RenderWindow;
-    using Sptr = std::shared_pointer;
-    using Uptr = std::unique_pointer;
+    template <typename T>
+    using SPtr = std::shared_ptr<T>;
+    template<typename T>
+    using Uptr = std::unique_ptr<T>;
 } // namespace stay
