@@ -24,9 +24,9 @@ int main()
         return -2;
     }
 }
-
-// test
-int main1()
+// NOLINTBEGIN
+// test==================================================================
+int testNode()
 {
     try
     {
@@ -46,3 +46,59 @@ int main1()
     }
     return -1;
 }
+// test==================================================================
+#include "../ecs/manager.hpp"
+#include <thread>
+#include <chrono>
+using namespace stay;
+using namespace std::chrono_literals;
+
+struct Physics : public ecs::System, public ecs::UpdateSystem, public ecs::StartSystem
+{
+    Physics(ecs::Manager* manager)
+        : ecs::System(manager)
+        , ecs::UpdateSystem{1}
+        , ecs::StartSystem{1}
+    {}
+
+    void start() override
+    {
+        std::cout << "Physics system inited" << std::endl;
+    }
+
+    void update(float/*dt*/) override
+    {
+        std::cout << "Physics system updating" << std::endl;
+    }
+};
+
+struct Render : public ecs::System, public ecs::StartSystem
+{
+    Render(ecs::Manager* managet)
+        : ecs::System(managet)
+        , ecs::StartSystem(-2)
+    {}
+
+    void start() override
+    {
+        std::cout << "render system inited" << std::endl;
+    }
+};
+
+int systemRegistration()
+{
+    ecs::Manager manager;
+    manager.registerSystem<Physics>();
+    manager.registerSystem<Render>();
+
+    manager.start();
+    while (true)
+    {
+        manager.update(1);
+        std::this_thread::sleep_for(1000ms);
+        return 0;
+    }
+    return 1;
+}
+// test==================================================================
+// NOLINTEND

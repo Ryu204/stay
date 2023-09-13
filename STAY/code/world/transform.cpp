@@ -167,4 +167,9 @@ namespace stay
     {
         return { left.getMatrix() * right.getMatrix() };
     }
+
+    bool Transform::operator == (const Transform& right)
+    {
+        return (mPosition == right.mPosition && mRotation == right.mRotation && mScale == right.mScale);
+    }
 } // namespace stay

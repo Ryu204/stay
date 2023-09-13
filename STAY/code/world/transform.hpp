@@ -4,16 +4,18 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "../type/vector.hpp"
+#include "../type/serializable.hpp"
 
 namespace stay
 {
-    class Transform
+    class Transform : Serializable
     {
         public:
             using Matrix = glm::mat4x4;
 
             Transform();
             Transform(const Matrix& matrix);
+            bool operator == (const Transform& right);
             // `matrix` transform's rotation must be only around OZ
             void setMatrix(const Matrix& matrix);
             const Matrix& getMatrix();
@@ -38,6 +40,31 @@ namespace stay
             void setScale(Vector3 scale);
             void setScale(Vector2 scale);
             Vector3 getScale() const;
+
+            Json::Value toJSONObject() const override
+            {
+                Json::Value res;
+                res["position"] = mPosition.toJSONObject();
+                res["rotation"] = mRotation;
+                res["scale"] = mScale.toJSONObject();
+                return res;
+            }
+
+            bool fetch(const Json::Value& data) override
+            {
+                if (data.type() == Json::objectValue 
+                    && mPosition.fetch(data["position"]) 
+                    && data["rotation"].isNumeric()
+                    && mScale.fetch(data["scale"]))
+                {
+                    mRotation = data["rotation"].asFloat();
+                    mMatrixNeedRebuild = true;
+                    mInverseNeedRebuild = true;
+                    return true;
+                }
+                setMatrix(glm::mat4(1.F));
+                return false;
+            }
         private:
             // Update other components by decomposing the transform matrix
             // Link: https://stackoverflow.com/questions/17918033/glm-decompose-mat4-into-translation-and-rotation
@@ -56,5 +83,5 @@ namespace stay
             Matrix mInverseMatrix;
     };
 
-    Transform operator * (const Transform& left, const Transform& right);
+    Transform operator * (Transform& left, Transform& right);
 } // namespace stay
