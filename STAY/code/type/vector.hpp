@@ -57,10 +57,13 @@ namespace stay
             }
     };
 
-    class Vector2 : public glm::vec<2, float>, public Serializable
+    class Vector2 : public glm::vec2, public Serializable
     {
         public:
-            using glm::vec<2, float>::vec;
+            using glm::vec2::vec;
+            Vector2(const glm::vec2& vec)
+                : glm::vec2(vec)
+            {}
             Json::Value toJSONObject() const override
             {
                 Json::Value res(Json::arrayValue);
@@ -81,10 +84,13 @@ namespace stay
             }
     };
 
-    class Vector3 : public glm::vec<3, float>, public Serializable
-    {
+    class Vector3 : public glm::vec3, public Serializable
+    {       
         public:
-            using glm::vec<3, float>::vec;
+            using glm::vec3::vec;
+            Vector3(const glm::vec3& vec)
+                : glm::vec3(vec)
+            { }
             Json::Value toJSONObject() const override
             {
                 Json::Value res(Json::arrayValue);
@@ -105,4 +111,21 @@ namespace stay
                 return false;
             }
     };
+    /*        Y+
+              |
+              |     SCREEN
+              |
+              |
+              /------------------ X+
+            /
+          /
+        /      
+      Z- <-- (PLAYER)
+    */
+    inline constexpr Vector3 vectorUp(0.F, 1.F, 0.F);
+    inline constexpr Vector3 vectorDown(0.F, -1.F, 0.F);
+    inline constexpr Vector3 vectorLeft(-1.F, 0.F, 0.F);
+    inline constexpr Vector3 vectorRight(1.F, 0.F, 0.F);
+    inline constexpr Vector3 vectorBack(0.F, 0.F, -1.F);
+    inline constexpr Vector3 vectorForward(0.F, 0.F, 1.F);
 } // namespace stay
