@@ -10,14 +10,18 @@
 // NOLINTBEGIN
 #include <SFML/Graphics.hpp>
 #include "../world/transform.hpp"
+#include "../world/node.hpp"
 #include "../utility/convert.hpp"
 namespace 
 {
     sf::RectangleShape shape(sf::Vector2f(30, 30));
-    stay::Transform trans;
-
+    stay::Node& node1 = *stay::Node::create();
+    stay::Node& node2 = *stay::Node::create();
     void init(stay::RWin* window)
     {
+        node1.setParent(&stay::Node::root());
+        node2.setParent(&node1);
+
         shape.setOrigin(15, 15);
         shape.setFillColor(sf::Color::Red);
         shape.setOutlineColor(sf::Color::Black);
@@ -26,14 +30,30 @@ namespace
         newView.setCenter(0, 0);
         window->setView(newView);
     }
-    void drawShape(stay::RWin* win)
+    void drawShape(stay::RWin* win, int id)
     {
-        auto pos = trans.getPosition();
-        auto scale = trans.getScale();
-        shape.setPosition(pos.x, -pos.y);
-        shape.setScale(scale.x, scale.y);
-        shape.setRotation(trans.getRotation());
-        win->draw(shape);
+        if (id == 1)
+        {
+            shape.setFillColor(sf::Color::White);
+            auto trans = node1.getGlobalTransform();
+            auto pos = trans.getPosition();
+            auto scale = trans.getScale();
+            shape.setPosition(pos.x, -pos.y);
+            shape.setScale(scale.x, scale.y);
+            shape.setRotation(trans.getRotation());
+            win->draw(shape);
+        }
+        else if (id == 2)
+        {
+            shape.setFillColor(sf::Color::Cyan);
+            auto trans = node2.getGlobalTransform();
+            auto pos = trans.getPosition();
+            auto scale = trans.getScale();
+            shape.setPosition(pos.x, -pos.y);
+            shape.setScale(scale.x, scale.y);
+            shape.setRotation(trans.getRotation());
+            win->draw(shape);
+        }
     }
     void updateaslkfj(float dt)
     {
@@ -46,7 +66,7 @@ namespace
             vel.y += 1;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
             vel.y -= 1;
-        trans.move(300 * dt * vel);
+        node1.getLocalTransform().move(300 * dt * vel);
         stay::Vector3 scale{1.F, 1.F, 1.F};
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
             scale.x = 1.1F;
@@ -54,13 +74,38 @@ namespace
             scale.y = 1.1F;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
             scale.z = 1.1F;
-        trans.scale(scale);
+        node1.getLocalTransform().scale(scale);
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-        trans.setScale({1, 1, 1});
+        node1.getLocalTransform().setScale({1, 1, 1});
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-        trans.rotate(-50 * dt);
+        node1.getLocalTransform().rotate(-50 * dt);
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::C))
-        trans.rotate(50 * dt);
+        node1.getLocalTransform().rotate(50 * dt);
+
+        vel = stay::Vector2{0, 0};
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad3))
+            vel.x += 1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1))
+            vel.x -= 1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad5))
+            vel.y += 1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad2))
+            vel.y -= 1;
+        node2.getLocalTransform().move(300 * dt * vel);
+        scale = stay::Vector3{1.F, 1.F, 1.F};
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num8))
+            scale.x = 1.1F;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num9))
+            scale.y = 1.1F;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num0))
+            scale.z = 1.1F;
+        node2.getLocalTransform().scale(scale);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        node2.getLocalTransform().setScale({1, 1, 1});
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+        node2.getLocalTransform().rotate(-50 * dt);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+        node2.getLocalTransform().rotate(50 * dt);
     }
     //NOLINTEND
 } // namespace
@@ -153,7 +198,8 @@ namespace stay
         {
             mWindow->clear(sf::Color(0x1144aaff));
 
-            drawShape(mWindow.get());
+            drawShape(mWindow.get(), 1);
+            drawShape(mWindow.get(), 2);
 
             mWindow->display();
         }

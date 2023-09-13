@@ -9,30 +9,44 @@
 namespace stay
 {
     Transform::Transform()
-        : mTRSMatrix(Matrix(1.F))
+        : mTRSMatrix(glm::mat4(1.F))
+        , mMatrixNeedRebuild(false)
+        , mInverseNeedRebuild(true)
     {
         updateFromMatrix();
     }
 
     Transform::Transform(const Matrix& matrix)
+        : mTRSMatrix(matrix)
+        , mMatrixNeedRebuild(false)
+        , mInverseNeedRebuild(true)
     {
-        setMatrix(matrix);
+        updateFromMatrix();
     }
 
     void Transform::setMatrix(const Matrix& matrix)
     {
         mTRSMatrix = matrix;
         updateFromMatrix();
+        mInverseNeedRebuild = true;
     }
 
-    const Transform::Matrix& Transform::getMatrix() const
+    const Transform::Matrix& Transform::getMatrix()
     {
+        if (mMatrixNeedRebuild)
+        {
+            buildMatrix();
+        }
         return mTRSMatrix;
     }
 
-    Transform::Matrix Transform::getInverseMatrix() const
+    const Transform::Matrix& Transform::getInverseMatrix()
     {
-        return glm::inverse(mTRSMatrix);
+        if (mInverseNeedRebuild)
+        {
+            buildInverseMatrix();
+        }
+        return mInverseMatrix;
     }
 
     // NOLINTBEGIN(*-unnecessary-value-param)   
@@ -43,8 +57,10 @@ namespace stay
 
     void Transform::move(Vector3 offset)
     {
-        mTRSMatrix = glm::translate(mTRSMatrix, offset);
         mPosition = mPosition + offset;
+
+        mMatrixNeedRebuild = true;
+        mInverseNeedRebuild = true;
     }
     
     void Transform::setPosition(Vector2 pos)
@@ -54,8 +70,7 @@ namespace stay
     
     void Transform::setPosition(Vector3 pos)
     {
-        mTRSMatrix = glm::translate(mTRSMatrix, pos - mPosition);
-        mPosition = pos;
+        move(Vector3(pos - mPosition));
     }
     
     Vector3 Transform::getPosition() const
@@ -65,46 +80,59 @@ namespace stay
 
     void Transform::rotate(float degree)
     {
-        rotate(degree, mPosition);
+        mRotation += degree;
+
+        mMatrixNeedRebuild = true;
+        mInverseNeedRebuild = true;
     }
 
     float Transform::getRotation() const
     {
-        return glm::eulerAngles(mRotation).z * RAD2DEG;
+        return mRotation;
     }
 
     void Transform::setRotation(float degree)
     {
-        float delta = degree - getRotation();
-        rotate(delta);
-    }
-
-    void Transform::rotate(float degree, Vector2 pole)
-    {
-        move(-pole);
-        rotateAroundAxis(degree, vectorForward);
-        move(pole);
-    }
-
-    void Transform::scale(Vector3 scale, Vector2 pole)
-    {
-        move(-pole);
-        mScale.x *= scale.x;
-        mScale.y *= scale.y;
-        mScale.z *= scale.z;
-        mTRSMatrix = glm::scale(mTRSMatrix, scale);
-        move(pole);
+        rotate(degree - mRotation);
     }
 
     void Transform::scale(Vector3 scale)
     {
-        this->scale(scale, mPosition);
+        mScale.x *= scale.x;
+        mScale.y *= scale.y;
+        mScale.z *= scale.z;
+
+        mMatrixNeedRebuild = true;
+        mInverseNeedRebuild = true;
+    }
+
+    void Transform::scale(Vector2 scale)
+    {
+        this->scale(Vector3(scale, 1.F));
+    }
+
+    void Transform::scaleAddition(Vector3 add)
+    {
+        mScale = mScale + add;
+
+        mMatrixNeedRebuild = true;
+        mInverseNeedRebuild = true;
+    }
+
+    void Transform::scaleAddition(Vector2 add)
+    {
+        scaleAddition(Vector3(add, 0.F));
     }
 
     void Transform::setScale(Vector3 scale)
     {
         Vector3 delta(scale.x / mScale.x, scale.y / mScale.y, scale.z / mScale.z);
         this->scale(delta);
+    }
+
+    void Transform::setScale(Vector2 scale)
+    {
+        setScale(Vector3(scale, mScale.z));
     }
 
     Vector3 Transform::getScale() const
@@ -117,20 +145,25 @@ namespace stay
     {
         glm::vec3 unused1;
         glm::vec4 unused2;
-        glm::decompose(mTRSMatrix, mScale, mRotation, mPosition, unused1, unused2);
-        mRotation = glm::conjugate(mRotation);
+        glm::quat rotation;
+        glm::decompose(mTRSMatrix, mScale, rotation, mPosition, unused1, unused2);
+        mRotation = glm::eulerAngles(glm::conjugate(rotation)).z * RAD2DEG;
     }
 
-    void Transform::rotateAroundAxis(float degree, Vector3 axis)
+    void Transform::buildMatrix()
     {
-        if (axis == Vector3())
-            axis = Vector3(0, 0, -1);
-        float angle = degree * DEG2RAD;
-        mTRSMatrix = glm::rotate(mTRSMatrix, angle, axis);
-        mRotation = glm::rotate(mRotation, angle, axis);
+        mTRSMatrix = glm::mat4(1.F);
+        mTRSMatrix = glm::translate(mTRSMatrix, mPosition);
+        mTRSMatrix = glm::rotate(mTRSMatrix, mRotation * DEG2RAD, vectorBack);
+        mTRSMatrix = glm::scale(mTRSMatrix, mScale);
     }
 
-    Transform operator * (const Transform& left, const Transform& right)
+    void Transform::buildInverseMatrix()
+    {
+        mInverseMatrix = glm::inverse(mTRSMatrix);
+    }
+
+    Transform operator * (Transform& left, Transform& right)
     {
         return { left.getMatrix() * right.getMatrix() };
     }

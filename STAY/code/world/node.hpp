@@ -31,7 +31,7 @@ namespace stay
             Transform& getLocalTransform();
             Transform getGlobalTransform() const;
             void setLocalTransform(const Transform& transform);
-            void setGlobalTransform(const Transform& transform);
+            void setGlobalTransform(Transform& transform);
         private:
             friend std::unique_ptr<Node> std::make_unique<Node>(); // NOLINT
             friend std::unique_ptr<Node>;

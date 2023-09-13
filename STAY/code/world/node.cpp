@@ -98,7 +98,8 @@ namespace stay
         auto* parent = mParent;
         while (parent != nullptr)
         {
-            res = parent->mLocalTransform * res;
+            res.setMatrix(parent->mLocalTransform.getMatrix() * res.getMatrix());
+            parent = parent->mParent;
         }
         return res;
     }
@@ -108,8 +109,8 @@ namespace stay
         mLocalTransform = transform;
     }
 
-    void Node::setGlobalTransform(const Transform& transform)
+    void Node::setGlobalTransform(Transform& transform)
     {
-        mLocalTransform = mParent->getGlobalTransform().getInverseMatrix() * transform;
+        mLocalTransform.setMatrix(mParent->getGlobalTransform().getInverseMatrix() * transform.getMatrix());
     }
 } // namespace stay
