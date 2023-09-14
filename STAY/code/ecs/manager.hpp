@@ -45,14 +45,26 @@ namespace stay
                 SPtr<DerviedSystem> registerSystem()
                 {
                     SPtr<DerviedSystem> ptr = std::make_shared<DerviedSystem>(this);
-                    
+                    // Start
                     SPtr<StartSystem> startPtr = std::dynamic_pointer_cast<StartSystem>(ptr);
                     if (startPtr.get() != nullptr)
                         mStartSystems.push_back(Pair<StartSystem>{ startPtr->orderStart, startPtr });
-
+                    // Update
                     SPtr<UpdateSystem> updatePtr = std::dynamic_pointer_cast<UpdateSystem>(ptr);
                     if (updatePtr.get() != nullptr)
                         mUpdateSystems.push_back(Pair<UpdateSystem>{updatePtr->orderUpdate, updatePtr});
+                    // LateUpdate
+                    SPtr<LateUpdateSystem> lateUpdatePtr = std::dynamic_pointer_cast<LateUpdateSystem>(ptr);
+                    if (lateUpdatePtr.get() != nullptr)
+                        mLateUpdateSystems.push_back(Pair<LateUpdateSystem>{lateUpdatePtr->orderLateUpdate, lateUpdatePtr});
+                    // Render
+                    SPtr<RenderSystem> renderPtr = std::dynamic_pointer_cast<RenderSystem>(ptr);
+                    if (renderPtr.get() != nullptr)
+                        mRenderSystems.push_back(Pair<RenderSystem>{renderPtr->orderRender, renderPtr});
+                    // Input
+                    SPtr<InputSystem> inputPtr = std::dynamic_pointer_cast<InputSystem>(ptr);
+                    if (inputPtr.get() != nullptr)
+                        mInputSystems.push_back(Pair<InputSystem>{inputPtr->orderInput, inputPtr});
 
                     return ptr;
                 }
@@ -77,14 +89,37 @@ namespace stay
                     {
                         pair.val->update(dt);
                     }
+                    for (auto& pair : mLateUpdateSystems)
+                    {
+                        pair.val->update(dt);
+                    }
+                }
+
+                void render(RTarget* target)
+                {
+                    for (auto& pair : mRenderSystems)
+                    {
+                        pair.val->render(target);
+                    }
+                }
+
+                void input(const sf::Event& event)
+                {
+                    for (auto& pair : mInputSystems)
+                    {
+                        pair.val->input(event);
+                    }
                 }
 
             private:
                 template <typename T>
                 using Pair = detail::Ordered<SPtr<T>>;
                 Registry mRegistry{};
-                std::vector<Pair<StartSystem>> mStartSystems;
-                std::vector<Pair<UpdateSystem>> mUpdateSystems;
+                std::vector<Pair<StartSystem>> mStartSystems{};
+                std::vector<Pair<UpdateSystem>> mUpdateSystems{};
+                std::vector<Pair<LateUpdateSystem>> mLateUpdateSystems{};
+                std::vector<Pair<RenderSystem>> mRenderSystems{};
+                std::vector<Pair<InputSystem>> mInputSystems{};
         };
     }
 } // namespace stay

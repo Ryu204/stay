@@ -18,8 +18,8 @@ namespace stay
             bool operator == (const Transform& right);
             // `matrix` transform's rotation must be only around OZ
             void setMatrix(const Matrix& matrix);
-            const Matrix& getMatrix();
-            const Matrix& getInverseMatrix();
+            const Matrix& getMatrix() const;
+            const Matrix& getInverseMatrix() const;
 
             void move(Vector2 offset);
             void move(Vector3 offset);
@@ -70,17 +70,17 @@ namespace stay
             // Link: https://stackoverflow.com/questions/17918033/glm-decompose-mat4-into-translation-and-rotation
             void updateFromMatrix();
 
-            void buildMatrix();
-            void buildInverseMatrix();
+            void buildMatrix() const;
+            void buildInverseMatrix() const;
             
             Vector3 mPosition;
             float mRotation;
             Vector3 mScale;
 
-            bool mMatrixNeedRebuild;
-            bool mInverseNeedRebuild;
-            Matrix mTRSMatrix;
-            Matrix mInverseMatrix;
+            mutable bool mMatrixNeedRebuild;
+            mutable bool mInverseNeedRebuild;
+            mutable Matrix mTRSMatrix;
+            mutable Matrix mInverseMatrix;
     };
 
     Transform operator * (Transform& left, Transform& right);

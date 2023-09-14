@@ -7,6 +7,7 @@ namespace stay
 {
     using RWin = sf::RenderWindow;
     using RTarget = sf::RenderTarget;
+    using RStates = sf::RenderStates;
     template <typename T>
     using SPtr = std::shared_ptr<T>;
     template<typename T>

@@ -31,6 +31,8 @@ namespace stay
 
             // Initialization
             mWindow = std::make_unique<RWin>(sf::VideoMode(mAppInfo.width, mAppInfo.height), mAppInfo.name);
+
+            mScene = std::make_unique<Scene>(mWindow.get());
         }
 
         void Application::saveProperties()
@@ -53,13 +55,15 @@ namespace stay
             float queuedTime = 0.F;
             float timePerUpdate = 1.F / mAppInfo.updatesPerSec;
 
+            mScene->start();
+
             while (mWindow->isOpen())
             {
                 queuedTime += clock.restart().asSeconds();
                 while (queuedTime >= timePerUpdate)
                 {
                     input();
-                    update();
+                    update(timePerUpdate);
                     queuedTime -= timePerUpdate;
                 }
                 render();
@@ -79,19 +83,20 @@ namespace stay
                 default:
                     break;
                 }
+                mScene->input(event);
             }
         }
 
-        void Application::update()
+        void Application::update(float dt)
         {
-
+            mScene->update(dt);
         }
 
         void Application::render()
         {
             mWindow->clear(sf::Color(0x1144aaff));
+            mScene->render(mWindow.get());
             mWindow->display();
         }
-
     } // namespace program
 } // namespace stay

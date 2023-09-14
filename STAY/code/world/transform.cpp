@@ -31,20 +31,27 @@ namespace stay
         mInverseNeedRebuild = true;
     }
 
-    const Transform::Matrix& Transform::getMatrix()
+    const Transform::Matrix& Transform::getMatrix() const
     {
         if (mMatrixNeedRebuild)
         {
             buildMatrix();
+            mMatrixNeedRebuild = false;
         }
         return mTRSMatrix;
     }
 
-    const Transform::Matrix& Transform::getInverseMatrix()
+    const Transform::Matrix& Transform::getInverseMatrix() const
     {
+        if (mMatrixNeedRebuild)
+        {
+            buildMatrix();
+            mMatrixNeedRebuild = false;
+        }
         if (mInverseNeedRebuild)
         {
             buildInverseMatrix();
+            mInverseNeedRebuild = false;
         }
         return mInverseMatrix;
     }
@@ -150,7 +157,7 @@ namespace stay
         mRotation = glm::eulerAngles(glm::conjugate(rotation)).z * RAD2DEG;
     }
 
-    void Transform::buildMatrix()
+    void Transform::buildMatrix() const
     {
         mTRSMatrix = glm::mat4(1.F);
         mTRSMatrix = glm::translate(mTRSMatrix, mPosition);
@@ -158,7 +165,7 @@ namespace stay
         mTRSMatrix = glm::scale(mTRSMatrix, mScale);
     }
 
-    void Transform::buildInverseMatrix()
+    void Transform::buildInverseMatrix() const
     {
         mInverseMatrix = glm::inverse(mTRSMatrix);
     }

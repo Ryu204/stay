@@ -5,6 +5,13 @@ namespace stay
     Node::Node()
         : mParent(nullptr)
     {}
+    Node::~Node()
+    {
+        if (assigned() && this != &root())
+        {
+            get()->getRegistry().destroy(mEntity);
+        }
+    }
     Node& Node::root()
     {
         static Node res;
@@ -89,6 +96,7 @@ namespace stay
 
     Transform& Node::getLocalTransform()
     {
+        assert(this != &root() && "cannot modify root's transform");
         return mLocalTransform;
     }
 
@@ -96,7 +104,7 @@ namespace stay
     {
         auto res = mLocalTransform;
         auto* parent = mParent;
-        while (parent != nullptr)
+        while (parent != nullptr && parent != &root())
         {
             res.setMatrix(parent->mLocalTransform.getMatrix() * res.getMatrix());
             parent = parent->mParent;
@@ -112,5 +120,15 @@ namespace stay
     void Node::setGlobalTransform(Transform& transform)
     {
         mLocalTransform.setMatrix(mParent->getGlobalTransform().getInverseMatrix() * transform.getMatrix());
+    }
+
+    void Node::postAssignment()
+    {
+        mEntity = get()->getRegistry().create();
+    }
+
+    ecs::Entity Node::getEntity() const
+    {
+        return mEntity;
     }
 } // namespace stay

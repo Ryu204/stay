@@ -3,6 +3,7 @@
 #include <string>
 #include "../utility/typedef.hpp"
 #include "../type/serializable.hpp"
+#include "../world/scene.hpp"
 
 namespace stay
 {
@@ -61,13 +62,14 @@ namespace stay
                 void run();
             private:
                 void input();
-                void update();
+                void update(float dt);
                 void render();
                 void initialize();    
                 void saveProperties();
 
                 detail::AppInfo mAppInfo;
                 Uptr<RWin> mWindow;
+                Uptr<Scene> mScene;
         };
     }
 } // namespace stay

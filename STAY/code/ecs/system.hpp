@@ -41,5 +41,32 @@ namespace stay
             int orderUpdate;
             virtual void update(float/*dt*/) = 0;
         };
+        struct LateUpdateSystem
+        {
+            LateUpdateSystem(int order)
+                : orderLateUpdate(order)
+            {}
+            virtual ~LateUpdateSystem() = default;
+            int orderLateUpdate;
+            virtual void update(float/*dt*/) = 0;
+        };
+        struct RenderSystem
+        {
+            RenderSystem(int order)
+                : orderRender(order)
+            {}
+            virtual ~RenderSystem() = default;
+            int orderRender;
+            virtual void render(RTarget* target) = 0;
+        };
+        struct InputSystem
+        {
+            InputSystem(int order)
+                : orderInput(order)
+            {}
+            virtual ~InputSystem() = default;
+            int orderInput;
+            virtual void input(const sf::Event&/*event*/) = 0;
+        };
     }
 } // namespace stay
