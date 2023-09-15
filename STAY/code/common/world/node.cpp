@@ -10,6 +10,7 @@ namespace stay
         if (assigned() && this != &root())
         {
             get()->getRegistry().destroy(mEntity);
+            globalMap().erase(getEntity());
         }
     }
     Node& Node::root()
@@ -21,6 +22,17 @@ namespace stay
     Node* Node::create()
     {
         return root().createEmptyChild();
+    }
+
+    Node* Node::getNode(ecs::Entity identifier)
+    {
+        return globalMap()[identifier];
+    }
+
+    std::unordered_map<ecs::Entity, Node*>& Node::globalMap()
+    {
+        static std::unordered_map<ecs::Entity, Node*> res;
+        return res;
     }
     
     void Node::destroy(Node* node)
@@ -125,6 +137,7 @@ namespace stay
     void Node::postAssignment()
     {
         mEntity = get()->getRegistry().create();
+        globalMap()[mEntity] = this;
     }
 
     ecs::Entity Node::getEntity() const

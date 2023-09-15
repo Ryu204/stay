@@ -16,9 +16,9 @@ namespace stay
         inline sf::Transform transTosfTrans(const Transform& trans)
         {
             const auto& mat = trans.getMatrix();
-            return { mat[0][0], mat[0][1], mat[0][3],
-                     mat[1][0], mat[1][1], mat[1][3],
-                     mat[3][0], mat[3][1], mat[3][3] };
+            return { mat[0][0], mat[1][0], mat[3][0],
+                     mat[0][1], mat[1][1], mat[3][1],
+                     mat[0][3], mat[1][3], mat[3][3] };
         }
     } // namespace utils
 } // namespace stay

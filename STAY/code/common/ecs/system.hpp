@@ -4,6 +4,8 @@
 
 #include <entt/entity/registry.hpp>
 
+#include "../utility/typedef.hpp"
+
 namespace stay
 {
     namespace ecs

@@ -19,6 +19,8 @@ namespace stay
             static Node& root();
             // Create an empty children of root node
             static Node* create();
+            // Get the Node associating with `identifier`
+            static Node* getNode(ecs::Entity identifier);
             // Comletely destroy a node and its children
             static void destroy(Node* node);
 
@@ -46,6 +48,7 @@ namespace stay
         private:
             // Assignable related functions
             void postAssignment() override;
+            static std::unordered_map<ecs::Entity, Node*>& globalMap();
             friend std::unique_ptr<Node> std::make_unique<Node>(); // NOLINT
             friend std::unique_ptr<Node>;
             Node();
