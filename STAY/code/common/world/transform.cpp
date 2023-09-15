@@ -150,11 +150,14 @@ namespace stay
 
     void Transform::updateFromMatrix()
     {
-        glm::vec3 unused1;
-        glm::vec4 unused2;
-        glm::quat rotation;
+        glm::vec3 unused1{};
+        glm::vec4 unused2{};
+        glm::quat rotation{};
         glm::decompose(mTRSMatrix, mScale, rotation, mPosition, unused1, unused2);
-        mRotation = glm::eulerAngles(glm::conjugate(rotation)).z * RAD2DEG;
+        
+        mRotation = glm::eulerAngles(rotation).z * RAD2DEG;
+        // This line is for glm version <= 0.9.7
+        // mRotation = glm::eulerAngles(glm::conjugate(rotation)).z * RAD2DEG;
     }
 
     void Transform::buildMatrix() const
