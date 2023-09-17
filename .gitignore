@@ -8,7 +8,6 @@
 
 # CMake build folder
 build/*
-!build/asset
 
 # CMake user preset
 CMakeUserPresets.json

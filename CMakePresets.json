@@ -6,10 +6,14 @@
     },
     "configurePresets" : [
         {
-            "name" : "clang-tidy",
-            "binaryDir": "build",
+            "name" : "base",
+            "binaryDir": "build"
+        },
+        {
+            "name": "clang-tidy",
+            "inherits" : "base",
             "cacheVariables": {
-                "CMAKE_CXX_CLANG_TIDY": "SET"
+                "CMAKE_CXX_CLANG_TIDY" : "clang-tidy;--header-filter=${sourceDir}/*"
             }
         }
     ]
