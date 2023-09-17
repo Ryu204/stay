@@ -64,12 +64,16 @@ namespace stay
                 void input();
                 void update(float dt);
                 void render();
-                void initialize();    
+                void initialize();  
+                void setUpRendering();  
                 void saveProperties();
 
                 detail::AppInfo mAppInfo;
                 Uptr<RWin> mWindow;
                 Uptr<Scene> mScene;
+
+                Uptr<RTexture> mTexture;
+                sf::VertexArray mSprite;
         };
     }
 } // namespace stay
