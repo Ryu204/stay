@@ -36,7 +36,7 @@ namespace stay
             }
 
             // Draw `node` and its children on target with current camera config
-            RStates drawOn(Node* node, RTarget* target)
+            void drawOn(Node* node, RTarget* target)
             {
                 assert(node != nullptr && "call on nullptr");
                 
