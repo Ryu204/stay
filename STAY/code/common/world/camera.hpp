@@ -34,26 +34,6 @@ namespace stay
             {
                 return mView;
             }
-
-            // Draw `node` and its children on target with current camera config
-            void drawOn(Node* node, RTarget* target)
-            {
-                assert(node != nullptr && "call on nullptr");
-                
-                const auto draw = [&target, this](Node* current, RStates states) -> RStates
-                {
-                    states.transform = states.transform * utils::transTosfTrans(current->getLocalTransform());
-                    auto* drawable = dynamic_cast<sf::Drawable*>(current);
-                    if (drawable != nullptr)
-                    {
-                        target->draw(*drawable, states);
-                    }
-                    return states;
-                };
-
-                target->setView(mView);
-                node->visitChained(draw, RStates::Default);
-            }
         private:
             View mView;
     };

@@ -2,6 +2,7 @@
 #include "../ecs/manager.hpp"
 #include "camera.hpp"
 #include "../../game/system/RawRenderSystem.hpp"
+#include "../../game/system/OrderedRenderSystem.hpp"
 #include "scene.hpp"
 
 namespace stay
@@ -35,11 +36,12 @@ namespace stay
     }
     void Scene::initialize()
     {
-        mManager.registerSystem<sys::RawRenderSystem>();
+        // mManager.registerSystem<sys::RawRenderSystem>();
+        mManager.registerSystem<sys::OrderedRenderSystem>();
         auto& reg = mManager.getRegistry();
         auto* node = create();
         reg.emplace<comp::Render>(node->getEntity(), sf::Color::Black, sf::Vector2f{40, 60});
-        node->getLocalTransform().move({100, -100, 0});
+        //node->getLocalTransform().move({100, -100, 0});
         for (int i = 1; i <= 4; ++i)
         {
             node = createChild(node);

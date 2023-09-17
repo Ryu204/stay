@@ -112,6 +112,11 @@ namespace stay
         return mLocalTransform;
     }
 
+    const Transform& Node::getLocalTransform() const
+    {
+        return mLocalTransform;
+    }
+
     Transform Node::getGlobalTransform() const
     {
         auto res = mLocalTransform;

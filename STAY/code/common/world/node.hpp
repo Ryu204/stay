@@ -33,6 +33,7 @@ namespace stay
             Node* createEmptyChild();
 
             Transform& getLocalTransform();
+            const Transform& getLocalTransform() const;
             Transform getGlobalTransform() const;
             void setLocalTransform(const Transform& transform);
             void setGlobalTransform(Transform& transform);
@@ -44,7 +45,17 @@ namespace stay
             // The return of `func` in a node will be forwarded when applying `func` to its children
             template <typename Func, typename FuncReturn, typename... Args>
             void visitChained(const Func& func, FuncReturn initial, Args&&... args);
+            
+            // ecs-related methods
             ecs::Entity getEntity() const;
+            template <typename... Args>
+            void addComponents(Args&&... args);
+            template <typename Type, typename... Other>
+            void removeComponents();
+            template <typename Type>
+            bool hasComponent();
+            template <typename Type>
+            Type& getComponent();
         private:
             // Assignable related functions
             void postAssignment() override;
@@ -76,5 +87,30 @@ namespace stay
         {
             child.first->visitChained(func, result, std::forward<Args>(args)...);
         }
+    }
+
+    template <typename... Args>
+    void Node::addComponents(Args&&... args)
+    {
+        get()->getRegistry().emplace(mEntity, std::forward<Args...>(args...));
+    }
+
+    template <typename Type, typename... Other>
+    void Node::removeComponents()
+    {
+        get()->getRegistry().remove<Type, Other...>(mEntity);
+    }
+
+    template <typename Type>
+    bool Node::hasComponent()
+    {
+        return get()->getRegistry().try_get<Type>(mEntity) != nullptr;
+    }
+    
+    template <typename Type>
+    Type& Node::getComponent()
+    {
+        assert(hasComponent<Type>() && "non-existing component");
+        return get()->getRegistry().get<Type>(mEntity);
     }
 } // namespace stay
