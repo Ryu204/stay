@@ -7,9 +7,8 @@
 
 namespace stay
 {
-    Scene::Scene(RTarget* target)
-        : mCamera(Camera::defaultOfTarget(*target))
-        , mRenderTarget(target)
+    Scene::Scene()
+        : mCamera(Vector2(), Vector2(500, 500))
     {
         Node::root().assign(&mManager);
         initialize();
@@ -30,11 +29,11 @@ namespace stay
     {
         mManager.input(event);
     }
-    void Scene::render()
+    void Scene::render(RTarget* target)
     {
-        mCamera = Camera::defaultOfTarget(*mRenderTarget);
-        mRenderTarget->setView(mCamera.getView());
-        mManager.render(mRenderTarget);
+        mCamera = Camera::defaultOfTarget(*target);
+        target->setView(mCamera.getView());
+        mManager.render(target);
     }
     void Scene::initialize()
     {

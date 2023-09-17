@@ -29,20 +29,19 @@ namespace stay
             dataReader >> data;
             dataReader.close();
             mAppInfo.fetch(data["window"]);
-
+            
+            mWindow = std::make_unique<RWin>(sf::VideoMode(mAppInfo.width, mAppInfo.height), mAppInfo.name);
             setUpRendering();
 
-            mScene = std::make_unique<Scene>(mTexture.get());
+            mScene = std::make_unique<Scene>();
         }
 
         void Application::setUpRendering()
         {
-            mWindow = std::make_unique<RWin>(sf::VideoMode(mAppInfo.width, mAppInfo.height), mAppInfo.name);
-            auto view = mWindow->getView();
-            view.setCenter(sf::Vector2f());
-            mWindow->setView(view);
             auto sizeu = mWindow->getSize();
             auto sizef = sf::Vector2f{sizeu};
+            auto view = sf::View(sf::Vector2f(), sizef);
+            mWindow->setView(view);
             mTexture = std::make_unique<RTexture>();
             mTexture->create(sizeu.x, sizeu.y);
             mSprite[0].position.x = -sizef.x / 2.F;      mSprite[0].position.y = -sizef.y / 2.F;
@@ -100,6 +99,9 @@ namespace stay
                 case sf::Event::Closed:
                     mWindow->close();
                     break;
+                case sf::Event::Resized:
+                    setUpRendering();
+                    break;
                 default:
                     break;
                 }
@@ -117,7 +119,7 @@ namespace stay
             mWindow->clear();
             mTexture->clear(sf::Color::Green);
             // Start drawing here
-            mScene->render();
+            mScene->render(mTexture.get());
             // End drawing
             mTexture->display();
             RStates states;

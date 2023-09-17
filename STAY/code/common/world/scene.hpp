@@ -9,12 +9,12 @@ namespace stay
     class Scene
     {
         public:
-            Scene(RTarget* target);
+            Scene();
             ~Scene();
             void update(float dt);
             void start();
             void input(const sf::Event& event);
-            void render();
+            void render(RTarget* target);
         private:
             void initialize();
             Node* create();
@@ -22,7 +22,5 @@ namespace stay
 
             Camera mCamera;
             ecs::Manager mManager;
-
-            RTarget* mRenderTarget;
     };
 } // namespace stay
