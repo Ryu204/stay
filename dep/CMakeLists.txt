@@ -44,5 +44,13 @@ FETCHCONTENT_DECLARE(
   SYSTEM
 )
 
+# Box2D
+FETCHCONTENT_DECLARE(
+  b2d
+  GIT_REPOSITORY        https://github.com/erincatto/box2d.git
+  GIT_TAG               411acc32eb6d4f2e96fc70ddbdf01fe5f9b16230
+  SYSTEM
+)
+
 # Build
-FETCHCONTENT_MAKEAVAILABLE(SFML LDtkLoader jsoncpp glm EnTT)
+FETCHCONTENT_MAKEAVAILABLE(SFML LDtkLoader jsoncpp glm EnTT b2d)

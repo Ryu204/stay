@@ -16,6 +16,11 @@ FILE(GLOB_RECURSE
     "STAY/code/*.c"
     "STAY/code/*.h")
 
+# Initialize clang-tidy if used
+IF(USER_DEFINED_CLANG_TIDY)
+    SET(CMAKE_CXX_CLANG_TIDY "${USER_DEFINED_CLANG_TIDY}")
+ENDIF()
+
 # Add target and link libraries
 ADD_EXECUTABLE(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCE_CODE})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC LDtkLoader sfml-graphics sfml-audio jsoncpp_lib glm::glm EnTT::EnTT)
