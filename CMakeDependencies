@@ -12,7 +12,7 @@ FETCHCONTENT_DECLARE(
   GIT_REPOSITORY        https://github.com/SFML/SFML.git
   GIT_TAG               ${SFML_VERSION}
   SYSTEM
-  FIND_PACKAGE_ARGS     NAMES SFML 2.6 COMPONENTS graphics audio
+  FIND_PACKAGE_ARGS     NAMES SFML 2.6 COMPONENTS graphics audio REQUIRED
 )
 # LDtkLoader
 FETCHCONTENT_DECLARE(
@@ -50,6 +50,7 @@ FETCHCONTENT_DECLARE(
   GIT_REPOSITORY        https://github.com/erincatto/box2d.git
   GIT_TAG               411acc32eb6d4f2e96fc70ddbdf01fe5f9b16230
   SYSTEM
+  FIND_PACKAGE_ARGS     NAMES box2d 
 )
 
 # Build

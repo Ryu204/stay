@@ -6,8 +6,9 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Build or search for dependencies
-ADD_SUBDIRECTORY(dep)
+INCLUDE(CMakeDependencies)
 
+# Collect source files
 FILE(GLOB_RECURSE 
     ${PROJECT_NAME}_SOURCE_CODE
     CONFIGURE_DEPENDS
