@@ -24,7 +24,7 @@ ENDIF()
 
 # Add target and link libraries
 ADD_EXECUTABLE(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCE_CODE})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC LDtkLoader sfml-graphics sfml-audio jsoncpp_lib glm::glm EnTT::EnTT)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC LDtkLoader sfml-graphics sfml-audio jsoncpp_lib glm::glm EnTT::EnTT box2d)
 
 # Copy asset folder
 FILE(COPY "${PROJECT_NAME}/asset" DESTINATION ".")
