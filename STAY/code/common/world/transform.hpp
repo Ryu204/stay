@@ -21,10 +21,10 @@ namespace stay
             const Matrix& getMatrix() const;
             const Matrix& getInverseMatrix() const;
 
-            void move(Vector2 offset);
-            void move(Vector3 offset);
-            void setPosition(Vector2 pos);
-            void setPosition(Vector3 pos);
+            void move(const Vector2& offset);
+            void move(const Vector3& offset);
+            void setPosition(const Vector2& pos);
+            void setPosition(const Vector3& pos);
             Vector3 getPosition() const;
 
             // Rotate an angle of `degree` clockwise looking from OZ-
@@ -33,12 +33,12 @@ namespace stay
             float getRotation() const;
             
             // Scale in local space
-            void scale(Vector3 scale);
-            void scale(Vector2 scale);
-            void scaleAddition(Vector3 add);
-            void scaleAddition(Vector2 add);
-            void setScale(Vector3 scale);
-            void setScale(Vector2 scale);
+            void scale(const Vector3& scale);
+            void scale(const Vector2& scale);
+            void scaleAddition(const Vector3& add);
+            void scaleAddition(const Vector2& add);
+            void setScale(const Vector3& scale);
+            void setScale(const Vector2& scale);
             Vector3 getScale() const;
 
             Json::Value toJSONObject() const override

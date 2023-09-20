@@ -56,13 +56,12 @@ namespace stay
         return mInverseMatrix;
     }
 
-    // NOLINTBEGIN(*-unnecessary-value-param)   
-    void Transform::move(Vector2 offset)
+    void Transform::move(const Vector2& offset)
     {
         move(Vector3(offset, 0.F));
     }
 
-    void Transform::move(Vector3 offset)
+    void Transform::move(const Vector3& offset)
     {
         mPosition = mPosition + offset;
 
@@ -70,12 +69,12 @@ namespace stay
         mInverseNeedRebuild = true;
     }
     
-    void Transform::setPosition(Vector2 pos)
+    void Transform::setPosition(const Vector2& pos)
     {
         setPosition(Vector3(pos, mPosition.z));
     }
     
-    void Transform::setPosition(Vector3 pos)
+    void Transform::setPosition(const Vector3& pos)
     {
         move(Vector3(pos - mPosition));
     }
@@ -103,7 +102,7 @@ namespace stay
         rotate(degree - mRotation);
     }
 
-    void Transform::scale(Vector3 scale)
+    void Transform::scale(const Vector3& scale)
     {
         mScale.x *= scale.x;
         mScale.y *= scale.y;
@@ -113,12 +112,12 @@ namespace stay
         mInverseNeedRebuild = true;
     }
 
-    void Transform::scale(Vector2 scale)
+    void Transform::scale(const Vector2& scale)
     {
         this->scale(Vector3(scale, 1.F));
     }
 
-    void Transform::scaleAddition(Vector3 add)
+    void Transform::scaleAddition(const Vector3& add)
     {
         mScale = mScale + add;
 
@@ -126,18 +125,18 @@ namespace stay
         mInverseNeedRebuild = true;
     }
 
-    void Transform::scaleAddition(Vector2 add)
+    void Transform::scaleAddition(const Vector2& add)
     {
         scaleAddition(Vector3(add, 0.F));
     }
 
-    void Transform::setScale(Vector3 scale)
+    void Transform::setScale(const Vector3& scale)
     {
         Vector3 delta(scale.x / mScale.x, scale.y / mScale.y, scale.z / mScale.z);
         this->scale(delta);
     }
 
-    void Transform::setScale(Vector2 scale)
+    void Transform::setScale(const Vector2& scale)
     {
         setScale(Vector3(scale, mScale.z));
     }

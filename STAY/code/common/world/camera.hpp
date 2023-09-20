@@ -20,11 +20,9 @@ namespace stay
                 return Camera(Vector2(), Vector2(size.x, size.y));
             }
             
-            // NOLINTBEGIN(performance-unnecessary-value-param)
-            Camera(Vector2 center, Vector2 size)
-                : mView(utils::vecTosfVec(center), utils::vecTosfVec(size))
+            Camera(const Vector2& center, const Vector2& size)
+                : mView(utils::convertVec2<sf::Vector2f>(center), utils::convertVec2<sf::Vector2f>(size))
             { }
-            // NOLINTEND(performance-unnecessary-value-param)
 
             Camera(View view)
                 : mView(view)

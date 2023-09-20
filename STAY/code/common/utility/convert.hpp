@@ -9,10 +9,20 @@ namespace stay
 {
     namespace utils
     {
-        inline sf::Vector2f vecTosfVec(Vector2 vec) // NOLINT
+        // @brief Convert vector2 of type `in` to `out`
+        template <typename out, typename in>
+        out convertVec2(const in& vec2)
         {
-            return {vec.x, vec.y};
+            return out(vec2.x, vec2.y);
         }
+
+        // @brief Convert vector3 of type `in` to `out`
+        template <typename out, typename in>
+        out convertVec3(const in& vec3)
+        {
+            return out(vec3.x, vec3.y, vec3.z);
+        }
+
         inline sf::Transform transTosfTrans(const Transform& trans)
         {
             const auto& mat = trans.getMatrix();
