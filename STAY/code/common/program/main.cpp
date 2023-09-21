@@ -5,7 +5,7 @@
 #include "application.hpp"
 #include "../world/node.hpp"
 
-int main()
+int main1()
 {
     try
     {
@@ -188,6 +188,29 @@ for (int32 i = 0; i < 60; ++i)
     }
 
     return 0;
+}
+// test==================================================================
+#include "../event/event.hpp"
+using namespace stay::event;
+
+Event<int, float> compiling;
+int id;
+
+void outOfScope()
+{
+    std::string source = "foo.cpp";
+    std::string obj = "foo.obj";
+    id = compiling += [&,source](int files, float time){
+        std::cout << "GNU compiling " << files << " files including " << source << ", time elapsed: " << time << "s" << std::endl;
+    };
+}
+
+int main()
+{
+    outOfScope();
+    compiling.invoke(2, 0.5F);
+    compiling -= id;
+    compiling.invoke(100, 100.F);
 }
 // test==================================================================
 // NOLINTEND
