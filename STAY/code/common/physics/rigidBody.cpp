@@ -1,7 +1,5 @@
 #include "rigidBody.hpp"
 
-#include <iostream>
-
 namespace stay
 {
     namespace phys

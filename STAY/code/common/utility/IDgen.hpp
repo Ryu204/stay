@@ -2,6 +2,7 @@
 
 #include <array>
 #include <queue>
+#include <cstdint>
 
 namespace stay
 {

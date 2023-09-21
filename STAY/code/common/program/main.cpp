@@ -200,16 +200,16 @@ void outOfScope()
 {
     std::string source = "foo.cpp";
     std::string obj = "foo.obj";
-    id = compiling += [&,source](int files, float time){
+    id = compiling.addEventListener([&,source](int files, float time){
         std::cout << "GNU compiling " << files << " files including " << source << ", time elapsed: " << time << "s" << std::endl;
-    };
+    });
 }
 
 int main()
 {
     outOfScope();
     compiling.invoke(2, 0.5F);
-    compiling -= id;
+    compiling.removeListener(id);
     compiling.invoke(100, 100.F);
 }
 // test==================================================================

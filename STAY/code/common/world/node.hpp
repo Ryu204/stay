@@ -8,8 +8,6 @@
 #include "../utility/assignable.hpp"
 #include "../ecs/manager.hpp"
 
-#include <iostream>
-
 namespace stay
 {
     class Node : public utils::Assignable<ecs::Manager*>

@@ -6,10 +6,6 @@
 #include "../utility/typedef.hpp"
 #include "transform.hpp"
 
-///////dsf sdkfjsakldfjksdf
-#include <iostream>
-//////////sadflijsaldkfjlf
-
 namespace stay
 {
     Transform::Transform()

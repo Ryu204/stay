@@ -1,7 +1,8 @@
 #pragma once
 
-#include <vector>
+#include <unordered_map>
 #include <functional>
+#include <cstdint>
 
 #include "../utility/IDgen.hpp"
 
@@ -18,22 +19,23 @@ namespace stay
         {
                 using Handler = std::function<void(EventArgs...)>;
                 
+                // @return The index of the listener. This index is used to later remove the listener from invoke list if needed.
                 template <typename Func>
-                std::size_t operator += (Func&& action)
+                std::size_t addEventListener(Func&& action)
                 {
                     auto newID = mIDGen.generate();
-                    mSubcribers.emplace(static_cast<int>(newID), (
+                    mSubcribers.emplace(newID,
                         [action = std::forward<Func>(action)](EventArgs&&... args)
                         {
                             action(std::forward<EventArgs>(args)...);
                         }
-                    ));
+                    );
                     return newID;
                 }
-                void operator -= (std::size_t index)
+                void removeListener(std::size_t index)
                 {
                     mIDGen.erase(index);
-                    mSubcribers.erase(static_cast<int>(index));
+                    mSubcribers.erase(index);
                 }
                 void invoke(EventArgs&&... args) const
                 {
@@ -43,7 +45,7 @@ namespace stay
                     }
                 }
             private:
-                std::map<int, Handler> mSubcribers;
+                std::unordered_map<std::size_t, Handler> mSubcribers;
                 utils::IDGenerator<100> mIDGen;
         };
     } // namespace event
