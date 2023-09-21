@@ -9,6 +9,8 @@
 #include "../utility/convert.hpp"
 #include "../utility/typedef.hpp"
 
+#include "../event/event.hpp"
+
 namespace stay
 {
     namespace phys
@@ -35,6 +37,10 @@ namespace stay
                 void setMaterial(const Material* mat);
                 void setTrigger(bool isTrigger);
                 bool getTrigger() const;
+
+                event::Event<int/*just foo*/> OnCollisionEnter;
+                event::Event<int/*just foo*/> OnCollisionExit;
+
             private:
                 void attachToRigidBody(const Info& info, RigidBody* body, const Material* mat);
                 // @warning This function uses `new` keyword to allocate new shape, care to their destruction must be taken
