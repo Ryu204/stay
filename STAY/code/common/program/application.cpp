@@ -117,7 +117,7 @@ namespace stay
         void Application::render()
         {
             mWindow->clear();
-            mTexture->clear(sf::Color::Green);
+            mTexture->clear();
             // Start drawing here
             mScene->render(mTexture.get());
             // End drawing

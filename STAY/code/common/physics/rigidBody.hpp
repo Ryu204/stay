@@ -1,6 +1,7 @@
 #pragma once
 
 #include <box2d/box2d.h>
+#include <SFML/System/NonCopyable.hpp>
 
 #include "../utility/convert.hpp"
 #include "../utility/typedef.hpp"
@@ -11,13 +12,14 @@ namespace stay
     {
         enum class BodyType
         {
-            STATIC, // Move under explicit `setPosition(...)`, only collides DYNAMIC
-            KINEMATIC, // Move under`setVelocity(...)`, only collides DYNAMIC
-            DYNAMIC // Move completely by internal solver
+            STATIC = b2_staticBody,         // Move under explicit `setPosition(...)`, only collides DYNAMIC
+            KINEMATIC = b2_kinematicBody,   // Move under`setVelocity(...)`, only collides DYNAMIC
+            DYNAMIC = b2_dynamicBody        // Move by internal solver and (sometimes) explicit user controls
         };
         class Collider;
         // @brief An abstract component, only functions if a collider is presented. Manipulate velocity and force.
-        class RigidBody
+        // @note Because we only want the body to be destroy when it's ultimately deleted, not deleted and copied again, we make it non-copyable
+        class RigidBody : private sf::NonCopyable
         {
             public:
                 // @param `angle` angle from OY+ to object's local OY+ in degree, positive if the angle is anti-clockwise

@@ -1,5 +1,7 @@
 #include "rigidBody.hpp"
 
+#include <iostream>
+
 namespace stay
 {
     namespace phys
@@ -12,7 +14,7 @@ namespace stay
             def.angle = angle * DEG2RAD;
             def.type = static_cast<b2BodyType>(type);
             def.linearDamping = 0.F;
-            def.angularDamping = 0.1F;
+            def.angularDamping = 0.01F;
             mBody = mWorld->CreateBody(&def);
         }
 

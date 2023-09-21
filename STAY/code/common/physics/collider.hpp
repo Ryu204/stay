@@ -2,6 +2,7 @@
 
 #include <variant>
 
+#include <SFML/System/NonCopyable.hpp>
 #include <box2d/box2d.h>
 
 #include "../type/vector.hpp"
@@ -14,7 +15,7 @@ namespace stay
     {
         class Material;
         class RigidBody;
-        class Collider
+        class Collider : private sf::NonCopyable
         {
             public:
                 struct Box {
@@ -30,6 +31,7 @@ namespace stay
                 
                 // @note Only `body` needs to stay alive after the construction
                 Collider(const Info& info, RigidBody* body, const Material* mat);  
+                virtual ~Collider();
                 void setMaterial(const Material* mat);
                 void setTrigger(bool isTrigger);
                 bool getTrigger() const;

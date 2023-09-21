@@ -1,14 +1,15 @@
 #include "node.hpp"
 #include "../ecs/manager.hpp"
+#include "../../game/system/list.hpp"
+#include "../../game/component/list.hpp"
 #include "camera.hpp"
-#include "../../game/system/RawRenderSystem.hpp"
-#include "../../game/system/OrderedRenderSystem.hpp"
 #include "scene.hpp"
 
 namespace stay
 {
     Scene::Scene()
         : mCamera(Vector2(), Vector2(500, 500))
+        , mPhysicsWorld({0.F, -10.F})
     {
         Node::root().assign(&mManager);
         initialize();
@@ -38,16 +39,20 @@ namespace stay
     void Scene::initialize()
     {
         // mManager.registerSystem<sys::RawRenderSystem>();
-        mManager.registerSystem<sys::OrderedRenderSystem>();
-        auto& reg = mManager.getRegistry();
+        // mManager.registerSystem<sys::OrderedRenderSystem>();
+        mManager.registerSystem<sys::RawPhysicsRenderSystem>()->initialize(&mPhysicsWorld);
         auto* node = create();
-        reg.emplace<comp::Render>(node->getEntity(), sf::Color::Black, sf::Vector2f{40, 60});
+
+        auto& body = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, 0), 45, phys::BodyType::DYNAMIC);
+        body.setAngularVelocity(100);
+        auto& ref = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)}, &body, nullptr);
+        // node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{40, 60});
         //node->getLocalTransform().move({100, -100, 0});
         for (int i = 1; i <= 4; ++i)
         {
             node = createChild(node);
-            reg.emplace<comp::Render>(node->getEntity(), sf::Color::Red, sf::Vector2f{70, 50});
-            node->getLocalTransform().move({35, 35, 0});
+            // node->addComponents<comp::Render>(sf::Color::Red, sf::Vector2f{70, 50});
+            //node->getLocalTransform().move({35, 35, 0});
         }
     }
 

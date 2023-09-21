@@ -24,6 +24,14 @@ namespace stay
             attachToRigidBody(info, body, mat);
         }     
 
+        Collider::~Collider()
+        {
+            if (mFixture != nullptr)
+            {
+                mFixture->GetBody()->DestroyFixture(mFixture);
+            }
+        }
+
         void Collider::setMaterial(const Material* mat)
         {
             if (mat != nullptr)
@@ -45,13 +53,15 @@ namespace stay
         void Collider::attachToRigidBody(const Info& info, RigidBody* body, const Material* mat)
         {
             bool materialExists = (mat != nullptr);
+            b2FixtureDef def;
+            def.density = 1.F;
             if (materialExists)
             {
-                auto def = mat->getFixtureDef();
-                def.shape = createShape(info);
-                mFixture = body->attachFixture(def);
-                delete def.shape;
+                def = mat->getFixtureDef();
             }
+            def.shape = createShape(info);
+            mFixture = body->attachFixture(def);
+            delete def.shape;
         }
 
         b2Shape* Collider::createShape(const Collider::Info& info)

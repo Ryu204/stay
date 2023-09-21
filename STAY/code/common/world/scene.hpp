@@ -1,5 +1,7 @@
 #pragma once
 
+#include <box2d/box2d.h>
+
 #include "node.hpp"
 #include "../ecs/manager.hpp"
 #include "camera.hpp"
@@ -22,5 +24,7 @@ namespace stay
 
             Camera mCamera;
             ecs::Manager mManager;
+
+            b2World mPhysicsWorld;
     };
 } // namespace stay

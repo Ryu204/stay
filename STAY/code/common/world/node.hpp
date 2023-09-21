@@ -48,8 +48,9 @@ namespace stay
             
             // ecs-related methods
             ecs::Entity getEntity() const;
-            template <typename... Args>
-            void addComponents(Args&&... args);
+            // @brief Construct a component from its constructor args
+            template <typename Type, typename... Args>
+            auto addComponents(Args&&... args) ->decltype(auto);
             template <typename Type, typename... Other>
             void removeComponents();
             template <typename Type>
@@ -89,10 +90,10 @@ namespace stay
         }
     }
 
-    template <typename... Args>
-    void Node::addComponents(Args&&... args)
+    template <typename Type, typename... Args>
+    auto Node::addComponents(Args&&... args) -> decltype(auto)
     {
-        get()->getRegistry().emplace(mEntity, std::forward<Args...>(args...));
+        return get()->getRegistry().emplace<Type>(mEntity, std::forward<Args>(args)...);
     }
 
     template <typename Type, typename... Other>

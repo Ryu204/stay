@@ -9,24 +9,49 @@ namespace stay
 {
     namespace sys
     {
-        struct RawRenderSystem : public ecs::RenderSystem, public ecs::System
+        struct RawPhysicsRenderSystem : public ecs::RenderSystem, public ecs::UpdateSystem, public ecs::System
         {
-                RawRenderSystem(ecs::Manager* manager)
-                    : ecs::RenderSystem(-1)
+                RawPhysicsRenderSystem(ecs::Manager* manager)
+                    : ecs::RenderSystem(1)
+                    , ecs::UpdateSystem(0)
                     , ecs::System(manager)
                 { }
-
-                void initialize(RTarget* target, b2World* world)
+                virtual ~RawPhysicsRenderSystem()
                 {
-                    mDrawer = std::make_unique<phys::DebugDraw>(target);
+                    // Clear the drawer
+                    if (mPhysicsWorld != nullptr)
+                    {
+                        mPhysicsWorld->SetDebugDraw(nullptr);
+                    }
+                }
+
+                void initialize(b2World* world)
+                {
+                    mDrawer = std::make_unique<phys::DebugDraw>();
                     mPhysicsWorld = world;
-                    mPhysicsWorld->SetDebugDraw(mDrawer.get());
+                    if (mPhysicsWorld != nullptr)
+                    {
+                        uint32 flags = 0;
+                        flags += b2Draw::e_shapeBit;
+                        flags += b2Draw::e_jointBit;
+                        // flags += b2Draw::e_aabbBit;
+                        flags += b2Draw::e_centerOfMassBit;
+                        mDrawer->SetFlags(flags);
+                        mPhysicsWorld->SetDebugDraw(mDrawer.get());
+                    }
                 }
 
                 void render(RTarget* target) override
                 {
                     mDrawer->setRenderTarget(target);
                     mPhysicsWorld->DebugDraw();
+                }
+
+                void update(float dt) override
+                {
+                    static const int velIterCount = 8;
+                    static const int posIterCount = 3;
+                    mPhysicsWorld->Step(dt, velIterCount, posIterCount);
                 }
 
             private:
