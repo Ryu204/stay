@@ -144,7 +144,7 @@ namespace stay
 
     void Transform::setScale(const Vector3& scale)
     {
-        Vector3 delta(scale.x / mScale.x, scale.y / mScale.y, scale.z / mScale.z);
+        const Vector3 delta(scale.x / mScale.x, scale.y / mScale.y, scale.z / mScale.z);
         this->scale(delta);
     }
 
@@ -157,7 +157,6 @@ namespace stay
     {
         return mScale;
     }
-    // NOLINTEND(*-unnecessary-value-param)   
 
     void Transform::updateFromMatrix()
     {

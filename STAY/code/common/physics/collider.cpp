@@ -52,7 +52,7 @@ namespace stay
 
         void Collider::attachToRigidBody(const Info& info, RigidBody* body, const Material* mat)
         {
-            bool materialExists = (mat != nullptr);
+            const bool materialExists = (mat != nullptr);
             b2FixtureDef def;
             def.density = 1.F;
             if (materialExists)

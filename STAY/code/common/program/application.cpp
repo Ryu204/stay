@@ -72,7 +72,7 @@ namespace stay
         {
             sf::Clock clock;
             float queuedTime = 0.F;
-            float timePerUpdate = 1.F / mAppInfo.updatesPerSec;
+            const float timePerUpdate = 1.F / mAppInfo.updatesPerSec;
 
             mScene->start();
 
