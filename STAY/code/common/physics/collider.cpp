@@ -69,7 +69,7 @@ namespace stay
                     auto* res = new b2PolygonShape();
                     res->SetAsBox(box.halfSize.x, box.halfSize.y, 
                         utils::convertVec2<b2Vec2>(box.position), 
-                        -box.angle * DEG2RAD);
+                        box.angle * DEG2RAD);
                     return static_cast<b2Shape*>(res);
                 }
             }, info);
@@ -106,6 +106,7 @@ namespace stay
         {
             auto* fixture = collider->mFixture;
             fixture->SetDensity(mDef.density);
+            fixture->GetBody()->ResetMassData();
             fixture->SetFriction(mDef.friction);
             fixture->SetRestitution(mDef.restitution);
         }

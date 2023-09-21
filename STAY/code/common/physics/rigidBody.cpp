@@ -9,7 +9,7 @@ namespace stay
         {
             b2BodyDef def;
             def.position = utils::convertVec2<b2Vec2>(position);
-            def.angle = -angle * DEG2RAD;
+            def.angle = angle * DEG2RAD;
             def.type = static_cast<b2BodyType>(type);
             def.linearDamping = 0.F;
             def.angularDamping = 0.1F;
@@ -33,12 +33,12 @@ namespace stay
 
         void RigidBody::setAngle(float angle)
         {
-            mBody->SetTransform(mBody->GetPosition(), -angle * DEG2RAD);
+            mBody->SetTransform(mBody->GetPosition(), angle * DEG2RAD);
         }
 
         float RigidBody::getAngle() const
         {
-            return mBody->GetAngle() * (-RAD2DEG);
+            return mBody->GetAngle() * RAD2DEG;
         }
 
         void RigidBody::applyForce(const Vector2& force)
@@ -58,12 +58,12 @@ namespace stay
 
         void RigidBody::setAngularVelocity(float velocity)
         {
-            mBody->SetAngularVelocity(-velocity * DEG2RAD);
+            mBody->SetAngularVelocity(velocity * DEG2RAD);
         }
 
         float RigidBody::getAngularVelocity() const
         {
-            return mBody->GetAngularVelocity() * (-RAD2DEG);
+            return mBody->GetAngularVelocity() * RAD2DEG;
         }
 
         void RigidBody::setFixedRotation(bool fixed)

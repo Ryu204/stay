@@ -75,6 +75,9 @@ namespace stay
                     // In the same category, system with smallest id gets called first and so on
                     std::sort(mStartSystems.begin(), mStartSystems.end(), detail::Cmpr<SPtr<StartSystem>>());
                     std::sort(mUpdateSystems.begin(), mUpdateSystems.end(), detail::Cmpr<SPtr<UpdateSystem>>());
+                    std::sort(mLateUpdateSystems.begin(), mLateUpdateSystems.end(), detail::Cmpr<SPtr<LateUpdateSystem>>());
+                    std::sort(mRenderSystems.begin(), mRenderSystems.end(), detail::Cmpr<SPtr<RenderSystem>>());
+                    std::sort(mInputSystems.begin(), mInputSystems.end(), detail::Cmpr<SPtr<InputSystem>>());
 
                     for (auto& pair : mStartSystems)
                     {
