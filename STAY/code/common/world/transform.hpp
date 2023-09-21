@@ -15,6 +15,7 @@ namespace stay
 
             Transform();
             Transform(const Matrix& matrix);
+            Transform(const Vector3& position, float rotation = 0.F, const Vector3& scale = Vector3(1.F, 1.F, 1.F));
             bool operator == (const Transform& right);
             // `matrix` transform's rotation must be only around OZ
             void setMatrix(const Matrix& matrix);

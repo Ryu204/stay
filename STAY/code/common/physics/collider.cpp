@@ -77,7 +77,7 @@ namespace stay
                 [](const Collider::Box& box)
                 {
                     auto* res = new b2PolygonShape();
-                    res->SetAsBox(box.halfSize.x, box.halfSize.y, 
+                    res->SetAsBox(box.size.x / 2.F, box.size.y / 2.F, 
                         utils::convertVec2<b2Vec2>(box.position), 
                         box.angle * DEG2RAD);
                     return static_cast<b2Shape*>(res);

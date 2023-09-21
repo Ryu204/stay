@@ -53,10 +53,14 @@ namespace stay
                     SPtr<UpdateSystem> updatePtr = std::dynamic_pointer_cast<UpdateSystem>(ptr);
                     if (updatePtr.get() != nullptr)
                         mUpdateSystems.push_back(Pair<UpdateSystem>{updatePtr->orderUpdate, updatePtr});
-                    // LateUpdate
-                    SPtr<LateUpdateSystem> lateUpdatePtr = std::dynamic_pointer_cast<LateUpdateSystem>(ptr);
+                    // PostUpdate
+                    SPtr<PostUpdateSystem> lateUpdatePtr = std::dynamic_pointer_cast<PostUpdateSystem>(ptr);
                     if (lateUpdatePtr.get() != nullptr)
-                        mLateUpdateSystems.push_back(Pair<LateUpdateSystem>{lateUpdatePtr->orderLateUpdate, lateUpdatePtr});
+                        mPostUpdateSystems.push_back(Pair<PostUpdateSystem>{lateUpdatePtr->orderLateUpdate, lateUpdatePtr});
+                    // PreUpdate
+                    SPtr<PreUpdateSystem> preUpdatePtr = std::dynamic_pointer_cast<PreUpdateSystem>(ptr);
+                    if (preUpdatePtr.get() != nullptr)
+                        mPreUpdateSystems.push_back(Pair<PreUpdateSystem>{preUpdatePtr->orderPreUpdate, preUpdatePtr});
                     // Render
                     SPtr<RenderSystem> renderPtr = std::dynamic_pointer_cast<RenderSystem>(ptr);
                     if (renderPtr.get() != nullptr)
@@ -75,7 +79,8 @@ namespace stay
                     // In the same category, system with smallest id gets called first and so on
                     std::sort(mStartSystems.begin(), mStartSystems.end(), detail::Cmpr<SPtr<StartSystem>>());
                     std::sort(mUpdateSystems.begin(), mUpdateSystems.end(), detail::Cmpr<SPtr<UpdateSystem>>());
-                    std::sort(mLateUpdateSystems.begin(), mLateUpdateSystems.end(), detail::Cmpr<SPtr<LateUpdateSystem>>());
+                    std::sort(mPreUpdateSystems.begin(), mPreUpdateSystems.end(), detail::Cmpr<SPtr<PreUpdateSystem>>());
+                    std::sort(mPostUpdateSystems.begin(), mPostUpdateSystems.end(), detail::Cmpr<SPtr<PostUpdateSystem>>());
                     std::sort(mRenderSystems.begin(), mRenderSystems.end(), detail::Cmpr<SPtr<RenderSystem>>());
                     std::sort(mInputSystems.begin(), mInputSystems.end(), detail::Cmpr<SPtr<InputSystem>>());
 
@@ -88,13 +93,17 @@ namespace stay
                 // Meant to be call every frame update
                 void update(float dt)
                 {
+                    for (auto& pair : mPreUpdateSystems)
+                    {
+                        pair.val->preUpdate(dt);
+                    }
                     for (auto& pair : mUpdateSystems)
                     {
                         pair.val->update(dt);
                     }
-                    for (auto& pair : mLateUpdateSystems)
+                    for (auto& pair : mPostUpdateSystems)
                     {
-                        pair.val->update(dt);
+                        pair.val->postUpdate(dt);
                     }
                 }
 
@@ -120,7 +129,8 @@ namespace stay
                 Registry mRegistry{};
                 std::vector<Pair<StartSystem>> mStartSystems{};
                 std::vector<Pair<UpdateSystem>> mUpdateSystems{};
-                std::vector<Pair<LateUpdateSystem>> mLateUpdateSystems{};
+                std::vector<Pair<PostUpdateSystem>> mPostUpdateSystems{};
+                std::vector<Pair<PreUpdateSystem>> mPreUpdateSystems{};
                 std::vector<Pair<RenderSystem>> mRenderSystems{};
                 std::vector<Pair<InputSystem>> mInputSystems{};
         };

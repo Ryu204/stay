@@ -5,18 +5,21 @@
 #include "../../common/ecs/manager.hpp"
 #include "../../common/physics/debugDraw.hpp"
 
+/*
+    Render colliders and other physics components using `b2World::DebugDraw()`
+*/
+
 namespace stay
 {
     namespace sys
     {
-        struct RawPhysicsRenderSystem : public ecs::RenderSystem, public ecs::UpdateSystem, public ecs::System
+        struct PhysicsDebugSystem : public ecs::RenderSystem, public ecs::System
         {
-                RawPhysicsRenderSystem(ecs::Manager* manager)
+                PhysicsDebugSystem(ecs::Manager* manager)
                     : ecs::RenderSystem(1)
-                    , ecs::UpdateSystem(0)
                     , ecs::System(manager)
                 { }
-                virtual ~RawPhysicsRenderSystem()
+                virtual ~PhysicsDebugSystem()
                 {
                     // Clear the drawer
                     if (mPhysicsWorld != nullptr)
@@ -45,13 +48,6 @@ namespace stay
                 {
                     mDrawer->setRenderTarget(target);
                     mPhysicsWorld->DebugDraw();
-                }
-
-                void update(float dt) override
-                {
-                    static const int velIterCount = 8;
-                    static const int posIterCount = 3;
-                    mPhysicsWorld->Step(dt, velIterCount, posIterCount);
                 }
 
             private:

@@ -20,9 +20,8 @@ namespace stay
                     : ecs::RenderSystem(0)
                     , ecs::System(manager)
                 {
-                    mShape.setSize({50, 50});
                     mShape.setOutlineColor(sf::Color::White);
-                    mShape.setOutlineThickness(2);
+                    mShape.setOutlineThickness(0.1F);
                     utils::centersf(mShape);
                 }
 

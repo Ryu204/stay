@@ -8,8 +8,8 @@
 namespace stay
 {
     Scene::Scene()
-        : mCamera(Vector2(), Vector2(500, 500))
-        , mPhysicsWorld({0.F, -10.F})
+        : mPhysicsWorld({0.F, -10.F})
+        , mPixelsPerMeter(100.F)
     {
         Node::root().assign(&mManager);
         initialize();
@@ -32,27 +32,28 @@ namespace stay
     }
     void Scene::render(RTarget* target)
     {
-        mCamera = Camera::defaultOfTarget(*target);
-        target->setView(mCamera.getView());
+        mCamera.setOn(target);
         mManager.render(target);
     }
     void Scene::initialize()
     {
         // mManager.registerSystem<sys::RawRenderSystem>();
-        // mManager.registerSystem<sys::OrderedRenderSystem>();
-        mManager.registerSystem<sys::RawPhysicsRenderSystem>()->initialize(&mPhysicsWorld);
+        mManager.registerSystem<sys::OrderedRenderSystem>();
+        mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
+        mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
+        
         auto* node = create();
-
-        auto& body = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, 0), 45, phys::BodyType::DYNAMIC);
+        auto& body = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, 0), 45, phys::BodyType::KINEMATIC);
         body.setAngularVelocity(100);
-        auto& ref = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)}, &body, nullptr);
-        // node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{40, 60});
-        //node->getLocalTransform().move({100, -100, 0});
+        node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)}, &body, nullptr);
+        node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{0.5F, 1.F});
         for (int i = 1; i <= 4; ++i)
         {
+            const auto& trans = node->getLocalTransform().getMatrix();
             node = createChild(node);
-            // node->addComponents<comp::Render>(sf::Color::Red, sf::Vector2f{70, 50});
-            //node->getLocalTransform().move({35, 35, 0});
+            node->addComponents<comp::Render>(sf::Color::Red, sf::Vector2f{0.4F, 1.2F});
+            node->getLocalTransform().move({1.3F, 1.3F, 0});
+            node->getLocalTransform().rotate(10);
         }
     }
 

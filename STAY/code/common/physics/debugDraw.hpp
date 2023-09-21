@@ -14,9 +14,8 @@ namespace stay
         class DebugDraw : public b2Draw
         {
             public:
-                DebugDraw(float meterToPixels = 100.F, float stroke = 2.F)
+                DebugDraw(float stroke = 0.05F)
                     : mCanvas(nullptr)
-                    , mMeterToPixels(meterToPixels)
                     , mStrokeWidth(stroke)
                 {}
                 void setRenderTarget(sf::RenderTarget* target)
@@ -30,10 +29,8 @@ namespace stay
                     sf::Vector2f center;
                     for(int i = 0; i < vertexCount; i++)
                     {
-                        auto vec = utils::convertVec2<sf::Vector2f>(mMeterToPixels * vertices[i]);
-                        // flooring the coords to fix distorted lines on flat surfaces
-                        // they still show up though.. but less frequently
-                        polygon.setPoint(i, sf::Vector2f(std::floor(vec.x), std::floor(vec.y))); 
+                        auto vec = utils::convertVec2<sf::Vector2f>(vertices[i]);
+                        polygon.setPoint(i, vec); 
                     }
                     polygon.setOutlineThickness(-mStrokeWidth);
                     polygon.setFillColor(sf::Color::Transparent);
@@ -47,10 +44,8 @@ namespace stay
                     sf::Vector2f center;
                     for(int i = 0; i < vertexCount; i++)
                     {
-                        auto vec = utils::convertVec2<sf::Vector2f>(mMeterToPixels * vertices[i]);
-                        // flooring the coords to fix distorted lines on flat surfaces
-                        // they still show up though.. but less frequently
-                        polygon.setPoint(i, sf::Vector2f(std::floor(vec.x), std::floor(vec.y))); 
+                        auto vec = utils::convertVec2<sf::Vector2f>(vertices[i]);
+                        polygon.setPoint(i, vec);
                     }
                     polygon.setOutlineThickness(-mStrokeWidth);
                     auto sfColor = utils::sfColorFrom(color);
@@ -63,9 +58,9 @@ namespace stay
 
                 void DrawCircle(const b2Vec2& center, float radius, const b2Color& color) override
                 {
-                    sf::CircleShape circle(radius * mMeterToPixels);
-                    circle.setOrigin(radius * mMeterToPixels, radius * mMeterToPixels);
-                    circle.setPosition(utils::convertVec2<sf::Vector2f>(mMeterToPixels * center));
+                    sf::CircleShape circle(radius);
+                    circle.setOrigin(radius, radius);
+                    circle.setPosition(utils::convertVec2<sf::Vector2f>(center));
                     circle.setFillColor(sf::Color::Transparent);
                     circle.setOutlineThickness(-mStrokeWidth);
                     circle.setOutlineColor(utils::sfColorFrom(color));
@@ -75,16 +70,16 @@ namespace stay
 
                 void DrawSolidCircle(const b2Vec2& center, float radius, const b2Vec2& axis, const b2Color& color) override
                 {
-                    sf::CircleShape circle(radius * mMeterToPixels);
-                    circle.setOrigin(radius * mMeterToPixels, radius * mMeterToPixels);
-                    circle.setPosition(utils::convertVec2<sf::Vector2f>(mMeterToPixels * center));
+                    sf::CircleShape circle(radius);
+                    circle.setOrigin(radius, radius);
+                    circle.setPosition(utils::convertVec2<sf::Vector2f>(center));
                     circle.setOutlineThickness(-mStrokeWidth);
                     auto sfColor = utils::sfColorFrom(color);
                     circle.setOutlineColor(utils::sfColorFrom(color));
                     sfColor.a = (float)sfColor.a * 0.6F;
                     circle.setFillColor(sfColor);
 
-                    b2Vec2 endPoint = center + radius * mMeterToPixels * axis;
+                    b2Vec2 endPoint = center + radius * axis;
                     sf::Vertex line[2] = 
                     {
                         sf::Vertex(utils::convertVec2<sf::Vector2f>(center), utils::sfColorFrom(color)),
@@ -98,17 +93,17 @@ namespace stay
                 {
                     sf::Vertex line[] =
                     {
-                        sf::Vertex(utils::convertVec2<sf::Vector2f>(mMeterToPixels * p1), utils::sfColorFrom(color)),
-                        sf::Vertex(utils::convertVec2<sf::Vector2f>(mMeterToPixels * p2), utils::sfColorFrom(color)),
+                        sf::Vertex(utils::convertVec2<sf::Vector2f>(p1), utils::sfColorFrom(color)),
+                        sf::Vertex(utils::convertVec2<sf::Vector2f>(p2), utils::sfColorFrom(color)),
                     };
 
                     mCanvas->draw(line, 2, sf::Lines);
                 }
                 void DrawTransform(const b2Transform& xf) override
                 {
-                    static const float lineLength = 1.F * mMeterToPixels;
+                    static const float lineLength = 1.F;
 
-                    auto pos = utils::convertVec2<sf::Vector2f>(mMeterToPixels* xf.p);
+                    auto pos = utils::convertVec2<sf::Vector2f>(xf.p);
                     /*b2Vec2 xAxis(b2Vec2(xf.p.x + (lineLength * xf.q.c), xf.p.y + (lineLength * xf.q.s)));*/
                     auto xAxis = pos + utils::convertVec2<sf::Vector2f>(lineLength * xf.q.GetXAxis());
                     sf::Vertex redLine[] = 
@@ -136,7 +131,6 @@ namespace stay
                 }
             private:
                 sf::RenderTarget* mCanvas;
-                float mMeterToPixels;
                 float mStrokeWidth;
         };
     } // namespace phys

@@ -13,26 +13,39 @@ namespace stay
     {
         public:
             using View = sf::View;
-
-            static Camera defaultOfTarget(const RTarget& target)
-            {
-                auto size = target.getSize();
-                return Camera(Vector2(), Vector2(size.x, size.y));
-            }
             
-            Camera(const Vector2& center, const Vector2& size)
-                : mView(utils::convertVec2<sf::Vector2f>(center), utils::convertVec2<sf::Vector2f>(size))
-            { }
+            Camera(float height = 15.F)
+                : mHeight(height)
+                , mView(sf::Vector2f(0.F, 0.F), sf::Vector2f())
+            { 
+                adaptTo(Vector2(1.F, 1.F));
+            }
 
-            Camera(View view)
-                : mView(view)
-            { }
-
+            // @return A reference to internal `sf::View` for modification
+            // @note If you change the scale, it won't be automatically recomputed. Use `adaptTo(...)` to recompute the right ratio
             View& getView()
             {
                 return mView;
             }
+            // @brief Modify `target` view to match this camera
+            void setOn(RTarget* target)
+            {
+                adaptTo(target);
+                target->setView(mView);
+            }
+            // @brief Change camera's aspect ratio to fit into `target` while keeping internal height
+            void adaptTo(const RTarget* target)
+            {
+                adaptTo(utils::convertVec2<Vector2>(target->getSize()));
+            }
+            // @brief Adjust aspect ratio to match `size` and the height is retanined
+            void adaptTo(Vector2 size)
+            {
+                mView.setSize(sf::Vector2f(mHeight * size.x / size.y, mHeight));
+            }
         private:
+            // Height of the visible area in meters
+            float mHeight;
             View mView;
     };
 } // namespace stay

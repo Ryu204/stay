@@ -26,5 +26,6 @@ namespace stay
             ecs::Manager mManager;
 
             b2World mPhysicsWorld;
+            const float mPixelsPerMeter;
     };
 } // namespace stay

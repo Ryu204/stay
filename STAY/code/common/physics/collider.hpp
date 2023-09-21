@@ -20,7 +20,7 @@ namespace stay
             public:
                 struct Box {
                     Vector2 position;
-                    Vector2 halfSize;
+                    Vector2 size;
                     float angle; // in game coords
                 };
                 struct Circle {

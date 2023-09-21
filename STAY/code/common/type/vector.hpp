@@ -91,6 +91,9 @@ namespace stay
             Vector3(const glm::vec3& vec)
                 : glm::vec3(vec)
             { }
+            Vector3(const glm::vec2& vec)
+                : glm::vec3(vec.x, vec.y, 0.F)
+            { }
             Json::Value toJSONObject() const override
             {
                 Json::Value res(Json::arrayValue);

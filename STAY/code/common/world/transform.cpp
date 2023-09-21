@@ -6,6 +6,10 @@
 #include "../utility/typedef.hpp"
 #include "transform.hpp"
 
+///////dsf sdkfjsakldfjksdf
+#include <iostream>
+//////////sadflijsaldkfjlf
+
 namespace stay
 {
     Transform::Transform()
@@ -23,6 +27,14 @@ namespace stay
     {
         updateFromMatrix();
     }
+
+    Transform::Transform(const Vector3& position, float rotation, const Vector3& scale) // NOLINT(*-pass-by-value)
+        : mPosition(position)
+        , mRotation(rotation)
+        , mScale(scale)
+        , mMatrixNeedRebuild(true)
+        , mInverseNeedRebuild(true)
+    { }
 
     void Transform::setMatrix(const Matrix& matrix)
     {
@@ -154,7 +166,7 @@ namespace stay
         glm::quat rotation{};
         glm::decompose(mTRSMatrix, mScale, rotation, mPosition, unused1, unused2);
         
-        mRotation = glm::eulerAngles(rotation).z * RAD2DEG;
+        mRotation = glm::yaw(rotation) * RAD2DEG;
         // This line is for glm version <= 0.9.7
         // mRotation = glm::eulerAngles(glm::conjugate(rotation)).z * RAD2DEG;
     }
@@ -163,7 +175,7 @@ namespace stay
     {
         mTRSMatrix = glm::mat4(1.F);
         mTRSMatrix = glm::translate(mTRSMatrix, mPosition);
-        mTRSMatrix = glm::rotate(mTRSMatrix, mRotation * DEG2RAD, vectorBack);
+        mTRSMatrix = glm::rotate(mTRSMatrix, mRotation * DEG2RAD, vectorForward);
         mTRSMatrix = glm::scale(mTRSMatrix, mScale);
     }
 
