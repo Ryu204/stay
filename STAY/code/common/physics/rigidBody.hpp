@@ -5,6 +5,7 @@
 
 #include "../utility/convert.hpp"
 #include "../utility/typedef.hpp"
+#include "../ecs/component.hpp"
 
 namespace stay
 {
@@ -19,9 +20,11 @@ namespace stay
         class Collider;
         // @brief An abstract component, only functions if a collider is presented. Manipulate velocity and force.
         // @note Because we only want the body to be destroy when it's ultimately deleted, not deleted and copied again, we make it non-copyable
-        class RigidBody : private sf::NonCopyable
+        class RigidBody : public ecs::Component
         {
             public:
+                // @brief Get the rigidbody currently associated with `body`
+                static RigidBody* getRigidBody(b2Body* body);
                 // @param `angle` angle from OY+ to object's local OY+ in degree, positive if the angle is anti-clockwise
                 RigidBody(b2World* world, const Vector2& position = Vector2(10.F, -10.F), float angle = 0.F, BodyType type = BodyType::STATIC);
                 ~RigidBody();

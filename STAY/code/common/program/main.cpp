@@ -3,7 +3,6 @@
 #include <json/json.h>
 
 #include "application.hpp"
-#include "../world/node.hpp"
 
 int main1()
 {
@@ -26,18 +25,20 @@ int main1()
 }
 // NOLINTBEGIN
 // test==================================================================
-int testNode()
+int main()
 {
     try
     {
-        auto* node1 = stay::Node::root().createEmptyChild();
-        auto* node2 = stay::Node::root().createEmptyChild();
-        auto* node3 = stay::Node::create();
+        stay::ecs::Registry reg;
+        stay::Node::setGlobalRegistry(&reg);
+        //auto* node1 = &stay::Node::root();//.createEmptyChild();
+        // auto* node2 = stay::Node::root().createEmptyChild();
+        // auto* node3 = stay::Node::create();
 
-        node3->setParent(node1);
-        node1->setParent(node2);
-        std::cout << node3->isChildOf(node2) << node2->isParentOf(node3) << std::endl;
-        stay::Node::destroy(node2);
+        // node3->setParent(node1);
+        // node1->setParent(node2);
+        // std::cout << node3->isChildOf(node2) << node2->isParentOf(node3) << std::endl;
+        // stay::Node::destroy(node2);
         std::cout << "about to kill node2\n";
     }
     catch(const std::exception& e)
@@ -205,12 +206,13 @@ void outOfScope()
     });
 }
 
-int main()
+int testEvent()
 {
     outOfScope();
     compiling.invoke(2, 0.5F);
     compiling.removeListener(id);
     compiling.invoke(100, 100.F);
+    return 0;
 }
 // test==================================================================
 // NOLINTEND

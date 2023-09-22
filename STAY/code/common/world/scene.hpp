@@ -2,7 +2,6 @@
 
 #include <box2d/box2d.h>
 
-#include "node.hpp"
 #include "../ecs/manager.hpp"
 #include "camera.hpp"
 

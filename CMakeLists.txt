@@ -15,7 +15,8 @@ FILE(GLOB_RECURSE
     "STAY/code/*.cpp"
     "STAY/code/*.hpp"
     "STAY/code/*.c"
-    "STAY/code/*.h")
+    "STAY/code/*.h"
+    "STAY/code/*.inl")
 
 # Initialize clang-tidy if used
 IF(USER_DEFINED_CLANG_TIDY)

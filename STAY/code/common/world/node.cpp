@@ -3,22 +3,29 @@
 namespace stay
 {
     Node::Node()
-        : mParent(nullptr)
-    {}
+    {
+        setParent(&root());
+    }
+
     Node::~Node()
     {
-        if (assigned() && this != &root())
+        if (this != &root())
         {
-            get()->getRegistry().destroy(mEntity);
             globalMap().erase(getEntity());
         }
     }
+
     Node& Node::root()
     {
         static Node res;
         return res;
     };
     
+    void Node::setGlobalRegistry(ecs::Registry* registry)
+    {
+        root().assign(registry);
+    }
+
     Node* Node::create()
     {
         return root().createEmptyChild();
@@ -103,6 +110,10 @@ namespace stay
         auto* res = ptr.get();
         res->mParent = this;
         mChildren.emplace(res, std::move(ptr));
+        // Once set up, the parent's registry pointer will be passed down to child as well
+        res->assign(get());
+        res->mEntity = get()->create();
+        globalMap()[res->mEntity] = res;
         return res;
     }
 
@@ -137,12 +148,6 @@ namespace stay
     void Node::setGlobalTransform(Transform& transform)
     {
         mLocalTransform.setMatrix(mParent->getGlobalTransform().getInverseMatrix() * transform.getMatrix());
-    }
-
-    void Node::postAssignment()
-    {
-        mEntity = get()->getRegistry().create();
-        globalMap()[mEntity] = this;
     }
 
     ecs::Entity Node::getEntity() const

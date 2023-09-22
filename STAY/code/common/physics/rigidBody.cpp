@@ -1,9 +1,26 @@
 #include "rigidBody.hpp"
 
+#include <unordered_map>
+
+namespace
+{
+    std::unordered_map<b2Body*, stay::phys::RigidBody*>& rigidBodyMap()
+    {
+        static std::unordered_map<b2Body*, stay::phys::RigidBody*> res;
+        return res;
+    }
+} // namespace
+
 namespace stay
 {
     namespace phys
     {
+        RigidBody* RigidBody::getRigidBody(b2Body* body)
+        {
+            assert(rigidBodyMap().find(body) != rigidBodyMap().end());
+            return rigidBodyMap()[body];
+        }
+
         RigidBody::RigidBody(b2World* world, const Vector2& position, float angle, BodyType type)
             : mWorld(world)
         {
@@ -14,10 +31,12 @@ namespace stay
             def.linearDamping = 0.F;
             def.angularDamping = 0.01F;
             mBody = mWorld->CreateBody(&def);
+            rigidBodyMap()[mBody] = this;
         }
 
         RigidBody::~RigidBody()
         {
+            rigidBodyMap().erase(mBody);
             mWorld->DestroyBody(mBody);
         }
         

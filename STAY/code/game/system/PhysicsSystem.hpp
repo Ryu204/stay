@@ -2,9 +2,9 @@
 
 #include <box2d/box2d.h>
 
-#include "../../common/ecs/manager.hpp"
 #include "../../common/physics/rigidBody.hpp"
-#include "../../common/world/node.hpp"
+#include "../../common/physics/collider.hpp"
+#include "../../common/ecs/manager.hpp"
 
 /*
     Render colliders and other physics components using `b2World::DebugDraw()`
@@ -14,6 +14,27 @@ namespace stay
 {
     namespace sys
     {
+        namespace detail
+        {
+            class ContactListener : public b2ContactListener
+            {
+                void BeginContact(b2Contact* contact) override
+                { 
+                    auto* A = phys::Collider::getCollider(contact->GetFixtureA());
+                    auto* B = phys::Collider::getCollider(contact->GetFixtureB());
+                    A->OnCollisionEnter.invoke(*B, *contact);
+                    B->OnCollisionEnter.invoke(*A, *contact);
+                }
+                void EndContact(b2Contact* contact) 
+                { 
+                    auto* A = phys::Collider::getCollider(contact->GetFixtureA());
+                    auto* B = phys::Collider::getCollider(contact->GetFixtureB());
+                    A->OnCollisionExit.invoke(*B, *contact);
+                    B->OnCollisionExit.invoke(*A, *contact);
+                }
+            };
+        } // namespace detail
+
         struct PhysicsSystem 
             : public ecs::PreUpdateSystem
             , public ecs::UpdateSystem
@@ -27,9 +48,15 @@ namespace stay
                     , ecs::System(manager)
                 { }
 
+                virtual ~PhysicsSystem()
+                {
+                    mPhysicsWorld->SetContactListener(nullptr);
+                }
+
                 void initialize(b2World* world)
                 {
                     mPhysicsWorld = world;
+                    world->SetContactListener(&mContactListener);
                 }
 
                 void preUpdate(float dt) override
@@ -60,6 +87,7 @@ namespace stay
                 }
             private:
                 b2World* mPhysicsWorld;
+                detail::ContactListener mContactListener;
         };
     } // namespace sys
 } // namespace stay

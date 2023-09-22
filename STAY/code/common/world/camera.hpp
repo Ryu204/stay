@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "../type/vector.hpp"
-#include "node.hpp"
+#include "../ecs/manager.hpp"
 #include "../utility/convert.hpp"
 #include "../utility/typedef.hpp"
 

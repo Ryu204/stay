@@ -2,6 +2,18 @@
 #include "rigidBody.hpp"
 #include "../utility/typedef.hpp"
 
+#include <unordered_map>
+
+namespace
+{
+    std::unordered_map<b2Fixture*, stay::phys::Collider*>& colliderMap()
+    {
+        static std::unordered_map<b2Fixture*, stay::phys::Collider*> res;
+        return res;
+    }
+} // namespace
+
+
 namespace stay
 {
     namespace phys
@@ -18,16 +30,24 @@ namespace stay
             Visitor(funcs...) -> Visitor<funcs...>;
         } // namespace detail
        
+        Collider* Collider::getCollider(b2Fixture* fixture)
+        {
+            assert(colliderMap().find(fixture) != colliderMap().end());
+            return colliderMap()[fixture];
+        }
+
         Collider::Collider(const Info& info, RigidBody* body, const Material* mat)
             : mFixture(nullptr)
         {
             attachToRigidBody(info, body, mat);
+            colliderMap()[mFixture] = this;
         }     
 
         Collider::~Collider()
         {
             if (mFixture != nullptr)
             {
+                colliderMap().erase(mFixture);
                 mFixture->GetBody()->DestroyFixture(mFixture);
             }
         }
@@ -48,6 +68,16 @@ namespace stay
         bool Collider::getTrigger() const
         {
             return mFixture->IsSensor();
+        }
+
+        RigidBody* Collider::getRigidBody()
+        {
+            return RigidBody::getRigidBody(mFixture->GetBody());
+        }
+
+        const RigidBody* Collider::getRigidBody() const
+        {
+            return RigidBody::getRigidBody(mFixture->GetBody());
         }
 
         void Collider::attachToRigidBody(const Info& info, RigidBody* body, const Material* mat)

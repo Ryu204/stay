@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../../common/ecs/manager.hpp"
 #include "../component/render.hpp"
-#include "../../common/world/node.hpp"
+#include "../../common/ecs/manager.hpp"
 #include "../../common/utility/convert.hpp"
 #include "../../common/utility/sfutils.hpp"
 

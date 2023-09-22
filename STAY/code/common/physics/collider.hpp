@@ -8,7 +8,7 @@
 #include "../type/vector.hpp"
 #include "../utility/convert.hpp"
 #include "../utility/typedef.hpp"
-
+#include "../ecs/component.hpp"
 #include "../event/event.hpp"
 
 namespace stay
@@ -17,7 +17,7 @@ namespace stay
     {
         class Material;
         class RigidBody;
-        class Collider : private sf::NonCopyable
+        class Collider : public ecs::Component
         {
             public:
                 struct Box {
@@ -32,14 +32,17 @@ namespace stay
                 using Info = std::variant<Box, Circle>;
                 
                 // @note Only `body` needs to stay alive after the construction
+                static Collider* getCollider(b2Fixture* fixture);
                 Collider(const Info& info, RigidBody* body, const Material* mat);  
                 virtual ~Collider();
                 void setMaterial(const Material* mat);
                 void setTrigger(bool isTrigger);
                 bool getTrigger() const;
+                RigidBody* getRigidBody();
+                const RigidBody* getRigidBody() const;
 
-                event::Event<int/*just foo*/> OnCollisionEnter;
-                event::Event<int/*just foo*/> OnCollisionExit;
+                event::Event<Collider&, b2Contact&> OnCollisionEnter;
+                event::Event<Collider&, b2Contact&> OnCollisionExit;
 
             private:
                 void attachToRigidBody(const Info& info, RigidBody* body, const Material* mat);
