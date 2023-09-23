@@ -1,8 +1,6 @@
 #pragma once
 
-#include <array>
-#include <queue>
-#include <cstdint>
+#include <unordered_set>
 
 namespace stay
 {
@@ -15,61 +13,36 @@ namespace stay
 		class IDGenerator
 		{
 		public:
-			IDGenerator();
 			// Generate a new ID.
-			std::size_t generate();
+			std::size_t generate()
+			{
+				if (mCaching.size() > 0)
+				{
+					std::size_t res = *mCaching.begin();
+					mCaching.erase(res);
+					mUsing.insert(res);
+					return res;
+				}
+				mUsing.insert(++mCurrentMax);
+				return mCurrentMax;
+			}
 			// Erase an ID generated before
-			void erase(std::size_t ID);
+			void erase(std::size_t ID)
+			{
+				assert(mUsing.count(ID) != 0 && "erase non existing ID");
+				mUsing.erase(ID);
+				mCaching.insert(ID);
+			}
 			// Check if ID is still in active state
-			bool isActive(std::size_t ID);
+			bool isActive(std::size_t ID)
+			{
+				return mUsing.count(ID) > 0;
+			}
 
 		private:
-            void checkInRange(std::size_t ID);
-
-			std::queue<std::size_t> mAvailable;
-			std::array<bool, N> mAliveLists;
+            std::unordered_set<std::size_t> mUsing{};
+			std::unordered_set<std::size_t> mCaching{};
+			std::size_t mCurrentMax{0};
 		};
-
-		template <std::size_t N>
-		IDGenerator<N>::IDGenerator()
-		{
-			for (std::size_t i = 0; i < N; ++i) {
-				mAvailable.push(i);
-				mAliveLists[i] = false;
-			}
-		}
-
-		template <std::size_t N>
-		std::size_t IDGenerator<N>::generate()
-		{
-            assert(!mAvailable.empty() && "Max IDs number exceeded");
-
-            const auto res = mAvailable.front();
-            mAvailable.pop();
-            mAliveLists[res] = true;
-            return res;
-		}
-
-		template <std::size_t N>
-		void IDGenerator<N>::erase(std::size_t ID)
-		{
-            checkInRange(ID);
-            assert(mAliveLists[ID] && "Erase non-existed ID");
-			mAliveLists[ID] = false;
-			mAvailable.push(ID);
-		}
-
-		template <std::size_t N>
-		bool IDGenerator<N>::isActive(std::size_t ID)
-		{
-            checkInRange(ID);
-			return mAliveLists[ID];
-		}
-
-        template <std::size_t N>
-        void IDGenerator<N>::checkInRange(std::size_t ID)
-        {
-            assert(ID < N && "ID query not in range");
-        }
 	} // namespace utils
 } // namespace stay
