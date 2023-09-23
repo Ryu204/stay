@@ -27,7 +27,7 @@ namespace stay
             {
                 return mView;
             }
-            // @brief Modify `target` view to match this camera
+            // @brief Adapt to `target` ratio and modify its view to match this camera
             void setOn(RTarget* target)
             {
                 adaptTo(target);

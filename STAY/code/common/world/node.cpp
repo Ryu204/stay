@@ -3,16 +3,13 @@
 namespace stay
 {
     Node::Node()
-    {
-        setParent(&root());
-    }
+        : mParent(nullptr)
+    { }
 
     Node::~Node()
     {
-        if (this != &root())
-        {
-            globalMap().erase(getEntity());
-        }
+        globalMap().erase(getEntity());
+        get()->destroy(mEntity);
     }
 
     Node& Node::root()
@@ -26,6 +23,12 @@ namespace stay
         root().assign(registry);
     }
 
+    void Node::postAssignment()
+    {
+        mEntity = get()->create();
+        globalMap().emplace(mEntity, this);
+    }
+
     Node* Node::create()
     {
         return root().createEmptyChild();
@@ -33,7 +36,7 @@ namespace stay
 
     Node* Node::getNode(ecs::Entity identifier)
     {
-        return globalMap()[identifier];
+        return globalMap().at(identifier);
     }
 
     std::unordered_map<ecs::Entity, Node*>& Node::globalMap()
@@ -112,8 +115,6 @@ namespace stay
         mChildren.emplace(res, std::move(ptr));
         // Once set up, the parent's registry pointer will be passed down to child as well
         res->assign(get());
-        res->mEntity = get()->create();
-        globalMap()[res->mEntity] = res;
         return res;
     }
 

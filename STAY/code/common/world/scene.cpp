@@ -39,18 +39,18 @@ namespace stay
     }
     void Scene::initialize()
     {
-        // // mManager.registerSystem<sys::RawRenderSystem>();
-        // mManager.registerSystem<sys::OrderedRenderSystem>();
+        // mManager.registerSystem<sys::RawRenderSystem>();
+        mManager.registerSystem<sys::OrderedRenderSystem>();
         // mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
-        // mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
+        mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
         
-        // auto* node = Node::create();
-        // auto& body = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, 0), 45, phys::BodyType::DYNAMIC);
-        // body.setAngularVelocity(100);
-        // auto& col = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)}, &body, nullptr);
-        // col.OnCollisionEnter.addEventListener([](phys::Collider& /*body*/, b2Contact& /*contact*/){std::cout << "touched start" << std::endl;});
-        // col.OnCollisionExit.addEventListener([](phys::Collider& /*body*/, b2Contact& /*contact*/){std::cout << "touched ended" << std::endl;});
-        // node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{0.5F, 1.F});
+        auto* node = Node::create();
+        auto& body = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, 0), 45, phys::BodyType::DYNAMIC);
+        body.setAngularVelocity(100);
+        auto& col = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)}, &body, nullptr);
+        col.OnCollisionEnter.addEventListener([](phys::Collider& /*body*/, b2Contact& /*contact*/){std::cout << "touched start" << std::endl;});
+        col.OnCollisionExit.addEventListener([](phys::Collider& /*body*/, b2Contact& /*contact*/){std::cout << "touched ended" << std::endl;});
+        node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{0.5F, 1.F});
 
         // node = Node::create();
         // auto& body1 = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, -6), 0, phys::BodyType::STATIC);

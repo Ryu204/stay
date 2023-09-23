@@ -48,7 +48,7 @@ namespace stay
             void visit(const Func& func, Args&&... args);
             // Apply a function to each node of the subtree
             // The return of `func` in a node will be forwarded when applying `func` to its children
-            // @note `func` parameters are `(Node*, Args&&...)`
+            // @note `func` parameters are `(Node*, const FuncReturn&, Args&&...)`
             template <typename Func, typename FuncReturn, typename... Args>
             void visitChained(const Func& func, const FuncReturn& initial, Args&&... args);
             
@@ -64,6 +64,7 @@ namespace stay
             Type& getComponent();
         private:
             Node();
+            void postAssignment() override;
             static std::unordered_map<ecs::Entity, Node*>& globalMap();
             friend std::unique_ptr<Node> std::make_unique<Node>();
             friend std::unique_ptr<Node>;

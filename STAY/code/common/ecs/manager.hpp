@@ -35,8 +35,8 @@ namespace stay
         {
             public:                
                 Registry& getRegistry();
-                // @param DerivedSystem A type is used as `DerivedSystem` if it's a `RenderSystem`, `UpdateSystem`,.etc (see `system.hpp`)
                 // @note Its overriding IDs are used to determine its order in the manager action, i.e type with lower ID called earlier
+                // @param DerivedSystem A dervied class of `ecs:*System`(s) defined in `system.hpp`, with the restriction of having a constructor taking an `ecs::Manager*`
                 template <typename DerviedSystem>
                 SPtr<DerviedSystem> registerSystem();
                 // Meant to be called only once, before any update
@@ -99,29 +99,41 @@ namespace stay
         {
             SPtr<DerviedSystem> ptr = std::make_shared<DerviedSystem>(this);
             // Start
-            SPtr<StartSystem> startPtr = std::dynamic_pointer_cast<StartSystem>(ptr);
-            if (startPtr.get() != nullptr)
+            if constexpr (std::is_base_of_v<StartSystem, DerviedSystem>)
+            {
+                SPtr<StartSystem> startPtr = std::dynamic_pointer_cast<StartSystem>(ptr);
                 mStartSystems.push_back(Pair<StartSystem>{ startPtr->orderStart, startPtr });
+            }
             // Update
-            SPtr<UpdateSystem> updatePtr = std::dynamic_pointer_cast<UpdateSystem>(ptr);
-            if (updatePtr.get() != nullptr)
+            if constexpr (std::is_base_of_v<UpdateSystem, DerviedSystem>)
+            {
+                SPtr<UpdateSystem> updatePtr = std::dynamic_pointer_cast<UpdateSystem>(ptr);
                 mUpdateSystems.push_back(Pair<UpdateSystem>{updatePtr->orderUpdate, updatePtr});
+            }
             // PostUpdate
-            SPtr<PostUpdateSystem> lateUpdatePtr = std::dynamic_pointer_cast<PostUpdateSystem>(ptr);
-            if (lateUpdatePtr.get() != nullptr)
+            if constexpr (std::is_base_of_v<PostUpdateSystem, DerviedSystem>)
+            {
+                SPtr<PostUpdateSystem> lateUpdatePtr = std::dynamic_pointer_cast<PostUpdateSystem>(ptr);
                 mPostUpdateSystems.push_back(Pair<PostUpdateSystem>{lateUpdatePtr->orderLateUpdate, lateUpdatePtr});
+            }
             // PreUpdate
-            SPtr<PreUpdateSystem> preUpdatePtr = std::dynamic_pointer_cast<PreUpdateSystem>(ptr);
-            if (preUpdatePtr.get() != nullptr)
+            if constexpr (std::is_base_of_v<PreUpdateSystem, DerviedSystem>)
+            {
+                SPtr<PreUpdateSystem> preUpdatePtr = std::dynamic_pointer_cast<PreUpdateSystem>(ptr);
                 mPreUpdateSystems.push_back(Pair<PreUpdateSystem>{preUpdatePtr->orderPreUpdate, preUpdatePtr});
+            }
             // Render
-            SPtr<RenderSystem> renderPtr = std::dynamic_pointer_cast<RenderSystem>(ptr);
-            if (renderPtr.get() != nullptr)
+            if constexpr (std::is_base_of_v<RenderSystem, DerviedSystem>)
+            {
+                SPtr<RenderSystem> renderPtr = std::dynamic_pointer_cast<RenderSystem>(ptr);
                 mRenderSystems.push_back(Pair<RenderSystem>{renderPtr->orderRender, renderPtr});
+            }
             // Input
-            SPtr<InputSystem> inputPtr = std::dynamic_pointer_cast<InputSystem>(ptr);
-            if (inputPtr.get() != nullptr)
+            if constexpr (std::is_base_of_v<InputSystem, DerviedSystem>)
+            {
+                SPtr<InputSystem> inputPtr = std::dynamic_pointer_cast<InputSystem>(ptr);
                 mInputSystems.push_back(Pair<InputSystem>{inputPtr->orderInput, inputPtr});
+            }
 
             return ptr;
         }

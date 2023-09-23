@@ -4,7 +4,7 @@
 
 #include "application.hpp"
 
-int main1()
+int main()
 {
     try
     {
@@ -25,20 +25,18 @@ int main1()
 }
 // NOLINTBEGIN
 // test==================================================================
-int main()
+int testNode()
 {
     try
     {
-        stay::ecs::Registry reg;
-        stay::Node::setGlobalRegistry(&reg);
-        //auto* node1 = &stay::Node::root();//.createEmptyChild();
-        // auto* node2 = stay::Node::root().createEmptyChild();
-        // auto* node3 = stay::Node::create();
+        auto* node1 = stay::Node::root().createEmptyChild();
+        auto* node2 = stay::Node::root().createEmptyChild();
+        auto* node3 = stay::Node::create();
 
-        // node3->setParent(node1);
-        // node1->setParent(node2);
-        // std::cout << node3->isChildOf(node2) << node2->isParentOf(node3) << std::endl;
-        // stay::Node::destroy(node2);
+        node3->setParent(node1);
+        node1->setParent(node2);
+        std::cout << node3->isChildOf(node2) << node2->isParentOf(node3) << std::endl;
+        stay::Node::destroy(node2);
         std::cout << "about to kill node2\n";
     }
     catch(const std::exception& e)
