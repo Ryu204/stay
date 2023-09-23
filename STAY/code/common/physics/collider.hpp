@@ -31,15 +31,11 @@ namespace stay
                 };
                 using Info = std::variant<Box, Circle>;
                 
-                // @note Only `body` needs to stay alive after the construction
-                static Collider* getCollider(b2Fixture* fixture);
                 Collider(const Info& info, RigidBody* body, const Material* mat);  
                 virtual ~Collider();
                 void setMaterial(const Material* mat);
                 void setTrigger(bool isTrigger);
                 bool getTrigger() const;
-                RigidBody* getRigidBody();
-                const RigidBody* getRigidBody() const;
 
                 event::Event<Collider&, b2Contact&> OnCollisionEnter;
                 event::Event<Collider&, b2Contact&> OnCollisionExit;

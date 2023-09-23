@@ -3,9 +3,7 @@
 #include "../../game/component/list.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
-
-#include <iostream>
-
+/*debug*/ #include <iostream>
 namespace stay
 {
     Scene::Scene()
@@ -19,6 +17,7 @@ namespace stay
     {
         Node::root().clearChildren();
         Node::setGlobalRegistry(nullptr);
+        /*debug*/ std::cout << "scene deleted" << std::endl;
     }
     void Scene::update(float dt)
     {
@@ -48,8 +47,6 @@ namespace stay
         auto& body = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, 0), 45, phys::BodyType::DYNAMIC);
         body.setAngularVelocity(100);
         auto& col = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)}, &body, nullptr);
-        col.OnCollisionEnter.addEventListener([](phys::Collider& /*body*/, b2Contact& /*contact*/){std::cout << "touched start" << std::endl;});
-        col.OnCollisionExit.addEventListener([](phys::Collider& /*body*/, b2Contact& /*contact*/){std::cout << "touched ended" << std::endl;});
         node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{0.5F, 1.F});
 
         // node = Node::create();

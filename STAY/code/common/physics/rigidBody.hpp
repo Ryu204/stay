@@ -23,8 +23,6 @@ namespace stay
         class RigidBody : public ecs::Component
         {
             public:
-                // @brief Get the rigidbody currently associated with `body`
-                static RigidBody* getRigidBody(b2Body* body);
                 // @param `angle` angle from OY+ to object's local OY+ in degree, positive if the angle is anti-clockwise
                 RigidBody(b2World* world, const Vector2& position = Vector2(10.F, -10.F), float angle = 0.F, BodyType type = BodyType::STATIC);
                 ~RigidBody();

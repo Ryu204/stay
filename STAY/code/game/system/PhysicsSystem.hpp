@@ -20,17 +20,17 @@ namespace stay
             {
                 void BeginContact(b2Contact* contact) override
                 { 
-                    auto* A = phys::Collider::getCollider(contact->GetFixtureA());
-                    auto* B = phys::Collider::getCollider(contact->GetFixtureB());
-                    A->OnCollisionEnter.invoke(*B, *contact);
-                    B->OnCollisionEnter.invoke(*A, *contact);
+                    auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
+                    auto* bCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureB()->GetUserData().pointer);
+                    aCol->OnCollisionEnter.invoke(*bCol, *contact);
+                    bCol->OnCollisionEnter.invoke(*aCol, *contact);
                 }
                 void EndContact(b2Contact* contact) 
                 { 
-                    auto* A = phys::Collider::getCollider(contact->GetFixtureA());
-                    auto* B = phys::Collider::getCollider(contact->GetFixtureB());
-                    A->OnCollisionExit.invoke(*B, *contact);
-                    B->OnCollisionExit.invoke(*A, *contact);
+                    auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
+                    auto* bCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureB()->GetUserData().pointer);
+                    aCol->OnCollisionExit.invoke(*bCol, *contact);
+                    bCol->OnCollisionExit.invoke(*aCol, *contact);
                 }
             };
         } // namespace detail
