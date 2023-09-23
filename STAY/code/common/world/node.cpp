@@ -1,7 +1,6 @@
 #include <string>
 
 #include "node.hpp"
-/*debug*/ #include <iostream>
 namespace stay
 {
     Node::Node()

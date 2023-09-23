@@ -3,7 +3,7 @@
 #include "../../game/component/list.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
-/*debug*/ #include <iostream>
+
 namespace stay
 {
     Scene::Scene()
@@ -17,7 +17,6 @@ namespace stay
     {
         Node::root().clearChildren();
         Node::setGlobalRegistry(nullptr);
-        /*debug*/ std::cout << "scene deleted" << std::endl;
     }
     void Scene::update(float dt)
     {
@@ -40,7 +39,7 @@ namespace stay
     {
         // mManager.registerSystem<sys::RawRenderSystem>();
         mManager.registerSystem<sys::OrderedRenderSystem>();
-        // mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
+        mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
         mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
         
         auto* node = Node::create();
@@ -49,12 +48,10 @@ namespace stay
         auto& col = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)}, &body, nullptr);
         node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{0.5F, 1.F});
 
-        // node = Node::create();
-        // auto& body1 = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, -6), 0, phys::BodyType::STATIC);
-        // auto& col1 = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(4.F, 0.5F)}, &body1, nullptr);
-        // //col1.OnCollisionEnter.addEventListener([](phys::RigidBody& /*body*/, b2Contact& /*contact*/){std::cout << "touched start\n";});
-        // //col1.OnCollisionExit.addEventListener([](phys::RigidBody& /*body*/, b2Contact& /*contact*/){std::cout << "touched ended\n";});
-        // node->addComponents<comp::Render>(sf::Color::Green, sf::Vector2f{0.5F, 1.F});
+        node = Node::create();
+        auto& body1 = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, -6), 0, phys::BodyType::STATIC);
+        auto& col1 = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(4.F, 0.5F)}, &body1, nullptr);
+        node->addComponents<comp::Render>(sf::Color::Green, sf::Vector2f{0.5F, 1.F});
 
         // for (int i = 1; i <= 4; ++i)
         // {

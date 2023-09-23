@@ -1,5 +1,5 @@
 #include "rigidBody.hpp"
-/*debug*/ #include <iostream>
+
 namespace stay
 {
     namespace phys
@@ -20,7 +20,6 @@ namespace stay
         RigidBody::~RigidBody()
         {
             mWorld->DestroyBody(mBody);
-            /*debug*/ std::cout << "rgbody destroyed" << std::endl;
         }
         
         void RigidBody::setPosition(const Vector2& position)

@@ -3,8 +3,6 @@
 #include "../utility/typedef.hpp"
 #include "../world/node.hpp"
 
-/*debug*/ #include <iostream>
-
 namespace stay
 {
     namespace phys
@@ -31,13 +29,11 @@ namespace stay
 
         Collider::~Collider()
         {
-            /* debug */ std::cout << "start destroying" << std::endl;
             // Must enable this check since `RigidBody` could have been destroyed prior to this call
             if (getNode()->hasComponent<RigidBody>())
             {
                 mFixture->GetBody()->DestroyFixture(mFixture);
             }
-            /* debug */ std::cout << "done destroying" << std::endl;
         }
 
         void Collider::setMaterial(const Material* mat)
