@@ -1,21 +1,24 @@
-#include "node.hpp"
 #include "../ecs/manager.hpp"
+#include "../../game/system/list.hpp"
+#include "../../game/component/list.hpp"
 #include "camera.hpp"
-#include "../../game/system/RawRenderSystem.hpp"
-#include "../../game/system/OrderedRenderSystem.hpp"
 #include "scene.hpp"
+
+/*debug*/ #include <iostream>
 
 namespace stay
 {
     Scene::Scene()
-        : mCamera(Vector2(), Vector2(500, 500))
+        : mPhysicsWorld({0.F, -10.F})
+        , mPixelsPerMeter(100.F)
     {
-        Node::root().assign(&mManager);
+        Node::setGlobalRegistry(&mManager.getRegistry());
         initialize();
     }
     Scene::~Scene()
     {
         Node::root().clearChildren();
+        Node::setGlobalRegistry(nullptr);
     }
     void Scene::update(float dt)
     {
@@ -31,37 +34,40 @@ namespace stay
     }
     void Scene::render(RTarget* target)
     {
-        mCamera = Camera::defaultOfTarget(*target);
-        target->setView(mCamera.getView());
+        mCamera.setOn(target);
         mManager.render(target);
     }
     void Scene::initialize()
     {
         // mManager.registerSystem<sys::RawRenderSystem>();
         mManager.registerSystem<sys::OrderedRenderSystem>();
-        auto& reg = mManager.getRegistry();
-        auto* node = create();
-        reg.emplace<comp::Render>(node->getEntity(), sf::Color::Black, sf::Vector2f{40, 60});
-        //node->getLocalTransform().move({100, -100, 0});
-        for (int i = 1; i <= 4; ++i)
-        {
-            node = createChild(node);
-            reg.emplace<comp::Render>(node->getEntity(), sf::Color::Red, sf::Vector2f{70, 50});
-            node->getLocalTransform().move({35, 35, 0});
-        }
-    }
+        mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
+        mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
+        
+        auto* node = Node::create();
+        auto& body = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, 0), 45, phys::BodyType::DYNAMIC);
+        body.setAngularVelocity(100);
+        auto& col = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)}, &body, nullptr);
+        node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{0.5F, 1.F});
 
-    Node* Scene::create()
-    {
-        auto* res = Node::create();
-        res->assign(&mManager);
-        return res;
-    }
+        node = Node::create();
+        auto& body1 = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, -6), 0, phys::BodyType::STATIC);
+        auto& col1 = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(4.F, 0.5F)}, &body1, nullptr);
+        node->addComponents<comp::Render>(sf::Color::Green, sf::Vector2f{0.5F, 1.F});
 
-    Node* Scene::createChild(Node* node)
-    {
-        auto* res = create();
-        res->setParent(node);
-        return res;
+        /*debug*/
+        col1.setTrigger(true);
+        col1.OnCollisionEnter.addEventListener([](phys::Collider&, b2Contact&) { std::cout << "sth entered static collider" << std::endl; });
+        col1.OnTriggerEnter.addEventListener([](phys::Collider&, b2Contact&) { std::cout << "sth entered static trigger" << std::endl; });
+        /**/
+
+        // for (int i = 1; i <= 4; ++i)
+        // {
+        //     const auto& trans = node->getLocalTransform().getMatrix();
+        //     node = createChild(node);
+        //     node->addComponents<comp::Render>(sf::Color::Red, sf::Vector2f{0.4F, 1.2F});
+        //     node->getLocalTransform().move({1.3F, 1.3F, 0});
+        //     node->getLocalTransform().rotate(10);
+        // }
     }
 } // namespace stay

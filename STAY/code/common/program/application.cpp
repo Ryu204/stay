@@ -72,7 +72,7 @@ namespace stay
         {
             sf::Clock clock;
             float queuedTime = 0.F;
-            float timePerUpdate = 1.F / mAppInfo.updatesPerSec;
+            const float timePerUpdate = 1.F / mAppInfo.updatesPerSec;
 
             mScene->start();
 
@@ -117,7 +117,7 @@ namespace stay
         void Application::render()
         {
             mWindow->clear();
-            mTexture->clear(sf::Color::Green);
+            mTexture->clear();
             // Start drawing here
             mScene->render(mTexture.get());
             // End drawing

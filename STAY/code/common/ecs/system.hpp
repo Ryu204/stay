@@ -43,14 +43,23 @@ namespace stay
             int orderUpdate;
             virtual void update(float/*dt*/) = 0;
         };
-        struct LateUpdateSystem
+        struct PostUpdateSystem
         {
-            LateUpdateSystem(int order)
+            PostUpdateSystem(int order)
                 : orderLateUpdate(order)
             {}
-            virtual ~LateUpdateSystem() = default;
+            virtual ~PostUpdateSystem() = default;
             int orderLateUpdate;
-            virtual void update(float/*dt*/) = 0;
+            virtual void postUpdate(float/*dt*/) = 0;
+        };
+        struct PreUpdateSystem
+        {
+            PreUpdateSystem(int order)
+                : orderPreUpdate(order)
+            {}
+            virtual ~PreUpdateSystem() = default;
+            int orderPreUpdate;
+            virtual void preUpdate(float/*dt*/) = 0;
         };
         struct RenderSystem
         {

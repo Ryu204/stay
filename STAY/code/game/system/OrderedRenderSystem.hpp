@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../../common/ecs/manager.hpp"
 #include "../component/render.hpp"
-#include "../../common/world/node.hpp"
+#include "../../common/ecs/manager.hpp"
 #include "../../common/utility/convert.hpp"
 #include "../../common/utility/sfutils.hpp"
 
@@ -20,9 +19,8 @@ namespace stay
                     : ecs::RenderSystem(0)
                     , ecs::System(manager)
                 {
-                    mShape.setSize({50, 50});
                     mShape.setOutlineColor(sf::Color::White);
-                    mShape.setOutlineThickness(2);
+                    mShape.setOutlineThickness(0.1F);
                     utils::centersf(mShape);
                 }
 
@@ -38,6 +36,7 @@ namespace stay
                     
                     const auto draw = [&target, this](Node* current, RStates states) -> RStates
                     {
+                        // Make the get function const because `current` can be the root
                         const auto& tf = ((const Node*)current)->getLocalTransform();
                         states.transform = states.transform * utils::transTosfTrans(tf);
                         if (current->hasComponent<comp::Render>())

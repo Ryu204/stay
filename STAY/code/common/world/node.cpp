@@ -1,24 +1,43 @@
-#include "node.hpp"
+#include <string>
 
+#include "node.hpp"
 namespace stay
 {
     Node::Node()
         : mParent(nullptr)
-    {}
+    { }
+
     Node::~Node()
     {
-        if (assigned() && this != &root())
-        {
-            get()->getRegistry().destroy(mEntity);
-            globalMap().erase(getEntity());
-        }
+        // If root is destroyed, i.e program ends, everything is destroyed already so no more cleanup
+        if (this == &root())
+            return;
+        // Order of removal: registry destroys entity, components -> destroy node and its global registration
+        get()->destroy(mEntity);
+        globalMap().erase(mEntity);
     }
+
     Node& Node::root()
     {
         static Node res;
         return res;
     };
     
+    void Node::setGlobalRegistry(ecs::Registry* registry)
+    {
+        root().assign(registry);
+    }
+
+    void Node::postAssignment()
+    {
+        if (get() == nullptr)
+        {
+            return;
+        }
+        mEntity = get()->create();
+        globalMap().emplace(mEntity, this);
+    }
+
     Node* Node::create()
     {
         return root().createEmptyChild();
@@ -26,7 +45,11 @@ namespace stay
 
     Node* Node::getNode(ecs::Entity identifier)
     {
-        return globalMap()[identifier];
+        if (globalMap().find(identifier) == globalMap().end())
+        {
+            throw std::invalid_argument("Node: \"getNode\" called with non-existing identifier " + std::to_string(static_cast<int>(identifier)));
+        }
+        return globalMap().at(identifier);
     }
 
     std::unordered_map<ecs::Entity, Node*>& Node::globalMap()
@@ -103,6 +126,8 @@ namespace stay
         auto* res = ptr.get();
         res->mParent = this;
         mChildren.emplace(res, std::move(ptr));
+        // Once set up, the parent's registry pointer will be passed down to child as well
+        res->assign(get());
         return res;
     }
 
@@ -137,12 +162,6 @@ namespace stay
     void Node::setGlobalTransform(Transform& transform)
     {
         mLocalTransform.setMatrix(mParent->getGlobalTransform().getInverseMatrix() * transform.getMatrix());
-    }
-
-    void Node::postAssignment()
-    {
-        mEntity = get()->getRegistry().create();
-        globalMap()[mEntity] = this;
     }
 
     ecs::Entity Node::getEntity() const

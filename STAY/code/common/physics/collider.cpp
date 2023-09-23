@@ -1,0 +1,128 @@
+#include "collider.hpp"
+#include "rigidBody.hpp"
+#include "../utility/typedef.hpp"
+#include "../world/node.hpp"
+
+namespace stay
+{
+    namespace phys
+    {
+        namespace detail
+        {
+            // Variant visitor
+            template <typename... funcs>
+            struct Visitor : funcs...
+            {
+                using funcs::operator()...;
+            };
+            // deduction guide
+            template <typename... funcs>
+            Visitor(funcs...) -> Visitor<funcs...>;
+        } // namespace detail
+
+        Collider::Collider(const Info& info, RigidBody* body, const Material* mat)
+            : mFixture(nullptr)
+        {
+            attachToRigidBody(info, body, mat);
+            mFixture->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+        }     
+
+        Collider::~Collider()
+        {
+            // Must enable this check since `RigidBody` could have been destroyed prior to this call
+            if (getNode()->hasComponent<RigidBody>())
+            {
+                mFixture->GetBody()->DestroyFixture(mFixture);
+            }
+        }
+
+        void Collider::setMaterial(const Material* mat)
+        {
+            if (mat != nullptr)
+            {
+                mat->updateCollider(this);
+            }
+        }   
+
+        void Collider::setTrigger(bool isTrigger)
+        {
+            mFixture->SetSensor(isTrigger);
+        }
+
+        bool Collider::getTrigger() const
+        {
+            return mFixture->IsSensor();
+        }
+
+        void Collider::attachToRigidBody(const Info& info, RigidBody* body, const Material* mat)
+        {
+            const bool materialExists = (mat != nullptr);
+            b2FixtureDef def;
+            def.density = 1.F;
+            if (materialExists)
+            {
+                def = mat->getFixtureDef();
+            }
+            def.shape = createShape(info);
+            mFixture = body->attachFixture(def);
+            delete def.shape;
+        }
+
+        b2Shape* Collider::createShape(const Collider::Info& info)
+        {
+            return std::visit(detail::Visitor{
+                [](const Collider::Circle& cir)
+                {
+                    auto* res = new b2CircleShape();
+                    res->m_p.Set(cir.position.x, cir.position.y);
+                    res->m_radius = cir.radius;
+                    return static_cast<b2Shape*>(res);
+                },
+                [](const Collider::Box& box)
+                {
+                    auto* res = new b2PolygonShape();
+                    res->SetAsBox(box.size.x / 2.F, box.size.y / 2.F, 
+                        utils::convertVec2<b2Vec2>(box.position), 
+                        box.angle * DEG2RAD);
+                    return static_cast<b2Shape*>(res);
+                }
+            }, info);
+        }
+        
+        Material::Material(float density, float friction, float restituition)
+        {
+            mDef.density = density;
+            mDef.friction = friction;
+            mDef.restitution = restituition;
+        }
+
+        void Material::setDensity(float density)
+        {
+            mDef.density = density;
+        }
+
+        void Material::setFriction(float friction)
+        {
+            mDef.friction = friction;
+        }
+
+        void Material::setRestituition(float restituition)
+        {
+            mDef.restitution = restituition;
+        }
+
+        b2FixtureDef Material::getFixtureDef() const
+        {
+            return mDef;
+        }
+
+        void Material::updateCollider(Collider* collider) const
+        {
+            auto* fixture = collider->mFixture;
+            fixture->SetDensity(mDef.density);
+            fixture->GetBody()->ResetMassData();
+            fixture->SetFriction(mDef.friction);
+            fixture->SetRestitution(mDef.restitution);
+        }
+    } // namespace phys
+} // namespace stay

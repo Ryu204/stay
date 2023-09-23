@@ -1,27 +1,30 @@
-#pragma once
-
 #include <vector>
 #include <unordered_map>
+
+#include "SFML/System/NonCopyable.hpp"
 
 #include "transform.hpp"
 #include "../utility/typedef.hpp"
 #include "../utility/assignable.hpp"
-#include "../ecs/manager.hpp"
-
-#include <iostream>
+#include "../ecs/system.hpp"
+#include "../ecs/component.hpp"
 
 namespace stay
 {
-    class Node : public utils::Assignable<ecs::Manager*>
+    class Node : utils::Assignable<ecs::Registry*>, sf::NonCopyable
     {
         public:
-            // The root node of the entire scene
+            // @brief The root node of the entire scene
+            // @warning You should not do anything with it, except visiting (since it's only used for getting all current Node's refs)
             static Node& root();
-            // Create an empty children of root node
+            // @brief Use this function to associate a registry with node hierachy
+            static void setGlobalRegistry(ecs::Registry* registry);
+            // Create a children of root node using root's `ecs::Manager`
             static Node* create();
             // Get the Node associating with `identifier`
             static Node* getNode(ecs::Entity identifier);
             // Comletely destroy a node and its children
+            // @warning Should not be used when a system is iterating
             static void destroy(Node* node);
 
             virtual ~Node();
@@ -30,6 +33,7 @@ namespace stay
             void clearChildren();
             bool isChildOf(const Node* node) const;
             bool isParentOf(const Node* node) const;
+            // @note new child also functions with the parent's `ecs::Manager*`
             Node* createEmptyChild();
 
             Transform& getLocalTransform();
@@ -39,30 +43,31 @@ namespace stay
             void setGlobalTransform(Transform& transform);
 
             // Apply a function to each node of the subtree
+            // @note `func` parameters are `(Node*, Args&&...)`
             template <typename Func, typename... Args>
             void visit(const Func& func, Args&&... args);
             // Apply a function to each node of the subtree
             // The return of `func` in a node will be forwarded when applying `func` to its children
+            // @note `func` parameters are `(Node*, const FuncReturn&, Args&&...)`
             template <typename Func, typename FuncReturn, typename... Args>
-            void visitChained(const Func& func, FuncReturn initial, Args&&... args);
+            void visitChained(const Func& func, const FuncReturn& initial, Args&&... args);
             
-            // ecs-related methods
             ecs::Entity getEntity() const;
-            template <typename... Args>
-            void addComponents(Args&&... args);
-            template <typename Type, typename... Other>
+            // @brief Construct a component from its constructor args
+            template <typename Type, typename... Args, whereIs(Type, ecs::Component)>
+            Type& addComponents(Args&&... args);
+            template <typename Type, whereIs(Type, ecs::Component)>
             void removeComponents();
-            template <typename Type>
-            bool hasComponent();
-            template <typename Type>
+            template <typename Type, whereIs(Type, ecs::Component)>
+            bool hasComponent() const;
+            template <typename Type, whereIs(Type, ecs::Component)>
             Type& getComponent();
         private:
-            // Assignable related functions
+            Node();
             void postAssignment() override;
             static std::unordered_map<ecs::Entity, Node*>& globalMap();
-            friend std::unique_ptr<Node> std::make_unique<Node>(); // NOLINT
+            friend std::unique_ptr<Node> std::make_unique<Node>();
             friend std::unique_ptr<Node>;
-            Node();
             
             Node* mParent;
             ecs::Entity mEntity;
@@ -79,38 +84,38 @@ namespace stay
             child.first->visit(func, std::forward<Args>(args)...);
         }
     }
+    
     template <typename Func, typename FuncReturn, typename... Args>
-    void Node::visitChained(const Func& func, FuncReturn initial, Args&&... args)
+    void Node::visitChained(const Func& func, const FuncReturn& initial, Args&&... args)
     {
-        FuncReturn result = func(this, initial, std::forward<Args>(args)...);
+        const FuncReturn result = func(this, initial, std::forward<Args>(args)...);
         for (auto& child : mChildren)
         {
             child.first->visitChained(func, result, std::forward<Args>(args)...);
         }
     }
 
-    template <typename... Args>
-    void Node::addComponents(Args&&... args)
+    template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
+    Type& Node::addComponents(Args&&... args)
     {
-        get()->getRegistry().emplace(mEntity, std::forward<Args...>(args...));
+        auto& res = get()->emplace<Type>(mEntity, std::forward<Args>(args)...);
+        res.assign(mEntity);
+        return res;
     }
-
-    template <typename Type, typename... Other>
+    template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
     void Node::removeComponents()
     {
-        get()->getRegistry().remove<Type, Other...>(mEntity);
+        get()->remove<Type>(mEntity);
     }
-
-    template <typename Type>
-    bool Node::hasComponent()
+    template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
+    bool Node::hasComponent() const
     {
-        return get()->getRegistry().try_get<Type>(mEntity) != nullptr;
+        return get()->try_get<Type>(mEntity) != nullptr;
     }
-    
-    template <typename Type>
+    template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
     Type& Node::getComponent()
     {
         assert(hasComponent<Type>() && "non-existing component");
-        return get()->getRegistry().get<Type>(mEntity);
+        return get()->get<Type>(mEntity);
     }
 } // namespace stay

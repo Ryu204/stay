@@ -13,7 +13,7 @@
             "name": "clang-tidy",
             "inherits" : "base",
             "cacheVariables": {
-                "CMAKE_CXX_CLANG_TIDY" : "clang-tidy;--header-filter=${sourceDir}/*"
+                "USER_DEFINED_CLANG_TIDY" : "clang-tidy;--header-filter=${sourceDir}/*.hpp"
             }
         }
     ]

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "node.hpp"
+#include <box2d/box2d.h>
+
 #include "../ecs/manager.hpp"
 #include "camera.hpp"
 
@@ -22,5 +23,8 @@ namespace stay
 
             Camera mCamera;
             ecs::Manager mManager;
+
+            b2World mPhysicsWorld;
+            const float mPixelsPerMeter;
     };
 } // namespace stay
