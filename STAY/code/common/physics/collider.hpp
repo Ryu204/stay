@@ -39,6 +39,8 @@ namespace stay
 
                 event::Event<Collider&, b2Contact&> OnCollisionEnter;
                 event::Event<Collider&, b2Contact&> OnCollisionExit;
+                event::Event<Collider&, b2Contact&> OnTriggerEnter;
+                event::Event<Collider&, b2Contact&> OnTriggerExit;
 
             private:
                 void attachToRigidBody(const Info& info, RigidBody* body, const Material* mat);

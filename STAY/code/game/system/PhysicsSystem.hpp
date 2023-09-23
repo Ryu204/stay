@@ -6,10 +6,6 @@
 #include "../../common/physics/collider.hpp"
 #include "../../common/ecs/manager.hpp"
 
-/*
-    Render colliders and other physics components using `b2World::DebugDraw()`
-*/
-
 namespace stay
 {
     namespace sys
@@ -22,15 +18,33 @@ namespace stay
                 { 
                     auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
                     auto* bCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureB()->GetUserData().pointer);
-                    aCol->OnCollisionEnter.invoke(*bCol, *contact);
-                    bCol->OnCollisionEnter.invoke(*aCol, *contact);
+                    bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
+                    if (!isTrigger)
+                    {
+                        aCol->OnCollisionEnter.invoke(*bCol, *contact);
+                        bCol->OnCollisionEnter.invoke(*aCol, *contact);
+                    }
+                    else
+                    {
+                        aCol->OnTriggerEnter.invoke(*bCol, *contact);
+                        bCol->OnTriggerEnter.invoke(*aCol, *contact);
+                    }
                 }
                 void EndContact(b2Contact* contact) 
                 { 
-                    auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
+                   auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
                     auto* bCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureB()->GetUserData().pointer);
-                    aCol->OnCollisionExit.invoke(*bCol, *contact);
-                    bCol->OnCollisionExit.invoke(*aCol, *contact);
+                    bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
+                    if (!isTrigger)
+                    {
+                        aCol->OnCollisionExit.invoke(*bCol, *contact);
+                        bCol->OnCollisionExit.invoke(*aCol, *contact);
+                    }
+                    else
+                    {
+                        aCol->OnTriggerExit.invoke(*bCol, *contact);
+                        bCol->OnTriggerExit.invoke(*aCol, *contact);
+                    }
                 }
             };
         } // namespace detail
