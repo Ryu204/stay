@@ -5,6 +5,7 @@ A project for my girlfriend's birthday.
 It's a game but the "engine" part is taking over.
 
 # How to build
+You will need `CMake` with version `>= 3.24` to build the project directly.
 
 In the project folder:
 ```bash
