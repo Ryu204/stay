@@ -66,5 +66,9 @@ namespace stay
             auto* res = parent->createEmptyChild();
             return res;
         }
+        Node* Manager::create(Entity parent)
+        {
+            return create(Node::getNode(parent));
+        }
     }
 } // namespace stay

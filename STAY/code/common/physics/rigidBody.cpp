@@ -1,25 +1,34 @@
 #include "rigidBody.hpp"
-
+/*debug*/ #include <iostream>
 namespace stay
 {
     namespace phys
     {
-        RigidBody::RigidBody(b2World* world, const Vector2& position, float angle, BodyType type)
-            : mWorld(world)
+        RigidBody::RigidBody(const Vector2& position, float angle, BodyType type)
         {
-            b2BodyDef def;
-            def.position = utils::convertVec2<b2Vec2>(position);
-            def.angle = angle * DEG2RAD;
-            def.type = static_cast<b2BodyType>(type);
-            def.linearDamping = 0.F;
-            def.angularDamping = 0.01F;
-            mBody = mWorld->CreateBody(&def);
+            /*debug*/ std::cout << "creating rgbd" << std::endl;
+            mBodyDef = b2BodyDef();
+            mBodyDef->position = utils::convertVec2<b2Vec2>(position);
+            mBodyDef->angle = angle * DEG2RAD;
+            mBodyDef->type = static_cast<b2BodyType>(type);
+            mBodyDef->linearDamping = 0.F;
+            mBodyDef->angularDamping = 0.01F;
+            /*debug*/ std::cout << "done creating" << std::endl;
+        }
+
+        void RigidBody::start(b2World* world)
+        {
+            mWorld = world;
+            mBody = mWorld->CreateBody(&(*mBodyDef));
             mBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+            mBodyDef = std::nullopt;
         }
 
         RigidBody::~RigidBody()
         {
+            /*debug*/ std::cout << "~rgbd" << std::endl;
             mWorld->DestroyBody(mBody);
+            /*debug*/ std::cout << "~~rgbd" << std::endl;
         }
         
         void RigidBody::setPosition(const Vector2& position)

@@ -14,11 +14,9 @@ namespace stay
         // Every component type must inherit this struct
         struct Component : utils::Assignable<Entity>, sf::NonCopyable
         {
+                using utils::Assignable<Entity>::get;
                 Node* getNode() const;
                 virtual ~Component() = default;
-            private:
-                friend class Manager;
-                friend class Node;
         };
     } // namespace ecs
 } // namespace stay

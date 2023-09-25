@@ -1,5 +1,5 @@
 #pragma once
-
+/*debug*/ #include <iostream>
 #include <box2d/box2d.h>
 
 #include "../../common/physics/rigidBody.hpp"
@@ -50,13 +50,15 @@ namespace stay
         } // namespace detail
 
         struct PhysicsSystem 
-            : public ecs::PreUpdateSystem
+            : public ecs::StartSystem
+            , public ecs::PreUpdateSystem
             , public ecs::UpdateSystem
             , public ecs::PostUpdateSystem
             , public ecs::System
         {
                 PhysicsSystem(ecs::Manager* manager)
-                    : ecs::PreUpdateSystem(0)
+                    : ecs::StartSystem(0)
+                    , ecs::PreUpdateSystem(0)
                     , ecs::UpdateSystem(-1)
                     , ecs::PostUpdateSystem(-1)
                     , ecs::System(manager)
@@ -65,6 +67,21 @@ namespace stay
                 virtual ~PhysicsSystem()
                 {
                     mPhysicsWorld->SetContactListener(nullptr);
+                }
+
+                void start() override
+                {
+                    /*debug*/std::cout << "starting phys" << std::endl;
+                    auto view = mManager->getRegistry().view<phys::RigidBody>();
+                    for (auto entity : view)
+                    {
+                        view.get<phys::RigidBody>(entity).start(mPhysicsWorld);
+                    }
+                    auto view2 = mManager->getRegistry().view<phys::Collider>();
+                    for (auto entity : view2)
+                    {
+                        view2.get<phys::Collider>(entity).start();
+                    }
                 }
 
                 void initialize(b2World* world)

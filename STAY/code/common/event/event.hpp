@@ -56,7 +56,7 @@ namespace stay
                 }
             private:
                 std::unordered_map<std::size_t, Handler> mSubcribers{};
-                utils::IDGenerator<20> mIDGen;
+                utils::IDGenerator mIDGen;
         };
     } // namespace event
 } // namespace stay

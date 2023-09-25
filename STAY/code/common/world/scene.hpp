@@ -18,8 +18,6 @@ namespace stay
             void render(RTarget* target);
         private:
             void initialize();
-            Node* create();
-            Node* createChild(Node* node);
 
             Camera mCamera;
             ecs::Manager mManager;

@@ -48,15 +48,36 @@ namespace stay
 
                 // Generate a new node
                 Node* create(Node* parent = &Node::root());
+                Node* create(Entity parent = Node::root().getEntity());
                 // Components related functions
                 template <typename Type, typename... Args, whereIs(Type, Component)>
-                Type& addComponents(Node* node, Args&&... args);
+                Type& addComponents(Node* node, Args&&... args)
+                {
+                    return addComponents<Type, Args...>(node->getEntity(), std::forward<Args>(args)...);
+                }
+                template <typename Type, typename... Args, whereIs(Type, Component)>
+                Type& addComponents(Entity entity, Args&&... args);
                 template <typename Type, whereIs(Type, Component)>
-                void removeComponents(Node* node);
+                void removeComponents(Node* node)
+                {
+                    removeComponents<Type>(node->getEntity());
+                }
                 template <typename Type, whereIs(Type, Component)>
-                bool hasComponent(const Node* node) const;
+                void removeComponents(Entity entity);
                 template <typename Type, whereIs(Type, Component)>
-                Type& getComponent(Node* node);
+                bool hasComponent(const Node* node) const
+                {
+                    return hasComponent<Type>(node->getEntity());
+                }
+                template <typename Type, whereIs(Type, Component)>
+                bool hasComponent(Entity entity) const;
+                template <typename Type, whereIs(Type, Component)>
+                Type& getComponent(Node* node)
+                {
+                    return getComponent<Type>(node->getEntity());
+                }
+                template <typename Type, whereIs(Type, Component)>
+                Type& getComponent(Entity entity);
             private:
                 template <typename T>
                 using Pair = detail::Ordered<SPtr<T>>;
@@ -70,28 +91,27 @@ namespace stay
         };
 
         template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
-        Type& Manager::addComponents(Node* node, Args&&... args)
+        Type& Manager::addComponents(Entity entity, Args&&... args)
         {
-            auto entity = node->getEntity();
             auto& res = mRegistry.emplace<Type>(entity, std::forward<Args>(args)...);
             // assign this entity to the component so it knows which node does it belong to
             res.assign(entity);
             return res;
         }
         template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
-        void Manager::removeComponents(Node* node)
+        void Manager::removeComponents(Entity entity)
         {
-            mRegistry.remove<Type>(node->getEntity());
+            mRegistry.remove<Type>(entity);
         }
         template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
-        bool Manager::hasComponent(const Node* node) const
+        bool Manager::hasComponent(Entity entity) const
         {
-            return mRegistry.try_get<Type>(node->getEntity()) != nullptr;
+            return mRegistry.try_get<Type>(entity) != nullptr;
         }
         template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
-        Type& Manager::getComponent(Node* node)
+        Type& Manager::getComponent(Entity entity)
         {
-            return mRegistry.get<Type>(node->getEntity());
+            return mRegistry.get<Type>(entity);
         }
 
         template <typename DerviedSystem>

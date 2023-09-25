@@ -17,6 +17,7 @@ namespace stay
     }
     Scene::~Scene()
     {
+        /*debug*/ std::cout << "~scene" << std::endl;
         Node::root().clearChildren();
         Node::setGlobalRegistry(nullptr);
     }
@@ -45,18 +46,18 @@ namespace stay
         mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
         
         auto* node = Node::create();
-        auto& body = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, 0), 45, phys::BodyType::DYNAMIC);
-        body.setAngularVelocity(100);
-        auto& col = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)}, &body, nullptr);
+        auto& body = node->addComponents<phys::RigidBody>(Vector2(0, 0), 45, phys::BodyType::DYNAMIC);
+        // body.setAngularVelocity(100);
+        auto& col = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)});
         node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{0.5F, 1.F});
 
         node = Node::create();
-        auto& body1 = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, -6), 0, phys::BodyType::STATIC);
-        auto& col1 = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(4.F, 0.5F)}, &body1, nullptr);
+        auto& body1 = node->addComponents<phys::RigidBody>(Vector2(0, -6), 0, phys::BodyType::STATIC);
+        auto& col1 = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(4.F, 0.5F)});
         node->addComponents<comp::Render>(sf::Color::Green, sf::Vector2f{0.5F, 1.F});
 
         /*debug*/
-        col1.setTrigger(true);
+        // col1.setTrigger(true);
         col1.OnCollisionEnter.addEventListener([](phys::Collider&, b2Contact&) { std::cout << "sth entered static collider" << std::endl; });
         col1.OnTriggerEnter.addEventListener([](phys::Collider&, b2Contact&) { std::cout << "sth entered static trigger" << std::endl; });
         /**/
