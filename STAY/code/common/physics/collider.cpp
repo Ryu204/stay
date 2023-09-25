@@ -3,7 +3,6 @@
 #include "../utility/typedef.hpp"
 #include "../world/node.hpp"
 
-/*debug*/ #include <iostream>
 namespace stay
 {
     namespace phys
@@ -25,21 +24,15 @@ namespace stay
             : mMaterial(mat)
             , mShapeInfo(info)
             , mFixture(nullptr)
-        {
-            /*debug*/ std::cout << "creating collider" << std::endl;
-        }     
+        { }     
 
         Collider::~Collider()
         {
-            /*debug*/
-            std::cout << "~collider" << std::endl;
             // Must enable this check since `RigidBody` could have been destroyed prior to this call
             if (getNode()->hasComponent<RigidBody>())
             {
                 mFixture->GetBody()->DestroyFixture(mFixture);
             }
-            /*debug*/
-            std::cout << "~~collider" << std::endl;
         }
 
         void Collider::start()

@@ -1,19 +1,17 @@
 #include "rigidBody.hpp"
-/*debug*/ #include <iostream>
+
 namespace stay
 {
     namespace phys
     {
         RigidBody::RigidBody(const Vector2& position, float angle, BodyType type)
         {
-            /*debug*/ std::cout << "creating rgbd" << std::endl;
             mBodyDef = b2BodyDef();
             mBodyDef->position = utils::convertVec2<b2Vec2>(position);
             mBodyDef->angle = angle * DEG2RAD;
             mBodyDef->type = static_cast<b2BodyType>(type);
             mBodyDef->linearDamping = 0.F;
             mBodyDef->angularDamping = 0.01F;
-            /*debug*/ std::cout << "done creating" << std::endl;
         }
 
         void RigidBody::start(b2World* world)
@@ -26,9 +24,7 @@ namespace stay
 
         RigidBody::~RigidBody()
         {
-            /*debug*/ std::cout << "~rgbd" << std::endl;
             mWorld->DestroyBody(mBody);
-            /*debug*/ std::cout << "~~rgbd" << std::endl;
         }
         
         void RigidBody::setPosition(const Vector2& position)

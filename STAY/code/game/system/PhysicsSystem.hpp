@@ -1,5 +1,5 @@
 #pragma once
-/*debug*/ #include <iostream>
+
 #include <box2d/box2d.h>
 
 #include "../../common/physics/rigidBody.hpp"
@@ -71,7 +71,6 @@ namespace stay
 
                 void start() override
                 {
-                    /*debug*/std::cout << "starting phys" << std::endl;
                     auto view = mManager->getRegistry().view<phys::RigidBody>();
                     for (auto entity : view)
                     {
