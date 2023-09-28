@@ -22,7 +22,6 @@ namespace stay
         };
         class Collider;
         // @brief An abstract component, only functions if a collider is presented. Manipulate velocity and force.
-        // @note Because we only want the body to be destroy when it's ultimately deleted, not deleted and copied again, we make it non-copyable
         class RigidBody : public ecs::Component
         {
             public:
@@ -44,8 +43,11 @@ namespace stay
                 void setFixedRotation(bool fixed);
                 void setGravityScale(float scale);
                 b2Fixture* attachFixture(const b2FixtureDef& properties);
+
+                Json::Value toJSONObject() const override;
+                bool fetch(const Json::Value& value) override;
             private:
-                std::optional<b2BodyDef> mBodyDef;
+                b2BodyDef mBodyDef;
                 b2World* mWorld;
                 b2Body* mBody;
         };

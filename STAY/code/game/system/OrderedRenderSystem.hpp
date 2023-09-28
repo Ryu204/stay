@@ -42,7 +42,7 @@ namespace stay
                         if (current->hasComponent<comp::Render>())
                         {
                             const auto& drawable = current->getComponent<comp::Render>();
-                            mShape.setSize(drawable.size);
+                            mShape.setSize(utils::convertVec2<sf::Vector2f>(drawable.size));
                             utils::centersf(mShape);
                             mShape.setFillColor(drawable.color);
                             target->draw(mShape, states);

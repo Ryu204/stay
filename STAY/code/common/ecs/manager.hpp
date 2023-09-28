@@ -51,12 +51,12 @@ namespace stay
                 Node* create(Entity parent = Node::root().getEntity());
                 // Components related functions
                 template <typename Type, typename... Args, whereIs(Type, Component)>
-                Type& addComponents(Node* node, Args&&... args)
+                Type& addComponent(Node* node, Args&&... args)
                 {
-                    return addComponents<Type, Args...>(node->getEntity(), std::forward<Args>(args)...);
+                    return addComponent<Type, Args...>(node->getEntity(), std::forward<Args>(args)...);
                 }
                 template <typename Type, typename... Args, whereIs(Type, Component)>
-                Type& addComponents(Entity entity, Args&&... args);
+                Type& addComponent(Entity entity, Args&&... args);
                 template <typename Type, whereIs(Type, Component)>
                 void removeComponents(Node* node)
                 {
@@ -91,7 +91,7 @@ namespace stay
         };
 
         template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
-        Type& Manager::addComponents(Entity entity, Args&&... args)
+        Type& Manager::addComponent(Entity entity, Args&&... args)
         {
             auto& res = mRegistry.emplace<Type>(entity, std::forward<Args>(args)...);
             // assign this entity to the component so it knows which node does it belong to

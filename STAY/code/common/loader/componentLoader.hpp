@@ -21,24 +21,25 @@ namespace stay
             virtual Json::Value serialize(ecs::Manager* /*manager*/, ecs::Entity /*entity*/) const = 0;
             // @brief create a dummy default component
             // @note to initialize the registry
-            virtual void createDefault(ecs::Manager* /*manager*/, ecs::Entity /*entity*/) const = 0;
+            virtual void createDefault(ecs::Registry* /*registry*/, ecs::Entity /*entity*/) const = 0;
     };
 
-    template <typename>
+    template <typename T, whereIs(T, ecs::Component)>
     class ComponentSerializer : public IComponentSerializer
     {
         public:
-            bool deserializeInto(ecs::Manager* /*manager*/, ecs::Entity /*entity*/, const Json::Value& /*val*/) const override
+            bool deserializeInto(ecs::Manager* manager, ecs::Entity entity, const Json::Value& val) const override
             {
-                throw std::logic_error("You must implement loader for each component type");
+                auto& comp = manager->addComponent<T>(entity);
+                return comp.fetch(val);
             }
-            Json::Value serialize(ecs::Manager* /*manager*/, ecs::Entity /*entity*/) const override
+            Json::Value serialize(ecs::Manager* manager, ecs::Entity entity) const override
             {
-                throw std::logic_error("You must implement loader for each component type");
+                return manager->getComponent<T>(entity).toJSONObject();
             }
-            void createDefault(ecs::Manager* /*manager*/, ecs::Entity /*entity*/) const
+            void createDefault(ecs::Registry* reg, ecs::Entity entity) const
             {
-                throw std::logic_error("You must implement loader for each component type");
+                reg->emplace<T>(entity);
             }
     };
 
@@ -72,7 +73,7 @@ namespace stay
             {
                 mLoaderList.emplace(name, std::make_unique<ComponentSerializer<T>>());
                 // Trigger the creation of registry's storage
-                mLoaderList.at(name)->createDefault(mManager, mUtilizeEntity);
+                mLoaderList.at(name)->createDefault(&mManager->getRegistry(), mUtilizeEntity);
                 const auto& storage = mManager->getRegistry().storage<T>();
                 mTypenameToLoader.emplace(storage.type().name(), name);
                 // Clean the utilize entity

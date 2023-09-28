@@ -3,9 +3,7 @@
 #include "../../game/component/list.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
-/*debug*/ #include "../loader/componentLoader.hpp"
-/*debug*/ #include <fstream>
-/*debug*/ #include <iostream>
+
 namespace stay
 {
     Scene::Scene()
@@ -43,37 +41,5 @@ namespace stay
         mManager.registerSystem<sys::OrderedRenderSystem>();
         mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
         mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
-        
-        /*debug:test component loading*/
-        Json::Value obj;
-        std::ifstream reader("asset/test.json");
-        reader >> obj;
-        ComponentsLoader compLoader(&mManager);
-        compLoader.registerComponent<comp::Render>("render");
-        //--------------------------------
-
-        auto* node = Node::create();
-        /*debug------------------------------*/ 
-        compLoader.loadAllComponents(node->getEntity(), obj["componentsData"]);
-        std::ofstream("asset/out.json") << compLoader.saveAllComponents(node->getEntity());
-        //-----------------------------------------
-        //auto& body = node->addComponents<phys::RigidBody>(Vector2(0, 0), 45, phys::BodyType::DYNAMIC);
-        // body.setAngularVelocity(100);
-        //auto& col = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)});
-        //node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{0.5F, 1.F});
-
-        node = Node::create();
-        auto& body1 = node->addComponents<phys::RigidBody>(Vector2(0, -6), 0, phys::BodyType::STATIC);
-        auto& col1 = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(4.F, 0.5F)});
-        node->addComponents<comp::Render>(sf::Color::Green, sf::Vector2f{0.5F, 1.F});
-
-        // for (int i = 1; i <= 4; ++i)
-        // {
-        //     const auto& trans = node->getLocalTransform().getMatrix();
-        //     node = createChild(node);
-        //     node->addComponents<comp::Render>(sf::Color::Red, sf::Vector2f{0.4F, 1.2F});
-        //     node->getLocalTransform().move({1.3F, 1.3F, 0});
-        //     node->getLocalTransform().rotate(10);
-        // }
     }
 } // namespace stay

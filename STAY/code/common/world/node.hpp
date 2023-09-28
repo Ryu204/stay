@@ -55,7 +55,7 @@ namespace stay
             ecs::Entity getEntity() const;
             // @brief Construct a component from its constructor args
             template <typename Type, typename... Args, whereIs(Type, ecs::Component)>
-            Type& addComponents(Args&&... args);
+            Type& addComponent(Args&&... args);
             template <typename Type, whereIs(Type, ecs::Component)>
             void removeComponents();
             template <typename Type, whereIs(Type, ecs::Component)>
@@ -96,7 +96,7 @@ namespace stay
     }
 
     template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
-    Type& Node::addComponents(Args&&... args)
+    Type& Node::addComponent(Args&&... args)
     {
         auto& res = get()->emplace<Type>(mEntity, std::forward<Args>(args)...);
         res.assign(mEntity);

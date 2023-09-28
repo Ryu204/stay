@@ -32,7 +32,7 @@ namespace stay
                     {
                         auto* node = Node::getNode(entity);
                         const auto& tf = node->getGlobalTransform();
-                        mShape.setSize(render.size);
+                        mShape.setSize(utils::convertVec2<sf::Vector2f>(render.size));
                         utils::centersf(mShape);
                         mShape.setFillColor(render.color);
                         RStates states = RStates::Default;

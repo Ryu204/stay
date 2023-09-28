@@ -6,25 +6,23 @@ namespace stay
     {
         RigidBody::RigidBody(const Vector2& position, float angle, BodyType type)
         {
-            mBodyDef = b2BodyDef();
-            mBodyDef->position = utils::convertVec2<b2Vec2>(position);
-            mBodyDef->angle = angle * DEG2RAD;
-            mBodyDef->type = static_cast<b2BodyType>(type);
-            mBodyDef->linearDamping = 0.F;
-            mBodyDef->angularDamping = 0.01F;
+            mBodyDef.position = utils::convertVec2<b2Vec2>(position);
+            mBodyDef.angle = angle * DEG2RAD;
+            mBodyDef.type = static_cast<b2BodyType>(type);
+            mBodyDef.angularDamping = 0.01F;
         }
 
         void RigidBody::start(b2World* world)
         {
             mWorld = world;
-            mBody = mWorld->CreateBody(&(*mBodyDef));
+            mBody = mWorld->CreateBody(&mBodyDef);
             mBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
-            mBodyDef = std::nullopt;
         }
 
         RigidBody::~RigidBody()
         {
-            mWorld->DestroyBody(mBody);
+            if (mWorld != nullptr)
+                mWorld->DestroyBody(mBody);
         }
         
         void RigidBody::setPosition(const Vector2& position)
@@ -85,6 +83,25 @@ namespace stay
         b2Fixture* RigidBody::attachFixture(const b2FixtureDef& properties)
         {
             return mBody->CreateFixture(&properties);
+        }
+
+        Json::Value RigidBody::toJSONObject() const
+        {
+            Json::Value res;
+            res["position"] = utils::convertVec2<Vector2>(mBodyDef.position).toJSONObject();
+            res["angle"] = mBodyDef.angle;
+            res["type"] = mBodyDef.type;
+            return res;
+        }
+        bool RigidBody::fetch(const Json::Value& value)
+        {
+            Vector2 position;
+            if (!(value["angle"].isNumeric() && value["type"].isInt() && position.fetch(value["position"])))
+                return false;
+            mBodyDef.angle = value["angle"].asFloat();
+            mBodyDef.position = utils::convertVec2<b2Vec2>(position);
+            mBodyDef.type = static_cast<b2BodyType>(value["type"].asInt());
+            return true;
         }
     } // namespace phys
 } // namespace stay

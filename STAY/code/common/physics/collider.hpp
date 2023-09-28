@@ -17,7 +17,7 @@ namespace stay
     namespace phys
     {
         class Collider;
-        class Material
+        class Material : public Serializable
         {
             public:
                 Material(float density = 1.F, float friction = 0.2F, float restituition = 0.F);
@@ -26,6 +26,8 @@ namespace stay
                 void setRestituition(float restituition);
                 b2FixtureDef getFixtureDef() const;
                 
+                Json::Value toJSONObject() const override;
+                bool fetch(const Json::Value& value) override;
             private:
                 b2FixtureDef mDef;
         };
@@ -42,9 +44,14 @@ namespace stay
                     Vector2 position;
                     float radius;
                 };
-                using Info = std::variant<Box, Circle>;
+                struct Info : public std::variant<Box, Circle>, public Serializable
+                {
+                    using std::variant<Box, Circle>::variant;
+                    Json::Value toJSONObject() const override;
+                    bool fetch(const Json::Value& value) override;
+                };
                 
-                Collider(const Info& info, const Material& mat = Material());
+                Collider(const Info& info = Box{}, const Material& mat = Material());
                 virtual ~Collider();
                 void start();
                 void setMaterial(const Material& mat);
@@ -56,12 +63,13 @@ namespace stay
                 event::Event<Collider&, b2Contact&> OnTriggerEnter;
                 event::Event<Collider&, b2Contact&> OnTriggerExit;
 
+                SERIALIZE(mMaterial, mShapeInfo)
             private:
                 void attachToRigidBody();
                 static Uptr<b2Shape> createShape(const Collider::Info& info);
 
-                std::optional<Material> mMaterial;
-                std::optional<Info> mShapeInfo;
+                Material mMaterial;
+                Info mShapeInfo;
                 b2Fixture* mFixture;
         };
     } // namespace phys

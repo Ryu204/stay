@@ -20,7 +20,7 @@ namespace stay
             Visitor(funcs...) -> Visitor<funcs...>;
         } // namespace detail
 
-        Collider::Collider(const Info& info, const Material& mat)
+        Collider::Collider(const Info& info, const Material& mat) // NOLINT
             : mMaterial(mat)
             , mShapeInfo(info)
             , mFixture(nullptr)
@@ -29,7 +29,7 @@ namespace stay
         Collider::~Collider()
         {
             // Must enable this check since `RigidBody` could have been destroyed prior to this call
-            if (getNode()->hasComponent<RigidBody>())
+            if (mFixture != nullptr && getNode()->hasComponent<RigidBody>())
             {
                 mFixture->GetBody()->DestroyFixture(mFixture);
             }
@@ -62,14 +62,11 @@ namespace stay
 
         void Collider::attachToRigidBody()
         {
-            b2FixtureDef def = (*mMaterial).getFixtureDef();
-            auto shape = createShape(*mShapeInfo);
+            b2FixtureDef def = mMaterial.getFixtureDef();
+            auto shape = createShape(mShapeInfo);
             def.shape = shape.get();
             mFixture = getNode()->getComponent<RigidBody>().attachFixture(def);
             mFixture->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
-            // Cleanup
-            mMaterial = std::nullopt;
-            mShapeInfo = std::nullopt;
         }
 
         Uptr<b2Shape> Collider::createShape(const Collider::Info& info)
@@ -92,6 +89,52 @@ namespace stay
                 }
             }, info);
             return std::move(res);
+        }
+
+        Json::Value Collider::Info::toJSONObject() const
+        {
+            Json::Value res;
+            std::visit(detail::Visitor{
+                [&res](const Collider::Circle& cir)
+                {
+                    res["type"] = "circle";
+                    res["position"] = cir.position.toJSONObject();
+                    res["radius"] = cir.radius;
+                },
+                [&res](const Collider::Box& box)
+                {
+                    res["type"] = "box";
+                    res["position"] = box.position.toJSONObject();
+                    res["angle"] = box.angle;
+                }
+            }, *this);
+            return res;
+        }
+
+        bool Collider::Info::fetch(const Json::Value& value)
+        {
+            bool succeeded = true;
+            if (!value["type"].isString())
+                return false;
+            if (value["type"].asString() == "circle")
+                operator=(Circle{});
+            else if (value["type"].asString() == "box")
+                operator=(Box{});
+            std::visit(detail::Visitor{
+                [&](Collider::Circle& cir)
+                {
+                    if (!(cir.position.fetch(value["position"]) && value["radius"].isNumeric()))
+                        succeeded = false;
+                    cir.radius = value["radius"].asFloat();
+                },
+                [&](Collider::Box& box)
+                {
+                    if (!(box.position.fetch(value["position"]) && box.size.fetch(value["size"]) && value["angle"].isNumeric()))
+                        succeeded = false;
+                    box.angle = value["angle"].asFloat();
+                }
+            }, *this);
+            return succeeded;
         }
         
         Material::Material(float density, float friction, float restituition)
@@ -120,6 +163,25 @@ namespace stay
         b2FixtureDef Material::getFixtureDef() const
         {
             return mDef;
+        }
+
+        Json::Value Material::toJSONObject() const
+        {
+            Json::Value res;
+            res["density"] = mDef.density;
+            res["friction"] = mDef.friction;
+            res["restituition"] = mDef.restitution;
+            return res;
+        }
+
+        bool Material::fetch(const Json::Value& value)
+        {
+            if (!(value["density"].isNumeric() && value["friction"].isNumeric() && value["restituition"].isNumeric()))
+                return false;
+            mDef.density = value["density"].asFloat();
+            mDef.friction = value["friction"].asFloat();
+            mDef.restitution = value["restituition"].asFloat();
+            return true;
         }
     } // namespace phys
 } // namespace stay

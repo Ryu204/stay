@@ -23,8 +23,9 @@ namespace stay
     {
         const bool isArray = componentsArray.type() == Json::ValueType::arrayValue;
         utils::throwIfFalse(isArray, error());
-        for (const auto& obj : componentsArray)
+        for (Json::ArrayIndex i = 0; i < componentsArray.size(); ++i) // NOLINT
         {
+            const auto& obj = componentsArray[i];
             const std::string name = obj["name"].asString();
             bool nameFound = mLoaderList.find(name) != mLoaderList.end();
             utils::throwIfFalse(nameFound, error());
