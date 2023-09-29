@@ -23,7 +23,7 @@ namespace stay
         }
         bool fetch(const Json::Value& data) override
         {
-            bool invalid = data.type() != Json::arrayValue || data.size() != 4;
+            bool invalid = (data.type() != Json::arrayValue || data.size() != 4);
             if (invalid)
             {
                 *(static_cast<sf::Color*>(this)) = sf::Color::White;

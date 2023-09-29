@@ -6,10 +6,15 @@ namespace stay
 {
     namespace ecs
     {       
-        Registry& Manager::getRegistry()
+        Registry& Manager::getRegistryRef()
+        {
+            return *mRegistry;
+        } 
+
+        SPtr<Registry> Manager::getRegistry()
         {
             return mRegistry;
-        } 
+        }
 
         // Meant to be called only once, before any update
         void Manager::start()

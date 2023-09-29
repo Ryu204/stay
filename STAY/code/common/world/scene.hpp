@@ -4,6 +4,7 @@
 
 #include "../ecs/manager.hpp"
 #include "camera.hpp"
+#include "../loader/sceneLoader.hpp"
 
 namespace stay
 {
@@ -26,5 +27,6 @@ namespace stay
 
             b2World mPhysicsWorld;
             const float mPixelsPerMeter;
+            //SceneLoader mSceneLoader;
     };
 } // namespace stay

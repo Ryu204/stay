@@ -71,12 +71,12 @@ namespace stay
 
                 void start() override
                 {
-                    auto view = mManager->getRegistry().view<phys::RigidBody>();
+                    auto view = mManager->getRegistryRef().view<phys::RigidBody>();
                     for (auto entity : view)
                     {
                         view.get<phys::RigidBody>(entity).start(mPhysicsWorld);
                     }
-                    auto view2 = mManager->getRegistry().view<phys::Collider>();
+                    auto view2 = mManager->getRegistryRef().view<phys::Collider>();
                     for (auto entity : view2)
                     {
                         view2.get<phys::Collider>(entity).start();
@@ -103,7 +103,7 @@ namespace stay
                 // Bind transform to body collider
                 void postUpdate(float dt) override
                 {
-                    auto view = mManager->getRegistry().view<phys::RigidBody>();
+                    auto view = mManager->getRegistryRef().view<phys::RigidBody>();
 
                     for (auto entity : view)
                     {

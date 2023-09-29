@@ -1,14 +1,22 @@
 #include <string>
-#include <iostream>
+
 #include "node.hpp"
 
 namespace stay
 {
-    void Node::init(ecs::Registry* reg)
+    void Node::init(const SPtr<ecs::Registry>& registry)
     {
         auto& info = globalInfo();
-        info.registry = reg;
-        info.root = reg->create();
+        info.registry = registry;
+        info.root = registry->create();
+    }
+
+    void Node::shutdown()
+    {
+        auto& info = globalInfo();
+        info.nodeOf.clear();
+        info.registry->destroy(info.root);
+        info.registry.reset();
     }
 
     Node* Node::getNode(ecs::Entity entity)
@@ -28,12 +36,17 @@ namespace stay
         , mEntity(globalInfo().registry->create())
     { 
         globalInfo().nodeOf.emplace(mEntity, this);
-        std::cout << "node created!\n";
+    }
+
+    Node::Node(ecs::Entity id)
+        : mParent(globalInfo().root)
+        , mEntity(globalInfo().registry->create(id))
+    {
+        assert(mEntity == id && "specified ID alreay exists");
     }
 
     Node::~Node()
     {
-        std::cout << "node destroyed!\n";
         globalInfo().registry->destroy(mEntity);
         globalInfo().nodeOf.erase(mEntity);
     }
@@ -69,6 +82,11 @@ namespace stay
         parent()->mChildren.erase(mEntity);
         // set new parent
         mParent = newParent->mEntity;
+    }
+
+    void Node::setParent(ecs::Entity parent)
+    {
+        setParent(getNode(parent));
     }
 
     void Node::destroy(Node* child)
@@ -115,6 +133,15 @@ namespace stay
     Node* Node::createChild()
     {
         auto ptr = std::make_unique<Node>();
+        auto* res = ptr.get();
+        res->mParent = mEntity;
+        mChildren.emplace(res->mEntity, std::move(ptr));
+        return res;
+    }
+
+    Node* Node::createChild(ecs::Entity id)
+    {
+        auto ptr = std::make_unique<Node>(id);
         auto* res = ptr.get();
         res->mParent = mEntity;
         mChildren.emplace(res->mEntity, std::move(ptr));

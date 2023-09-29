@@ -10,13 +10,13 @@ namespace stay
     }
 
     ComponentsLoader::ComponentsLoader(ecs::Manager* manager)
-        : mUtilizeEntity(manager->getRegistry().create())
+        : mUtilizeEntity(manager->getRegistryRef().create())
         , mManager(manager)
     {}
 
     ComponentsLoader::~ComponentsLoader()
     {
-        mManager->getRegistry().destroy(mUtilizeEntity);
+        mManager->getRegistryRef().destroy(mUtilizeEntity);
     }
 
     void ComponentsLoader::loadAllComponents(ecs::Entity entity, const Json::Value& componentsArray)
@@ -43,7 +43,7 @@ namespace stay
     Json::Value ComponentsLoader::saveAllComponents(ecs::Entity entity) const
     {
         Json::Value arr(Json::ValueType::arrayValue);
-        const auto& reg = mManager->getRegistry();
+        const auto& reg = mManager->getRegistryRef();
         for (const auto [id, storage] : reg.storage())
         {
             auto type = storage.type();

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 #include <unordered_map>
 
@@ -14,21 +16,25 @@ namespace stay
     class Node : sf::NonCopyable
     {
         public:
-            static void init(ecs::Registry* reg);
+            static void init(const SPtr<ecs::Registry>& registry);
+            static void shutdown();
             static Node* getNode(ecs::Entity entity);
 
             Node();
+            Node(ecs::Entity id);
             virtual ~Node();
             bool stray() const;
             const Node* parent() const;
             Node* parent();
             void setParent(Node* newParent);
+            void setParent(ecs::Entity parent);
             void destroy(Node* child);
             void destroy(ecs::Entity child);
             void destroyChildren();
             bool childOf(const Node* node) const;
             bool parentOf(const Node* node) const;
             Node* createChild();
+            Node* createChild(ecs::Entity id);
 
             const Transform& localTransform() const;
             Transform& localTransform();
@@ -53,7 +59,7 @@ namespace stay
         private:
             struct Global
             {
-                ecs::Registry* registry{nullptr};
+                SPtr<ecs::Registry> registry;
                 std::unordered_map<ecs::Entity, Node*> nodeOf{};
                 ecs::Entity root;
             };

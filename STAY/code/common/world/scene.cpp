@@ -11,8 +11,9 @@ namespace stay
     Scene::Scene()
         : mPhysicsWorld({0.F, -10.F})
         , mPixelsPerMeter(100.F)
+        //, mSceneLoader(&mManager, "asset/test.json")
     {
-        Node::init(&mManager.getRegistry());
+        Node::init(mManager.getRegistry());
         mSceneRoot = std::make_unique<Node>();
         initialize();
     }

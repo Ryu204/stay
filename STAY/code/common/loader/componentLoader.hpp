@@ -73,11 +73,11 @@ namespace stay
             {
                 mLoaderList.emplace(name, std::make_unique<ComponentSerializer<T>>());
                 // Trigger the creation of registry's storage
-                mLoaderList.at(name)->createDefault(&mManager->getRegistry(), mUtilizeEntity);
-                const auto& storage = mManager->getRegistry().storage<T>();
+                mLoaderList.at(name)->createDefault(&mManager->getRegistryRef(), mUtilizeEntity);
+                const auto& storage = mManager->getRegistryRef().storage<T>();
                 mTypenameToLoader.emplace(storage.type().name(), name);
                 // Clean the utilize entity
-                mManager->getRegistry().remove<T>(mUtilizeEntity);
+                mManager->getRegistryRef().remove<T>(mUtilizeEntity);
             }
 
             void loadAllComponents(ecs::Entity entity, const Json::Value& componentsArray);

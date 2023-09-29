@@ -27,7 +27,7 @@ namespace stay
 
                 void render(RTarget* target, Node* /*root*/) override
                 {
-                    auto view = mManager->getRegistry().view<comp::Render>();
+                    auto view = mManager->getRegistryRef().view<comp::Render>();
                     for (auto [entity, render] : view.each())
                     {
                         auto* node = Node::getNode(entity);
