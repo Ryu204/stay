@@ -11,14 +11,14 @@
 
 namespace stay
 {
-    class Node : utils::Assignable<ecs::Registry*>, sf::NonCopyable
+    class Node : sf::NonCopyable
     {
         public:
             // @brief The root node of the entire scene
             // @warning You should not do anything with it, except visiting (since it's only used for getting all current Node's refs)
             static Node& root();
             // @brief Use this function to associate a registry with node hierachy
-            static void setGlobalRegistry(ecs::Registry* registry);
+            static void setRegistry(ecs::Registry* registry);
             // Create a children of root node using root's `ecs::Manager`
             static Node* create();
             // Get the Node associating with `identifier`
@@ -26,6 +26,7 @@ namespace stay
             // Comletely destroy a node and its children
             // @warning Should not be used when a system is iterating
             static void destroy(Node* node);
+            static void resetNodeHierachy();
 
             virtual ~Node();
             void setParent(Node* newParent);
@@ -63,14 +64,18 @@ namespace stay
             template <typename Type, whereIs(Type, ecs::Component)>
             Type& getComponent();
         private:
+            struct Global
+            {
+                ecs::Registry* registry{nullptr};
+                std::unordered_map<ecs::Entity, Node*> nodeOf{};
+            };
             Node();
-            void postAssignment() override;
-            static std::unordered_map<ecs::Entity, Node*>& globalMap();
+            static Global& globalInfo();
             friend std::unique_ptr<Node> std::make_unique<Node>();
             friend std::unique_ptr<Node>;
             
             Node* mParent;
-            ecs::Entity mEntity;
+            const ecs::Entity mEntity;
             std::unordered_map<Node*, Uptr<Node>> mChildren;
             Transform mLocalTransform;
     };
@@ -98,24 +103,24 @@ namespace stay
     template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
     Type& Node::addComponent(Args&&... args)
     {
-        auto& res = get()->emplace<Type>(mEntity, std::forward<Args>(args)...);
+        auto& res = globalInfo().registry->emplace<Type>(mEntity, std::forward<Args>(args)...);
         res.assign(mEntity);
         return res;
     }
     template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
     void Node::removeComponents()
     {
-        get()->remove<Type>(mEntity);
+        globalInfo().registry->remove<Type>(mEntity);
     }
     template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
     bool Node::hasComponent() const
     {
-        return get()->try_get<Type>(mEntity) != nullptr;
+        return globalInfo().registry->try_get<Type>(mEntity) != nullptr;
     }
     template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
     Type& Node::getComponent()
     {
         assert(hasComponent<Type>() && "non-existing component");
-        return get()->get<Type>(mEntity);
+        return globalInfo().registry->get<Type>(mEntity);
     }
 } // namespace stay

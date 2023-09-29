@@ -10,13 +10,12 @@ namespace stay
         : mPhysicsWorld({0.F, -10.F})
         , mPixelsPerMeter(100.F)
     {
-        Node::setGlobalRegistry(&mManager.getRegistry());
+        Node::setRegistry(&mManager.getRegistry());
         initialize();
     }
     Scene::~Scene()
     {
-        Node::root().clearChildren();
-        Node::setGlobalRegistry(nullptr);
+        Node::resetNodeHierachy();
     }
     void Scene::update(float dt)
     {

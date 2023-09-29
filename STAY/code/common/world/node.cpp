@@ -5,7 +5,10 @@ namespace stay
 {
     Node::Node()
         : mParent(nullptr)
-    { }
+        , mEntity(globalInfo().registry->create())
+    { 
+        globalInfo().nodeOf[mEntity] = this;
+    }
 
     Node::~Node()
     {
@@ -13,8 +16,8 @@ namespace stay
         if (this == &root())
             return;
         // Order of removal: registry destroys entity, components -> destroy node and its global registration
-        get()->destroy(mEntity);
-        globalMap().erase(mEntity);
+        globalInfo().registry->destroy(mEntity);
+        globalInfo().nodeOf.erase(mEntity);
     }
 
     Node& Node::root()
@@ -23,19 +26,9 @@ namespace stay
         return res;
     };
     
-    void Node::setGlobalRegistry(ecs::Registry* registry)
+    void Node::setRegistry(ecs::Registry* registry)
     {
-        root().assign(registry);
-    }
-
-    void Node::postAssignment()
-    {
-        if (get() == nullptr)
-        {
-            return;
-        }
-        mEntity = get()->create();
-        globalMap().emplace(mEntity, this);
+        globalInfo().registry = registry;
     }
 
     Node* Node::create()
@@ -45,17 +38,17 @@ namespace stay
 
     Node* Node::getNode(ecs::Entity identifier)
     {
-        if (globalMap().find(identifier) == globalMap().end())
+        if (globalInfo().nodeOf.find(identifier) == globalInfo().nodeOf.end())
         {
             throw std::invalid_argument("Node: \"getNode\" called with non-existing identifier " + std::to_string(static_cast<int>(identifier)));
         }
-        return globalMap().at(identifier);
+        return globalInfo().nodeOf[identifier];
     }
 
-    std::unordered_map<ecs::Entity, Node*>& Node::globalMap()
+    Node::Global& Node::globalInfo()
     {
-        static std::unordered_map<ecs::Entity, Node*> res;
-        return res;
+        static Global global;
+        return global;
     }
     
     void Node::destroy(Node* node)
@@ -64,7 +57,12 @@ namespace stay
         assert(node != nullptr && "cannot destroy null node");
         node->mParent->destroyChild(node);
     }
-            
+
+    void Node::resetNodeHierachy()
+    {
+        root().clearChildren();
+        globalInfo().registry = nullptr;
+    }            
 
     void Node::setParent(Node* newParent)
     {
@@ -126,8 +124,6 @@ namespace stay
         auto* res = ptr.get();
         res->mParent = this;
         mChildren.emplace(res, std::move(ptr));
-        // Once set up, the parent's registry pointer will be passed down to child as well
-        res->assign(get());
         return res;
     }
 
