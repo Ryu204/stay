@@ -24,9 +24,9 @@ namespace stay
                     utils::centersf(mShape);
                 }
 
-                void render(RTarget* target) override
+                void render(RTarget* target, Node* root) override
                 {
-                    drawOn(&Node::root(), target);
+                    drawOn(root, target);
                 }
             private:
                 // Draw `node` and its children on target with current camera config
@@ -37,7 +37,7 @@ namespace stay
                     const auto draw = [&target, this](Node* current, RStates states) -> RStates
                     {
                         // Make the get function const because `current` can be the root
-                        const auto& tf = ((const Node*)current)->getLocalTransform();
+                        const auto& tf = ((const Node*)current)->localTransform();
                         states.transform = states.transform * utils::transTosfTrans(tf);
                         if (current->hasComponent<comp::Render>())
                         {

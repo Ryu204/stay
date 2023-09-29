@@ -12,12 +12,13 @@ namespace stay
         : mPhysicsWorld({0.F, -10.F})
         , mPixelsPerMeter(100.F)
     {
-        Node::setRegistry(&mManager.getRegistry());
+        Node::init(&mManager.getRegistry());
+        mSceneRoot = std::make_unique<Node>();
         initialize();
     }
     Scene::~Scene()
     {
-        Node::resetNodeHierachy();
+        mSceneRoot.reset();
     }
     void Scene::update(float dt)
     {
@@ -34,7 +35,7 @@ namespace stay
     void Scene::render(RTarget* target)
     {
         mCamera.setOn(target);
-        mManager.render(target);
+        mManager.render(target, mSceneRoot.get());
     }
     void Scene::initialize()
     {
@@ -52,11 +53,11 @@ namespace stay
         compLoader.registerComponent<phys::RigidBody>("rigidbody");
         compLoader.registerComponent<phys::Collider>("collider");
 
-        auto* node = Node::create();
-        compLoader.loadAllComponents(node->getEntity(), obj["componentsData"]);
-        std::ofstream("asset/out.json") << compLoader.saveAllComponents(node->getEntity());
+        auto* node = mSceneRoot->createChild();
+        compLoader.loadAllComponents(node->entity(), obj["componentsData"]);
+        std::ofstream("asset/out.json") << compLoader.saveAllComponents(node->entity());
 
-        node = Node::create();
+        node = mSceneRoot->createChild();
         auto& body1 = node->addComponent<phys::RigidBody>(Vector2(0, -6), 0, phys::BodyType::STATIC);
         auto& col1 = node->addComponent<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(4.F, 0.5F)});
         node->addComponent<comp::Render>(Color(0x540099FF), Vector2(0.5F, 1.F));

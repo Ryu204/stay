@@ -19,6 +19,8 @@ namespace stay
         private:
             void initialize();
 
+            Uptr<Node> mSceneRoot;
+
             Camera mCamera;
             ecs::Manager mManager;
 

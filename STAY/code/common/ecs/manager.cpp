@@ -45,11 +45,11 @@ namespace stay
             }
         }
 
-        void Manager::render(RTarget* target)
+        void Manager::render(RTarget* target, Node* root)
         {
             for (auto& pair : mRenderSystems)
             {
-                pair.val->render(target);
+                pair.val->render(target, root);
             }
         }
 
@@ -59,16 +59,6 @@ namespace stay
             {
                 pair.val->input(event);
             }
-        }
-
-        Node* Manager::create(Node* parent)
-        {
-            auto* res = parent->createEmptyChild();
-            return res;
-        }
-        Node* Manager::create(Entity parent)
-        {
-            return create(Node::getNode(parent));
         }
     }
 } // namespace stay

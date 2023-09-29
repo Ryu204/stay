@@ -8,6 +8,7 @@
 
 namespace stay
 {
+    class Node;
     namespace ecs
     {
         using Entity = entt::entity;
@@ -68,7 +69,7 @@ namespace stay
             {}
             virtual ~RenderSystem() = default;
             int orderRender;
-            virtual void render(RTarget* target) = 0;
+            virtual void render(RTarget* target, Node* root) = 0;
         };
         struct InputSystem
         {

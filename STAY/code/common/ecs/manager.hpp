@@ -43,38 +43,35 @@ namespace stay
                 void start();
                 // Meant to be call every frame update
                 void update(float dt);
-                void render(RTarget* target);
+                void render(RTarget* target, Node* root);
                 void input(const sf::Event& event);
 
-                // Generate a new node
-                Node* create(Node* parent = &Node::root());
-                Node* create(Entity parent = Node::root().getEntity());
                 // Components related functions
                 template <typename Type, typename... Args, whereIs(Type, Component)>
                 Type& addComponent(Node* node, Args&&... args)
                 {
-                    return addComponent<Type, Args...>(node->getEntity(), std::forward<Args>(args)...);
+                    return addComponent<Type, Args...>(node->entity(), std::forward<Args>(args)...);
                 }
                 template <typename Type, typename... Args, whereIs(Type, Component)>
                 Type& addComponent(Entity entity, Args&&... args);
                 template <typename Type, whereIs(Type, Component)>
                 void removeComponents(Node* node)
                 {
-                    removeComponents<Type>(node->getEntity());
+                    removeComponents<Type>(node->entity());
                 }
                 template <typename Type, whereIs(Type, Component)>
                 void removeComponents(Entity entity);
                 template <typename Type, whereIs(Type, Component)>
                 bool hasComponent(const Node* node) const
                 {
-                    return hasComponent<Type>(node->getEntity());
+                    return hasComponent<Type>(node->entity());
                 }
                 template <typename Type, whereIs(Type, Component)>
                 bool hasComponent(Entity entity) const;
                 template <typename Type, whereIs(Type, Component)>
                 Type& getComponent(Node* node)
                 {
-                    return getComponent<Type>(node->getEntity());
+                    return getComponent<Type>(node->entity());
                 }
                 template <typename Type, whereIs(Type, Component)>
                 Type& getComponent(Entity entity);
