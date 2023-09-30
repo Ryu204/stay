@@ -1,10 +1,13 @@
 #pragma once
 
+#include <optional>
+
 #include <box2d/box2d.h>
 #include <SFML/System/NonCopyable.hpp>
 
 #include "../utility/convert.hpp"
 #include "../utility/typedef.hpp"
+#include "../utility/assignable.hpp"
 #include "../ecs/component.hpp"
 
 namespace stay
@@ -19,13 +22,13 @@ namespace stay
         };
         class Collider;
         // @brief An abstract component, only functions if a collider is presented. Manipulate velocity and force.
-        // @note Because we only want the body to be destroy when it's ultimately deleted, not deleted and copied again, we make it non-copyable
         class RigidBody : public ecs::Component
         {
             public:
                 // @param `angle` angle from OY+ to object's local OY+ in degree, positive if the angle is anti-clockwise
-                RigidBody(b2World* world, const Vector2& position = Vector2(10.F, -10.F), float angle = 0.F, BodyType type = BodyType::STATIC);
+                RigidBody(const Vector2& position = Vector2(10.F, -10.F), float angle = 0.F, BodyType type = BodyType::STATIC);
                 ~RigidBody();
+                void start(b2World* world);
                 void setPosition(const Vector2& position);
                 Vector2 getPosition() const;
                 // @param `angle` the angle between OY+ and object's local OY+ in degree, positive if anti-clockwise
@@ -40,7 +43,11 @@ namespace stay
                 void setFixedRotation(bool fixed);
                 void setGravityScale(float scale);
                 b2Fixture* attachFixture(const b2FixtureDef& properties);
+
+                Json::Value toJSONObject() const override;
+                bool fetch(const Json::Value& value) override;
             private:
+                b2BodyDef mBodyDef;
                 b2World* mWorld;
                 b2Body* mBody;
         };

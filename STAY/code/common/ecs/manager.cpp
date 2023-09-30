@@ -6,10 +6,15 @@ namespace stay
 {
     namespace ecs
     {       
-        Registry& Manager::getRegistry()
+        Registry& Manager::getRegistryRef()
+        {
+            return *mRegistry;
+        } 
+
+        SPtr<Registry> Manager::getRegistry()
         {
             return mRegistry;
-        } 
+        }
 
         // Meant to be called only once, before any update
         void Manager::start()
@@ -45,11 +50,11 @@ namespace stay
             }
         }
 
-        void Manager::render(RTarget* target)
+        void Manager::render(RTarget* target, Node* root)
         {
             for (auto& pair : mRenderSystems)
             {
-                pair.val->render(target);
+                pair.val->render(target, root);
             }
         }
 
@@ -59,12 +64,6 @@ namespace stay
             {
                 pair.val->input(event);
             }
-        }
-
-        Node* Manager::create(Node* parent)
-        {
-            auto* res = parent->createEmptyChild();
-            return res;
         }
     }
 } // namespace stay

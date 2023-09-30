@@ -1,14 +1,12 @@
 #pragma once
 
 #include <unordered_set>
+#include <cassert>
 
 namespace stay
 {
 	namespace utils
 	{
-		// Manage ID creation and deletion
-		// N is the number of maximum available IDs
-        // This class asserts excessively in debug build if the parameters are faulty
 		class IDGenerator
 		{
 		public:

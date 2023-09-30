@@ -1,155 +1,175 @@
 #include <string>
 
 #include "node.hpp"
+
 namespace stay
 {
+    void Node::init(const SPtr<ecs::Registry>& registry)
+    {
+        auto& info = globalInfo();
+        info.nodeOf.clear();
+        info.registry = registry;
+        info.root = registry->create();
+    }
+
+    void Node::shutdown()
+    {
+        auto& info = globalInfo();
+        info.nodeOf.clear();
+        info.registry->destroy(info.root);
+        info.registry.reset();
+    }
+
+    Node* Node::getNode(ecs::Entity entity)
+    {
+        assert(globalInfo().nodeOf.find(entity) != globalInfo().nodeOf.end());
+        return globalInfo().nodeOf.at(entity);
+    }
+
+    Node::Global& Node::globalInfo()
+    {
+        static Global global;
+        return global;
+    }   
+
     Node::Node()
-        : mParent(nullptr)
-    { }
+        : mParent(globalInfo().root)
+        , mEntity(globalInfo().registry->create())
+    { 
+        globalInfo().nodeOf.emplace(mEntity, this);
+    }
+
+    Node::Node(ecs::Entity id)
+        : mParent(globalInfo().root)
+        , mEntity(globalInfo().registry->create(id))
+    {
+        assert(mEntity == id && "specified ID alreay exists");
+        globalInfo().nodeOf.emplace(mEntity, this);
+    }
 
     Node::~Node()
     {
-        // If root is destroyed, i.e program ends, everything is destroyed already so no more cleanup
-        if (this == &root())
-            return;
-        // Order of removal: registry destroys entity, components -> destroy node and its global registration
-        get()->destroy(mEntity);
-        globalMap().erase(mEntity);
+        globalInfo().registry->destroy(mEntity);
+        globalInfo().nodeOf.erase(mEntity);
     }
 
-    Node& Node::root()
+    bool Node::stray() const
     {
-        static Node res;
-        return res;
-    };
-    
-    void Node::setGlobalRegistry(ecs::Registry* registry)
-    {
-        root().assign(registry);
+        return mParent == globalInfo().root;
     }
 
-    void Node::postAssignment()
+    const Node* Node::parent() const
     {
-        if (get() == nullptr)
-        {
-            return;
-        }
-        mEntity = get()->create();
-        globalMap().emplace(mEntity, this);
+        assert(stray() == false && "top-level node has no parent");
+        return getNode(mParent);
     }
 
-    Node* Node::create()
+    Node* Node::parent() 
     {
-        return root().createEmptyChild();
+        return const_cast<Node*>(std::as_const(*this).parent());
     }
-
-    Node* Node::getNode(ecs::Entity identifier)
-    {
-        if (globalMap().find(identifier) == globalMap().end())
-        {
-            throw std::invalid_argument("Node: \"getNode\" called with non-existing identifier " + std::to_string(static_cast<int>(identifier)));
-        }
-        return globalMap().at(identifier);
-    }
-
-    std::unordered_map<ecs::Entity, Node*>& Node::globalMap()
-    {
-        static std::unordered_map<ecs::Entity, Node*> res;
-        return res;
-    }
-    
-    void Node::destroy(Node* node)
-    {
-        assert(node != &root() && "cannot destroy root");
-        assert(node != nullptr && "cannot destroy null node");
-        node->mParent->destroyChild(node);
-    }
-            
 
     void Node::setParent(Node* newParent)
     {
-        assert(this != &root() && "cannot change root's parent");
-        assert(newParent != nullptr && "cannot set null as parent\n");
-        if (newParent->isParentOf(this))
+        assert(stray() == false && "cannot set parent of top-level node");
+        assert(newParent != nullptr && "cannot set null as parent");
+        assert(newParent->childOf(this) == false && "a cycle exists in the scene");
+
+        bool alreadyParent = newParent->mEntity == mParent;
+        if (alreadyParent)
             return;
-        assert(newParent->isChildOf(this) == false && "a cycle exists in the scene");
         // move unique_ptr to new parent container
-        newParent->mChildren.emplace(this, std::move(mParent->mChildren[this]));
+        newParent->mChildren.emplace(mEntity, std::move(parent()->mChildren.at(mEntity)));
         // detach from previous parent
-        mParent->mChildren.erase(this);
+        parent()->mChildren.erase(mEntity);
         // set new parent
-        mParent = newParent;
+        mParent = newParent->mEntity;
     }
 
-    void Node::destroyChild(Node* child)
+    void Node::setParent(ecs::Entity parent)
+    {
+        assert(parent != globalInfo().root && "Cannot change stray-ness of a node");
+        
+        setParent(getNode(parent));
+    }
+
+    void Node::destroy(Node* child)
+    {
+        assert(child != nullptr);
+        destroy(child->mEntity);
+    }
+
+    void Node::destroy(ecs::Entity child)
     {
         assert(mChildren.find(child) != mChildren.end() && "no child found to destroy");
         mChildren.erase(child);
     }
 
-    void Node::clearChildren()
+    void Node::destroyChildren()
     {
         mChildren.clear();
     }
 
-    bool Node::isChildOf(const Node* node) const
+    bool Node::childOf(const Node* node) const
     {
-        if (node == &root())
-        {
-            return true;
-        }
         if (node == nullptr)
         {
             return false;
         }
-        const auto* parent = this;
-        // the tree's depth won't be too great so we can brute-force from the child upwards
-        while (parent != nullptr)
+        auto parent = mEntity;
+        const auto other = node->mEntity;
+        while (parent != globalInfo().root)
         {
-            if (parent == node)
+            if (parent == other)
             {
                 return true;
             }
-            parent = parent->mParent;
+            parent = getNode(parent)->mParent;
         }
         return false;
     }
 
-    bool Node::isParentOf(const Node* node) const
+    bool Node::parentOf(const Node* node) const
     {
-        return node->isChildOf(this);
+        return node->childOf(this);
     }
 
-    Node* Node::createEmptyChild()
+    Node* Node::createChild()
     {
         auto ptr = std::make_unique<Node>();
         auto* res = ptr.get();
-        res->mParent = this;
-        mChildren.emplace(res, std::move(ptr));
-        // Once set up, the parent's registry pointer will be passed down to child as well
-        res->assign(get());
+        res->mParent = mEntity;
+        mChildren.emplace(res->mEntity, std::move(ptr));
         return res;
     }
 
-    Transform& Node::getLocalTransform()
+    Node* Node::createChild(ecs::Entity id)
     {
-        assert(this != &root() && "cannot modify root's transform");
+        auto ptr = std::make_unique<Node>(id);
+        auto* res = ptr.get();
+        res->mParent = mEntity;
+        mChildren.emplace(res->mEntity, std::move(ptr));
+        return res;
+    }
+
+    const Transform& Node::localTransform() const
+    {
         return mLocalTransform;
     }
 
-    const Transform& Node::getLocalTransform() const
+    Transform& Node::localTransform()
     {
         return mLocalTransform;
     }
 
-    Transform Node::getGlobalTransform() const
+    Transform Node::globalTransform() const
     {
         auto res = mLocalTransform;
-        auto* parent = mParent;
-        while (parent != nullptr && parent != &root())
+        auto parent = mParent;
+        while (parent != globalInfo().root)
         {
-            res.setMatrix(parent->mLocalTransform.getMatrix() * res.getMatrix());
-            parent = parent->mParent;
+            res.setMatrix(getNode(parent)->mLocalTransform.getMatrix() * res.getMatrix());
+            parent = getNode(parent)->mParent;
         }
         return res;
     }
@@ -161,10 +181,15 @@ namespace stay
 
     void Node::setGlobalTransform(Transform& transform)
     {
-        mLocalTransform.setMatrix(mParent->getGlobalTransform().getInverseMatrix() * transform.getMatrix());
+        if (stray())
+        {
+            setLocalTransform(transform);
+            return;
+        }
+        mLocalTransform.setMatrix(parent()->globalTransform().getInverseMatrix() * transform.getMatrix());
     }
 
-    ecs::Entity Node::getEntity() const
+    ecs::Entity Node::entity() const
     {
         return mEntity;
     }

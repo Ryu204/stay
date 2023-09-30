@@ -3,22 +3,23 @@
 #include "../../game/component/list.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
-
 /*debug*/ #include <iostream>
+/*debug*/ #include <fstream>
 
 namespace stay
 {
     Scene::Scene()
         : mPhysicsWorld({0.F, -10.F})
         , mPixelsPerMeter(100.F)
+        , mSceneLoader(&mManager, "asset/test.json")
     {
-        Node::setGlobalRegistry(&mManager.getRegistry());
+        Node::init(mManager.getRegistry());
         initialize();
     }
     Scene::~Scene()
     {
-        Node::root().clearChildren();
-        Node::setGlobalRegistry(nullptr);
+        mSceneRoot.reset();
+        Node::shutdown();
     }
     void Scene::update(float dt)
     {
@@ -35,7 +36,7 @@ namespace stay
     void Scene::render(RTarget* target)
     {
         mCamera.setOn(target);
-        mManager.render(target);
+        mManager.render(target, mSceneRoot.get());
     }
     void Scene::initialize()
     {
@@ -43,31 +44,28 @@ namespace stay
         mManager.registerSystem<sys::OrderedRenderSystem>();
         mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
         mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
-        
-        auto* node = Node::create();
-        auto& body = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, 0), 45, phys::BodyType::DYNAMIC);
-        body.setAngularVelocity(100);
-        auto& col = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(1.F, 2.F)}, &body, nullptr);
-        node->addComponents<comp::Render>(sf::Color::Black, sf::Vector2f{0.5F, 1.F});
+        //======================================debug==============================
+         /*debug:test component loading*/
+        // Json::Value obj;
+        // std::ifstream reader("asset/test.json");
+        // reader >> obj;
+        // ComponentsLoader compLoader(&mManager);
+        // compLoader.registerComponent<comp::Render>("render");
+        // compLoader.registerComponent<phys::RigidBody>("rigidbody");
+        // compLoader.registerComponent<phys::Collider>("collider");
 
-        node = Node::create();
-        auto& body1 = node->addComponents<phys::RigidBody>(&mPhysicsWorld, Vector2(0, -6), 0, phys::BodyType::STATIC);
-        auto& col1 = node->addComponents<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(4.F, 0.5F)}, &body1, nullptr);
-        node->addComponents<comp::Render>(sf::Color::Green, sf::Vector2f{0.5F, 1.F});
+        // auto* node = mSceneRoot->createChild();
+        // compLoader.loadAllComponents(node->entity(), obj["componentsData"]);
+        // std::ofstream("asset/out.json") << compLoader.saveAllComponents(node->entity());
 
-        /*debug*/
-        col1.setTrigger(true);
-        col1.OnCollisionEnter.addEventListener([](phys::Collider&, b2Contact&) { std::cout << "sth entered static collider" << std::endl; });
-        col1.OnTriggerEnter.addEventListener([](phys::Collider&, b2Contact&) { std::cout << "sth entered static trigger" << std::endl; });
-        /**/
-
-        // for (int i = 1; i <= 4; ++i)
-        // {
-        //     const auto& trans = node->getLocalTransform().getMatrix();
-        //     node = createChild(node);
-        //     node->addComponents<comp::Render>(sf::Color::Red, sf::Vector2f{0.4F, 1.2F});
-        //     node->getLocalTransform().move({1.3F, 1.3F, 0});
-        //     node->getLocalTransform().rotate(10);
-        // }
+        // node = mSceneRoot->createChild();
+        // auto& body1 = node->addComponent<phys::RigidBody>(Vector2(0, -6), 0, phys::BodyType::STATIC);
+        // auto& col1 = node->addComponent<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(4.F, 0.5F)});
+        // node->addComponent<comp::Render>(Color(0x540099FF), Vector2(0.5F, 1.F));
+        //======================================debug==============================
+        mSceneLoader.registerType<comp::Render>("render");
+        mSceneLoader.registerType<phys::Collider>("collider");
+        mSceneLoader.registerType<phys::RigidBody>("rigidbody");
+        mSceneRoot = mSceneLoader.load();
     }
 } // namespace stay

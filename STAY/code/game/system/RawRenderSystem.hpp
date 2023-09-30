@@ -25,14 +25,14 @@ namespace stay
                     utils::centersf(mShape);
                 }
 
-                void render(RTarget* target) override
+                void render(RTarget* target, Node* /*root*/) override
                 {
-                    auto view = mManager->getRegistry().view<comp::Render>();
+                    auto view = mManager->getRegistryRef().view<comp::Render>();
                     for (auto [entity, render] : view.each())
                     {
                         auto* node = Node::getNode(entity);
-                        const auto& tf = node->getGlobalTransform();
-                        mShape.setSize(render.size);
+                        const auto& tf = node->globalTransform();
+                        mShape.setSize(utils::convertVec2<sf::Vector2f>(render.size));
                         utils::centersf(mShape);
                         mShape.setFillColor(render.color);
                         RStates states = RStates::Default;

@@ -188,4 +188,14 @@ namespace stay
     {
         return (mPosition == right.mPosition && mRotation == right.mRotation && mScale == right.mScale);
     }
+
+    Transform& Transform::operator = (const Transform& right)
+    {
+        mRotation = right.mRotation;
+        mPosition = right.mPosition;
+        mScale = right.mScale;
+        mMatrixNeedRebuild = true;
+        mInverseNeedRebuild = true;
+        return *this;
+    }
 } // namespace stay

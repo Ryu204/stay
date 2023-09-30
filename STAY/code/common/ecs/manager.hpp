@@ -6,7 +6,6 @@
 
 #include "system.hpp"
 #include "../utility/typedef.hpp"
-#include "../utility/typedef.hpp"
 #include "../world/node.hpp"
 
 namespace stay
@@ -33,8 +32,10 @@ namespace stay
         } // namespace detail
         class Manager 
         {
-            public:                
-                Registry& getRegistry();
+            public:     
+                Registry& getRegistryRef();
+                SPtr<Registry> getRegistry();
+
                 // @note Its overriding IDs are used to determine its order in the manager action, i.e type with lower ID called earlier
                 // @param DerivedSystem A dervied class of `ecs:*System`(s) defined in `system.hpp`, with the restriction of having a constructor taking an `ecs::Manager*`
                 template <typename DerviedSystem>
@@ -43,24 +44,42 @@ namespace stay
                 void start();
                 // Meant to be call every frame update
                 void update(float dt);
-                void render(RTarget* target);
+                void render(RTarget* target, Node* root);
                 void input(const sf::Event& event);
 
-                // Generate a new node
-                Node* create(Node* parent = &Node::root());
                 // Components related functions
                 template <typename Type, typename... Args, whereIs(Type, Component)>
-                Type& addComponents(Node* node, Args&&... args);
+                Type& addComponent(Node* node, Args&&... args)
+                {
+                    return addComponent<Type, Args...>(node->entity(), std::forward<Args>(args)...);
+                }
+                template <typename Type, typename... Args, whereIs(Type, Component)>
+                Type& addComponent(Entity entity, Args&&... args);
                 template <typename Type, whereIs(Type, Component)>
-                void removeComponents(Node* node);
+                void removeComponents(Node* node)
+                {
+                    removeComponents<Type>(node->entity());
+                }
                 template <typename Type, whereIs(Type, Component)>
-                bool hasComponent(const Node* node) const;
+                void removeComponents(Entity entity);
                 template <typename Type, whereIs(Type, Component)>
-                Type& getComponent(Node* node);
+                bool hasComponent(const Node* node) const
+                {
+                    return hasComponent<Type>(node->entity());
+                }
+                template <typename Type, whereIs(Type, Component)>
+                bool hasComponent(Entity entity) const;
+                template <typename Type, whereIs(Type, Component)>
+                Type& getComponent(Node* node)
+                {
+                    return getComponent<Type>(node->entity());
+                }
+                template <typename Type, whereIs(Type, Component)>
+                Type& getComponent(Entity entity);
             private:
                 template <typename T>
                 using Pair = detail::Ordered<SPtr<T>>;
-                Registry mRegistry{};
+                SPtr<Registry> mRegistry{std::make_shared<Registry>()};
                 std::vector<Pair<StartSystem>> mStartSystems{};
                 std::vector<Pair<UpdateSystem>> mUpdateSystems{};
                 std::vector<Pair<PostUpdateSystem>> mPostUpdateSystems{};
@@ -70,28 +89,27 @@ namespace stay
         };
 
         template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
-        Type& Manager::addComponents(Node* node, Args&&... args)
+        Type& Manager::addComponent(Entity entity, Args&&... args)
         {
-            auto entity = node->getEntity();
-            auto& res = mRegistry.emplace<Type>(entity, std::forward<Args>(args)...);
+            auto& res = mRegistry->emplace<Type>(entity, std::forward<Args>(args)...);
             // assign this entity to the component so it knows which node does it belong to
             res.assign(entity);
             return res;
         }
         template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
-        void Manager::removeComponents(Node* node)
+        void Manager::removeComponents(Entity entity)
         {
-            mRegistry.remove<Type>(node->getEntity());
+            mRegistry->remove<Type>(entity);
         }
         template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
-        bool Manager::hasComponent(const Node* node) const
+        bool Manager::hasComponent(Entity entity) const
         {
-            return mRegistry.try_get<Type>(node->getEntity()) != nullptr;
+            return mRegistry->try_get<Type>(entity) != nullptr;
         }
         template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
-        Type& Manager::getComponent(Node* node)
+        Type& Manager::getComponent(Entity entity)
         {
-            return mRegistry.get<Type>(node->getEntity());
+            return mRegistry->get<Type>(entity);
         }
 
         template <typename DerviedSystem>

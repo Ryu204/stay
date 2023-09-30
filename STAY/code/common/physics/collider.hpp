@@ -1,6 +1,7 @@
 #pragma once
 
 #include <variant>
+#include <optional>
 
 #include <SFML/System/NonCopyable.hpp>
 #include <box2d/box2d.h>
@@ -15,7 +16,21 @@ namespace stay
 {
     namespace phys
     {
-        class Material;
+        class Collider;
+        class Material : public Serializable
+        {
+            public:
+                Material(float density = 1.F, float friction = 0.2F, float restituition = 0.F);
+                void setDensity(float density);
+                void setFriction(float friction);
+                void setRestituition(float restituition);
+                b2FixtureDef getFixtureDef() const;
+                
+                Json::Value toJSONObject() const override;
+                bool fetch(const Json::Value& value) override;
+            private:
+                b2FixtureDef mDef;
+        };
         class RigidBody;
         class Collider : public ecs::Component
         {
@@ -29,11 +44,17 @@ namespace stay
                     Vector2 position;
                     float radius;
                 };
-                using Info = std::variant<Box, Circle>;
+                struct Info : public std::variant<Box, Circle>, public Serializable
+                {
+                    using std::variant<Box, Circle>::variant;
+                    Json::Value toJSONObject() const override;
+                    bool fetch(const Json::Value& value) override;
+                };
                 
-                Collider(const Info& info, RigidBody* body, const Material* mat);  
+                Collider(const Info& info = Box{}, const Material& mat = Material());
                 virtual ~Collider();
-                void setMaterial(const Material* mat);
+                void start();
+                void setMaterial(const Material& mat);
                 void setTrigger(bool isTrigger);
                 bool getTrigger() const;
 
@@ -42,28 +63,14 @@ namespace stay
                 event::Event<Collider&, b2Contact&> OnTriggerEnter;
                 event::Event<Collider&, b2Contact&> OnTriggerExit;
 
+                SERIALIZE(mMaterial, mShapeInfo)
             private:
-                void attachToRigidBody(const Info& info, RigidBody* body, const Material* mat);
-                // @warning This function uses `new` keyword to allocate new shape, care to their destruction must be taken
-                static b2Shape* createShape(const Collider::Info& info);
+                void attachToRigidBody();
+                static Uptr<b2Shape> createShape(const Collider::Info& info);
 
+                Material mMaterial;
+                Info mShapeInfo;
                 b2Fixture* mFixture;
-                friend class Material;
-        };
-
-        class Material
-        {
-            public:
-                Material(float density, float friction, float restituition);
-                void setDensity(float density);
-                void setFriction(float friction);
-                void setRestituition(float restituition);
-                b2FixtureDef getFixtureDef() const;
-                
-            private:
-                void updateCollider(Collider* collider) const;
-                b2FixtureDef mDef;
-                friend class Collider;
         };
     } // namespace phys
 } // namespace stay

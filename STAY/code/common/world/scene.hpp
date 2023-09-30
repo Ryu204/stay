@@ -4,6 +4,7 @@
 
 #include "../ecs/manager.hpp"
 #include "camera.hpp"
+#include "../loader/sceneLoader.hpp"
 
 namespace stay
 {
@@ -18,13 +19,12 @@ namespace stay
             void render(RTarget* target);
         private:
             void initialize();
-            Node* create();
-            Node* createChild(Node* node);
-
+            b2World mPhysicsWorld;
             Camera mCamera;
             ecs::Manager mManager;
+            Uptr<Node> mSceneRoot;
+            SceneLoader mSceneLoader;
 
-            b2World mPhysicsWorld;
             const float mPixelsPerMeter;
     };
 } // namespace stay

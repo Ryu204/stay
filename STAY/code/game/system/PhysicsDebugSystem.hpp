@@ -44,7 +44,7 @@ namespace stay
                     }
                 }
 
-                void render(RTarget* target) override
+                void render(RTarget* target, Node* /*root*/) override
                 {
                     mDrawer->setRenderTarget(target);
                     mPhysicsWorld->DebugDraw();
