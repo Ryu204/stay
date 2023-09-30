@@ -7,6 +7,7 @@ namespace stay
     void Node::init(const SPtr<ecs::Registry>& registry)
     {
         auto& info = globalInfo();
+        info.nodeOf.clear();
         info.registry = registry;
         info.root = registry->create();
     }
@@ -43,6 +44,7 @@ namespace stay
         , mEntity(globalInfo().registry->create(id))
     {
         assert(mEntity == id && "specified ID alreay exists");
+        globalInfo().nodeOf.emplace(mEntity, this);
     }
 
     Node::~Node()
@@ -86,6 +88,8 @@ namespace stay
 
     void Node::setParent(ecs::Entity parent)
     {
+        assert(parent != globalInfo().root && "Cannot change stray-ness of a node");
+        
         setParent(getNode(parent));
     }
 

@@ -1,34 +1,78 @@
 {
-    "componentsData" : [
+    "root" : 100,
+    "entities" : [
         {
-            "name" : "render",
-            "data" : {
-                "color" : [255, 50, 50, 255, 0],
-                "size" : [0.5, 1.0]
-            }
-        },
-        {
-            "name" : "rigidbody",
-            "data" : {
-                "position" : [0.0, 0.0],
-                "type" : 2,
-                "angle" : 45
-            }
-        },
-        {
-            "name" : "collider",
-            "data" : {
-                "mMaterial" : {
-                    "density" : 5,
-                    "restituition" : 1.0,
-                    "friction" : 0.2
+            "id" : 4,
+            "parent" : 100,
+            "components" : [
+                {
+                    "name" : "render",
+                    "data" : {
+                        "color" : [255, 50, 50, 255],
+                        "size" : [0.5, 1.0]
+                    }
                 },
-                "mShapeInfo" : {
-                    "type" : "circle",
-                    "radius" : 0.5,
-                    "position" : [5.0, 5.0]
+                {
+                    "name" : "rigidbody",
+                    "data" : {
+                        "position" : [0.0, 0.0],
+                        "type" : 2,
+                        "angle" : 45
+                    }
+                },
+                {
+                    "name" : "collider",
+                    "data" : {
+                        "mMaterial" : {
+                            "density" : 5,
+                            "restituition" : 1.0,
+                            "friction" : 0.2
+                        },
+                        "mShapeInfo" : {
+                            "type" : "circle",
+                            "radius" : 0.5,
+                            "position" : [5.0, 5.0]
+                        }
+                    }
                 }
-            }
-        }
+            ]
+        },
+        {
+            "id" : 5,
+            "parent" : 4,
+            "components" : [
+                {
+                    "name" : "render",
+                    "data" : {
+                        "color" : [100, 0, 150, 255],
+                        "size" : [0.5, 1.0]
+                    }
+                },
+                {
+                    "name" : "rigidbody",
+                    "data" : {
+                        "position" : [0, -6],
+                        "type" : 0,
+                        "angle" : 0
+                    }
+                },
+                {
+                    "name" : "collider",
+                    "data" : {
+                        "mMaterial" : {
+                            "density" : 5,
+                            "restituition" : 1.0,
+                            "friction" : 0.2
+                        },
+                        "mShapeInfo" : {
+                            "type" : "box",
+                            "size" : [4, 0.5],
+                            "angle" : 0,
+                            "position" : [0, 0]
+                        }
+                    }
+                }
+            ]
+        }        
     ]
 }

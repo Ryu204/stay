@@ -19,14 +19,12 @@ namespace stay
             void render(RTarget* target);
         private:
             void initialize();
-
-            Uptr<Node> mSceneRoot;
-
+            b2World mPhysicsWorld;
             Camera mCamera;
             ecs::Manager mManager;
+            Uptr<Node> mSceneRoot;
+            SceneLoader mSceneLoader;
 
-            b2World mPhysicsWorld;
             const float mPixelsPerMeter;
-            //SceneLoader mSceneLoader;
     };
 } // namespace stay
