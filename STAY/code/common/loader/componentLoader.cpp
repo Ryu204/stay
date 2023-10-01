@@ -28,7 +28,7 @@ namespace stay
             const auto& obj = componentsArray[i];
             const std::string name = obj["name"].asString();
             bool nameFound = mLoaderList.find(name) != mLoaderList.end();
-            utils::throwIfFalse(nameFound, error() + " (name \"" + name + "\" not found)");
+            utils::throwIfFalse(nameFound, error() + " (name \"" + name + "\" not recognized)");
             loadComponent(entity, name, obj["data"]);
         }
     }
