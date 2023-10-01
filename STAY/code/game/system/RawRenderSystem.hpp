@@ -19,25 +19,23 @@ namespace stay
                     : ecs::RenderSystem(0)
                     , ecs::System(manager)
                 {
-                    mShape.setSize({50, 50});
                     mShape.setOutlineColor(sf::Color::White);
-                    mShape.setOutlineThickness(2);
-                    utils::centersf(mShape);
+                    mShape.setOutlineThickness(0.1);
                 }
 
                 void render(RTarget* target, Node* /*root*/) override
                 {
                     auto view = mManager->getRegistryRef().view<comp::Render>();
-                    for (auto [entity, render] : view.each())
+                    for (auto entity : view)
                     {
+                        auto& render = mManager->getRegistryRef().get<comp::Render>(entity);
                         auto* node = Node::getNode(entity);
-                        const auto& tf = node->globalTransform();
+                        const auto tf = node->globalTransform();
                         mShape.setSize(utils::convertVec2<sf::Vector2f>(render.size));
+                        mShape.setPosition(utils::convertVec2<sf::Vector2f>(tf.getPosition()));
                         utils::centersf(mShape);
                         mShape.setFillColor(render.color);
-                        RStates states = RStates::Default;
-                        states.transform *= utils::transTosfTrans(tf);
-                        target->draw(mShape, states);
+                        target->draw(mShape);
                     }
                 }
 

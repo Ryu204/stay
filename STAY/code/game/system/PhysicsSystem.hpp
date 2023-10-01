@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_set>
+
 #include <box2d/box2d.h>
 
 #include "../../common/physics/rigidBody.hpp"
@@ -14,38 +16,8 @@ namespace stay
         {
             class ContactListener : public b2ContactListener
             {
-                void BeginContact(b2Contact* contact) override
-                { 
-                    auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
-                    auto* bCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureB()->GetUserData().pointer);
-                    bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
-                    if (!isTrigger)
-                    {
-                        aCol->OnCollisionEnter.invoke(*bCol, *contact);
-                        bCol->OnCollisionEnter.invoke(*aCol, *contact);
-                    }
-                    else
-                    {
-                        aCol->OnTriggerEnter.invoke(*bCol, *contact);
-                        bCol->OnTriggerEnter.invoke(*aCol, *contact);
-                    }
-                }
-                void EndContact(b2Contact* contact) 
-                { 
-                   auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
-                    auto* bCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureB()->GetUserData().pointer);
-                    bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
-                    if (!isTrigger)
-                    {
-                        aCol->OnCollisionExit.invoke(*bCol, *contact);
-                        bCol->OnCollisionExit.invoke(*aCol, *contact);
-                    }
-                    else
-                    {
-                        aCol->OnTriggerExit.invoke(*bCol, *contact);
-                        bCol->OnTriggerExit.invoke(*aCol, *contact);
-                    }
-                }
+                void BeginContact(b2Contact* contact) override;
+                void EndContact(b2Contact* contact) override;
             };
         } // namespace detail
 
@@ -56,68 +28,20 @@ namespace stay
             , public ecs::PostUpdateSystem
             , public ecs::System
         {
-                PhysicsSystem(ecs::Manager* manager)
-                    : ecs::StartSystem(0)
-                    , ecs::PreUpdateSystem(0)
-                    , ecs::UpdateSystem(-1)
-                    , ecs::PostUpdateSystem(-1)
-                    , ecs::System(manager)
-                { }
-
-                virtual ~PhysicsSystem()
-                {
-                    mPhysicsWorld->SetContactListener(nullptr);
-                }
-
-                void start() override
-                {
-                    auto view = mManager->getRegistryRef().view<phys::RigidBody>();
-                    for (auto entity : view)
-                    {
-                        view.get<phys::RigidBody>(entity).start(mPhysicsWorld);
-                    }
-                    auto view2 = mManager->getRegistryRef().view<phys::Collider>();
-                    for (auto entity : view2)
-                    {
-                        view2.get<phys::Collider>(entity).start();
-                    }
-                }
-
-                void initialize(b2World* world)
-                {
-                    mPhysicsWorld = world;
-                    world->SetContactListener(&mContactListener);
-                }
-
-                void preUpdate(float dt) override
-                {
-                }
-
-                void update(float dt) override
-                {
-                    static const int velIterCount = 8;
-                    static const int posIterCount = 3;
-                    mPhysicsWorld->Step(dt, velIterCount, posIterCount);
-                }
-
+                PhysicsSystem(ecs::Manager* manager);
+                virtual ~PhysicsSystem();
+                void start() override;
+                void initialize(b2World* world);
+                void preUpdate(float dt) override;
+                void update(float dt) override;
                 // Bind transform to body collider
-                void postUpdate(float dt) override
-                {
-                    auto view = mManager->getRegistryRef().view<phys::RigidBody>();
-
-                    for (auto entity : view)
-                    {
-                        auto* node = Node::getNode(entity);
-                        auto& rgbody = view.get<phys::RigidBody>(entity);
-                        // Unoptimized chunk of code
-                        auto newTf = Transform(rgbody.getPosition(), rgbody.getAngle());
-                        node->setGlobalTransform(newTf);
-                        // End unoptimized chunk of code
-                    }
-                }
+                void postUpdate(float /*dt*/) override;
             private:
+                void batchToPhysicsPos(ecs::Entity entity);
+
                 b2World* mPhysicsWorld;
                 detail::ContactListener mContactListener;
+                std::unordered_set<ecs::Entity> mBatched;
         };
     } // namespace sys
 } // namespace stay

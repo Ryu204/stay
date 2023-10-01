@@ -164,14 +164,14 @@ namespace stay
 
     Transform Node::globalTransform() const
     {
-        auto res = mLocalTransform;
+        auto res = mLocalTransform.getMatrix();
         auto parent = mParent;
         while (parent != globalInfo().root)
         {
-            res.setMatrix(getNode(parent)->mLocalTransform.getMatrix() * res.getMatrix());
+            res = getNode(parent)->mLocalTransform.getMatrix() * res;
             parent = getNode(parent)->mParent;
         }
-        return res;
+        return Transform(res);
     }
 
     void Node::setLocalTransform(const Transform& transform)
