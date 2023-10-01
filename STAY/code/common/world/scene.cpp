@@ -1,10 +1,7 @@
 #include "../ecs/manager.hpp"
 #include "../../game/system/list.hpp"
-#include "../../game/component/list.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
-/*debug*/ #include <iostream>
-/*debug*/ #include <fstream>
 
 namespace stay
 {
@@ -44,25 +41,7 @@ namespace stay
         mManager.registerSystem<sys::OrderedRenderSystem>();
         mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
         mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
-        //======================================debug==============================
-         /*debug:test component loading*/
-        // Json::Value obj;
-        // std::ifstream reader("asset/test.json");
-        // reader >> obj;
-        // ComponentsLoader compLoader(&mManager);
-        // compLoader.registerComponent<comp::Render>("render");
-        // compLoader.registerComponent<phys::RigidBody>("rigidbody");
-        // compLoader.registerComponent<phys::Collider>("collider");
-
-        // auto* node = mSceneRoot->createChild();
-        // compLoader.loadAllComponents(node->entity(), obj["componentsData"]);
-        // std::ofstream("asset/out.json") << compLoader.saveAllComponents(node->entity());
-
-        // node = mSceneRoot->createChild();
-        // auto& body1 = node->addComponent<phys::RigidBody>(Vector2(0, -6), 0, phys::BodyType::STATIC);
-        // auto& col1 = node->addComponent<phys::Collider>(phys::Collider::Box{Vector2(0, 0), Vector2(4.F, 0.5F)});
-        // node->addComponent<comp::Render>(Color(0x540099FF), Vector2(0.5F, 1.F));
-        //======================================debug==============================
+        
         mSceneLoader.registerType<comp::Render>("render");
         mSceneLoader.registerType<phys::Collider>("collider");
         mSceneLoader.registerType<phys::RigidBody>("rigidbody");

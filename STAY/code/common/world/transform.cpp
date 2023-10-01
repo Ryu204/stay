@@ -37,6 +37,7 @@ namespace stay
         mTRSMatrix = matrix;
         updateFromMatrix();
         mInverseNeedRebuild = true;
+        mMatrixNeedRebuild = false;
     }
 
     const Transform::Matrix& Transform::getMatrix() const
@@ -84,7 +85,10 @@ namespace stay
     
     void Transform::setPosition(const Vector3& pos)
     {
-        move(Vector3(pos - mPosition));
+        mPosition = pos;
+
+        mMatrixNeedRebuild = true;
+        mInverseNeedRebuild = true;
     }
     
     Vector3 Transform::getPosition() const

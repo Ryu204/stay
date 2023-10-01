@@ -36,8 +36,7 @@ namespace stay
                     
                     const auto draw = [&target, this](Node* current, RStates states) -> RStates
                     {
-                        // Make the get function const because `current` can be the root
-                        const auto& tf = ((const Node*)current)->localTransform();
+                        const auto& tf = current->localTransform();
                         states.transform = states.transform * utils::transTosfTrans(tf);
                         if (current->hasComponent<comp::Render>())
                         {
