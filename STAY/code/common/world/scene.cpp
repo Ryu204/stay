@@ -37,8 +37,8 @@ namespace stay
     }
     void Scene::initialize()
     {
-        mManager.registerSystem<sys::RawRenderSystem>();
-        //mManager.registerSystem<sys::OrderedRenderSystem>();
+        // mManager.registerSystem<sys::RawRenderSystem>();
+        mManager.registerSystem<sys::OrderedRenderSystem>();
         mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
         mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
         

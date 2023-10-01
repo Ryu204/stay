@@ -42,9 +42,7 @@ namespace stay
 
         PhysicsSystem::PhysicsSystem(ecs::Manager* manager)
             : ecs::StartSystem(0)
-            , ecs::PreUpdateSystem(0)
             , ecs::UpdateSystem(-1)
-            , ecs::PostUpdateSystem(-1)
             , ecs::System(manager)
         { }
 
@@ -73,31 +71,19 @@ namespace stay
             world->SetContactListener(&mContactListener);
         }
 
-        void PhysicsSystem::preUpdate(float dt)
-        {
-        }
-
         void PhysicsSystem::update(float dt)
         {
             static const int velIterCount = 8;
             static const int posIterCount = 3;
             mPhysicsWorld->Step(dt, velIterCount, posIterCount);
-        }
-
-        // Bind transform to body collider
-        void PhysicsSystem::postUpdate(float /*dt*/)
-        {
+            
             auto view = mManager->getRegistryRef().view<phys::RigidBody>();
-
             mBatched.clear();
-
             for (auto entity : view)
-            {
-                batchToPhysicsPos(entity);
-            }
+                batchSingle(entity);
         }
 
-        void PhysicsSystem::batchToPhysicsPos(ecs::Entity entity)
+        void PhysicsSystem::batchSingle(ecs::Entity entity)
         {
             if (mBatched.count(entity) > 0)
                 return;
@@ -120,7 +106,7 @@ namespace stay
             }
             bool parentIsBatched = mBatched.count(node->parent()->entity()) > 0;
             if (!parentIsBatched)
-                batchToPhysicsPos(node->parent()->entity());
+                batchSingle(node->parent()->entity());
             node->setGlobalTransform(tf);
             mBatched.insert(entity);
         }
