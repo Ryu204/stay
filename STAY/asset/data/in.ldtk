@@ -1660,8 +1660,8 @@
 			"identifier": "Testing_ground",
 			"iid": "a015bed0-3b70-11ee-83e9-1f0216a931c1",
 			"uid": 0,
-			"worldX": 0,
-			"worldY": 0,
+			"worldX": -1024,
+			"worldY": -640,
 			"worldDepth": 0,
 			"pxWid": 2048,
 			"pxHei": 1280,
@@ -1708,8 +1708,8 @@
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#D2BF41",
-							"__worldX": 1984,
-							"__worldY": 528,
+							"__worldX": 960,
+							"__worldY": -112,
 							"iid": "23e86f20-3b70-11ee-a075-3196891bae74",
 							"width": 16,
 							"height": 16,
@@ -2208,7 +2208,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [{ "levelIid": "be8d39e0-3b70-11ee-a075-f3808a23d3bf", "dir": "o" }]
+			"__neighbours": []
 		},
 		{
 			"identifier": "Level_1",
@@ -2363,7 +2363,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": [{ "levelIid": "a015bed0-3b70-11ee-83e9-1f0216a931c1", "dir": "o" }]
+			"__neighbours": []
 		}
 	],
 	"worlds": [],

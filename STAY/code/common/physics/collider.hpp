@@ -6,6 +6,7 @@
 #include <SFML/System/NonCopyable.hpp>
 #include <box2d/box2d.h>
 
+#include "colliderInfo.hpp"
 #include "../type/vector.hpp"
 #include "../utility/convert.hpp"
 #include "../utility/typedef.hpp"
@@ -35,23 +36,7 @@ namespace stay
         class Collider : public ecs::Component
         {
             public:
-                struct Box {
-                    Vector2 position;
-                    Vector2 size;
-                    float angle; // in game coords
-                };
-                struct Circle {
-                    Vector2 position;
-                    float radius;
-                };
-                struct Info : public std::variant<Box, Circle>, public Serializable
-                {
-                    using std::variant<Box, Circle>::variant;
-                    Json::Value toJSONObject() const override;
-                    bool fetch(const Json::Value& value) override;
-                };
-                
-                Collider(const Info& info = Box{}, const Material& mat = Material());
+                Collider(const ColliderInfo& info = Box{}, const Material& mat = Material());
                 virtual ~Collider();
                 void start();
                 void setMaterial(const Material& mat);
@@ -66,10 +51,9 @@ namespace stay
                 SERIALIZE(mMaterial, mShapeInfo)
             private:
                 void attachToRigidBody();
-                static Uptr<b2Shape> createShape(const Collider::Info& info);
 
                 Material mMaterial;
-                Info mShapeInfo;
+                ColliderInfo mShapeInfo;
                 b2Fixture* mFixture;
         };
     } // namespace phys

@@ -2,13 +2,11 @@
 
 namespace stay
 {
-    template <>
-    Json::Value toJSON<int>(const int& t)
+    Json::Value toJSON(const int& t)
     {
         return Json::Value(t);
     }
-    template <>
-    bool fromJSON<int>(int& t, const Json::Value& data)
+    bool fromJSON(int& t, const Json::Value& data)
     {
         if (data.isInt())
         {
@@ -17,13 +15,11 @@ namespace stay
         }
         return false;
     }
-    template <>
-    Json::Value toJSON<float>(const float& t)
+    Json::Value toJSON(const float& t)
     {
         return Json::Value(t);
     }
-    template <>
-    bool fromJSON<float>(float& t, const Json::Value& data)
+    bool fromJSON(float& t, const Json::Value& data)
     {
         if (data.isNumeric())
         {
@@ -32,13 +28,11 @@ namespace stay
         }
         return false;
     }
-    template <>
-    Json::Value toJSON<bool>(const bool& t)
+    Json::Value toJSON(const bool& t)
     {
         return Json::Value(t);
     }
-    template <>
-    bool fromJSON<bool>(bool& t, const Json::Value& data)
+    bool fromJSON(bool& t, const Json::Value& data)
     {
         if (data.isBool())
         {
@@ -47,13 +41,11 @@ namespace stay
         }
         return false;
     }
-    template <>
-    Json::Value toJSON<std::string>(const std::string& t)
+    Json::Value toJSON(const std::string& t)
     {
         return Json::Value(t);
     }
-    template <>
-    bool fromJSON<std::string>(std::string& t, const Json::Value& data)
+    bool fromJSON(std::string& t, const Json::Value& data)
     {
         if (data.isString())
         {

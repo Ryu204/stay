@@ -20,7 +20,7 @@ namespace stay
             Visitor(funcs...) -> Visitor<funcs...>;
         } // namespace detail
 
-        Collider::Collider(const Info& info, const Material& mat) // NOLINT
+        Collider::Collider(const ColliderInfo& info, const Material& mat) // NOLINT
             : mMaterial(mat)
             , mShapeInfo(info)
             , mFixture(nullptr)
@@ -63,81 +63,12 @@ namespace stay
         void Collider::attachToRigidBody()
         {
             b2FixtureDef def = mMaterial.getFixtureDef();
-            auto shape = createShape(mShapeInfo);
+            auto shape = mShapeInfo.createShape();
             def.shape = shape.get();
             mFixture = getNode()->getComponent<RigidBody>().attachFixture(def);
             mFixture->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
         }
 
-        Uptr<b2Shape> Collider::createShape(const Collider::Info& info)
-        {
-            auto res = std::visit(detail::Visitor{
-                [](const Collider::Circle& cir) -> Uptr<b2Shape>
-                {
-                    Uptr<b2CircleShape> res = std::make_unique<b2CircleShape>();
-                    res->m_p.Set(cir.position.x, cir.position.y);
-                    res->m_radius = cir.radius;
-                    return std::move(res);
-                },
-                [](const Collider::Box& box) -> Uptr<b2Shape>
-                {
-                    Uptr<b2PolygonShape> res = std::make_unique<b2PolygonShape>();
-                    res->SetAsBox(box.size.x / 2.F, box.size.y / 2.F, 
-                        utils::convertVec2<b2Vec2>(box.position), 
-                        box.angle * DEG2RAD);
-                    return std::move(res);
-                }
-            }, info);
-            return std::move(res);
-        }
-
-        Json::Value Collider::Info::toJSONObject() const
-        {
-            Json::Value res;
-            std::visit(detail::Visitor{
-                [&res](const Collider::Circle& cir)
-                {
-                    res["type"] = "circle";
-                    res["position"] = cir.position.toJSONObject();
-                    res["radius"] = cir.radius;
-                },
-                [&res](const Collider::Box& box)
-                {
-                    res["type"] = "box";
-                    res["position"] = box.position.toJSONObject();
-                    res["angle"] = box.angle;
-                    res["size"] = box.size.toJSONObject();
-                }
-            }, *this);
-            return res;
-        }
-
-        bool Collider::Info::fetch(const Json::Value& value)
-        {
-            bool succeeded = true;
-            if (!value["type"].isString())
-                return false;
-            if (value["type"].asString() == "circle")
-                operator=(Circle{});
-            else if (value["type"].asString() == "box")
-                operator=(Box{});
-            std::visit(detail::Visitor{
-                [&](Collider::Circle& cir)
-                {
-                    if (!(cir.position.fetch(value["position"]) && value["radius"].isNumeric()))
-                        succeeded = false;
-                    cir.radius = value["radius"].asFloat();
-                },
-                [&](Collider::Box& box)
-                {
-                    if (!(box.position.fetch(value["position"]) && box.size.fetch(value["size"]) && value["angle"].isNumeric()))
-                        succeeded = false;
-                    box.angle = value["angle"].asFloat();
-                }
-            }, *this);
-            return succeeded;
-        }
-        
         Material::Material(float density, float friction, float restituition)
         {
             mDef.density = density;

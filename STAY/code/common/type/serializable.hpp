@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <vector>
 
 #include <json/json.h>
 
@@ -16,36 +17,46 @@ namespace stay
             virtual bool fetch(const Json::Value& /*data*/) = 0;
     };
 
-    template <typename T>
+    template <typename T, whereIs(T, Serializable)>
     Json::Value toJSON(const T& t)
     {
-        if constexpr (std::is_base_of_v<Serializable, T>)
-            return t.toJSONObject();
-        assert(true && "Must implement specialization");
+        return t.toJSONObject();
     }
-    template <typename T>
+    template <typename T, whereIs(T, Serializable)>
     bool fromJSON(T& t, const Json::Value& data)
     {
-        if constexpr (std::is_base_of_v<Serializable, T>)
-            return t.fetch(data);
-        assert(true && "Must implement specialization");
+        return t.fetch(data);
     }
-    template <>
-    Json::Value toJSON<int>(const int& t);
-    template <>
-    bool fromJSON<int>(int& t, const Json::Value& data);
-    template <>
-    Json::Value toJSON<float>(const float& t);
-    template <>
-    bool fromJSON<float>(float& t, const Json::Value& data);
-    template <>
-    Json::Value toJSON<bool>(const bool& t);
-    template <>
-    bool fromJSON<bool>(bool& t, const Json::Value& data);
-    template <>
-    Json::Value toJSON<std::string>(const std::string& t);
-    template <>
-    bool fromJSON<std::string>(std::string& t, const Json::Value& data);
+    Json::Value toJSON(const int& t);
+    bool fromJSON(int& t, const Json::Value& data);
+    Json::Value toJSON(const float& t);
+    bool fromJSON(float& t, const Json::Value& data);
+    Json::Value toJSON(const bool& t);
+    bool fromJSON(bool& t, const Json::Value& data);
+    Json::Value toJSON(const std::string& t);
+    bool fromJSON(std::string& t, const Json::Value& data);
+    template <typename T>
+    inline Json::Value toJSON(const std::vector<T>& t)
+    {
+        Json::Value res(Json::arrayValue);
+        for (const auto& i : t)
+            res.append(toJSON(i));
+        return res;
+    }
+    template <typename T>
+    inline bool fromJSON(std::vector<T>& t, const Json::Value& data)
+    {
+        if (!data.isArray())
+            return false;
+        t.clear();
+        for (const auto& val : data)
+        {
+            t.push_back(T());
+            if (!t.back().fetch(val))
+                return false;
+        }
+        return true;
+    }
 } // namespace stay
 #define stay_GET_JSON(x) { res[#x] = stay::toJSON(x); }
 #define stay_FETCH_JSON(x) { if (!stay::fromJSON(x, val[#x])) return false; }
