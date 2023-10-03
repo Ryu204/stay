@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "sceneLoader.hpp"
+#include "LDtk/rawSceneLoader.hpp"
 
 namespace stay
 {
@@ -16,46 +17,85 @@ namespace stay
     // @return Root node
     Uptr<Node> SceneLoader::load()
     {
-        auto file = mFile/"in";
-        Json::Value data;
+        try 
         {
-            std::ifstream reader(file);
-            if (!reader.good())
-                throw std::runtime_error("Cannot open data file");
-            reader >> data;
+            throw std::runtime_error("LOL");
+            std::string log;
+            auto* maybeRes = tryLoad(log);
+            if (maybeRes != nullptr)
+                return Uptr<Node>(maybeRes);
+            else
+                throw std::runtime_error(log);
         }
-        if (!data["root"].isInt())
-            throw std::runtime_error(error() + " (no \"root\" id)");
-        auto root = std::make_unique<Node>(static_cast<ecs::Entity>(data["root"].asInt()));
-        data = data["entities"];
-
-        mParentOf.clear();
-
-        for (const auto& entity : data)
+        catch (std::exception& e)
         {
-            bool hasValidIDs = entity["id"].isInt() && entity["parent"].isInt();
-            if (!hasValidIDs)
-                throw std::runtime_error(error() + " (entity or parent id not found)");
-            auto id = static_cast<ecs::Entity>(entity["id"].asInt());
-            auto* created = root->createChild(id);
-            bool hasTransform = created->localTransform().fetch(entity["transform"]);
-            if (!hasTransform)
-                throw std::runtime_error(error() + " (transform data not found)");
-            mParentOf[id] = static_cast<ecs::Entity>(entity["parent"].asInt());
-            mLoader.loadAllComponents(id, entity["components"]);
+            RawSceneLoader altLoader;
+            auto res = altLoader.load(mFile/"in.ldtk", e.what());
+            return std::move(res);
         }
-        for (const auto [child, parent] : mParentOf)
-        {
-            Node::getNode(child)->setParent(parent);
-        }
-        mParentOf.clear();
-        return std::move(root);
     }
 
-    std::string& SceneLoader::error()
+    Node* SceneLoader::tryLoad(std::string& log)
     {
-        static std::string res("Entity data in file is faulty");
-        return res;
+        log = "";
+        auto data = openFile();
+        if (!data["root"].isInt())
+        {
+            throw std::runtime_error("no \"root\" id");
+            return nullptr;
+        }
+        auto rootID = static_cast<ecs::Entity>(data["root"].asInt());
+        Uptr<Node> reserver = std::make_unique<Node>(rootID);
+        Node fakeRoot;
+        Node* underRoot = fakeRoot.createChild();
+        data = data["entities"];
+        mParentOf.clear();
+        for (const auto& entity : data)
+            loadEntity(underRoot, entity);
+        for (const auto [child, parent] : mParentOf)
+            Node::getNode(child)->setParent(parent);
+        mParentOf.clear();
+        reserver.reset();
+        Node* rootPtr = new Node(rootID);
+        underRoot->setParent(rootPtr);
+        return rootPtr;
+    }
+
+    Json::Value SceneLoader::openFile()
+    {
+        auto file = mFile/"in";
+        try
+        {
+            std::ifstream reader(file);
+            Json::Value res;
+            reader >> res;
+            return res;
+        }
+        catch(std::exception& e)
+        {
+            throw std::runtime_error("Cannot open file " + file.string() + ":\n" + e.what());
+        }
+    }
+
+    void SceneLoader::loadEntity(Node* currentRoot, const Json::Value& data)
+    {
+        bool hasValidIDs = data["id"].isInt() && data["parent"].isInt();
+        if (!hasValidIDs)
+            throw std::runtime_error("entity or parent id not found");
+        auto id = static_cast<ecs::Entity>(data["id"].asInt());
+        auto* created = currentRoot->createChild(id);
+        bool hasTransform = created->localTransform().fetch(data["transform"]);
+        if (!hasTransform)
+            throw std::runtime_error("transform data not found");
+        mParentOf[id] = static_cast<ecs::Entity>(data["parent"].asInt());
+        try
+        {
+            mLoader.loadAllComponents(id, data["components"]);
+        }
+        catch(const std::exception& e)
+        {
+            throw std::runtime_error(std::string("components data is broken: ") + e.what());
+        }
     }
 
     void SceneLoader::save(Node* root) const

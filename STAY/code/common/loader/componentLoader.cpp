@@ -3,12 +3,6 @@
 
 namespace stay
 {
-    const std::string& ComponentsLoader::error()
-    {
-        static std::string res("Component data in file is broken");
-        return res;
-    }
-
     ComponentsLoader::ComponentsLoader(ecs::Manager* manager)
         : mUtilizeEntity(manager->getRegistryRef().create())
         , mManager(manager)
@@ -22,13 +16,13 @@ namespace stay
     void ComponentsLoader::loadAllComponents(ecs::Entity entity, const Json::Value& componentsArray)
     {
         const bool isArray = componentsArray.type() == Json::ValueType::arrayValue;
-        utils::throwIfFalse(isArray, error() + " (not an array)");
+        utils::throwIfFalse(isArray, "not an array");
         for (Json::ArrayIndex i = 0; i < componentsArray.size(); ++i) // NOLINT
         {
             const auto& obj = componentsArray[i];
             const std::string name = obj["name"].asString();
             bool nameFound = mLoaderList.find(name) != mLoaderList.end();
-            utils::throwIfFalse(nameFound, error() + " (name \"" + name + "\" not recognized)");
+            utils::throwIfFalse(nameFound, "name \"" + name + "\" not recognized");
             loadComponent(entity, name, obj["data"]);
         }
     }
@@ -37,7 +31,7 @@ namespace stay
     {
         const auto& loader = *mLoaderList.at(name);
         auto loadSucceeded = loader.deserializeInto(mManager, entity, componentData);
-        utils::throwIfFalse(loadSucceeded, error() + " (cannot load data of \"" + name + "\")");
+        utils::throwIfFalse(loadSucceeded, "cannot load data of \"" + name + "\"");
     }
 
     Json::Value ComponentsLoader::saveAllComponents(ecs::Entity entity) const

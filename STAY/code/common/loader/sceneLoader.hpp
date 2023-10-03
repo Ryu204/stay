@@ -25,8 +25,10 @@ namespace stay
             Uptr<Node> load();
             void save(Node* root) const;
         private:
+            Node* tryLoad(std::string& log);
+            Json::Value openFile();
+            void loadEntity(Node* currentRoot, const Json::Value& data);
             Json::Value createSaveObject(Node* root) const;
-            static std::string& error();
             Path mFile;
             ComponentsLoader mLoader;
             std::unordered_map<ecs::Entity, ecs::Entity> mParentOf;
