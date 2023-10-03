@@ -23,7 +23,7 @@ namespace stay
             }
             // @return Root node
             Uptr<Node> load();
-            void save(Node* root) const;
+            void save(Node* root, bool overrideIn = false) const;
         private:
             Node* tryLoad(std::string& log);
             Json::Value openFile();
