@@ -16,15 +16,21 @@ namespace stay
             using Path = typename std::filesystem::path;
             SceneLoader(ecs::Manager* manager, Path&& filepath);
             template <typename T>
-            void registerType(const std::string& name)
+            SceneLoader& registerComponent(const std::string& name)
             {
                 mLoader.registerComponent<T>(name);
+                return *this;
             }
             // @return Root node
             Uptr<Node> load();
+            void save(Node* root) const;
         private:
-            static std::string& error();
+            Node* tryLoad(std::string& log);
+            Json::Value openFile();
+            void loadEntity(Node* currentRoot, const Json::Value& data);
+            Json::Value createSaveObject(Node* root) const;
             Path mFile;
             ComponentsLoader mLoader;
+            std::unordered_map<ecs::Entity, ecs::Entity> mParentOf;
     };
 } // namespace stay

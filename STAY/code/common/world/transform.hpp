@@ -8,7 +8,7 @@
 
 namespace stay
 {
-    class Transform : Serializable
+    class Transform : public Serializable
     {
         public:
             using Matrix = glm::mat4x4;

@@ -11,7 +11,7 @@ namespace stay
     class Scene
     {
         public:
-            Scene();
+            Scene(std::filesystem::path&& filepath);
             ~Scene();
             void update(float dt);
             void start();

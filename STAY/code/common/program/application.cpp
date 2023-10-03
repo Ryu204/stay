@@ -24,7 +24,9 @@ namespace stay
         void Application::initialize()
         {
             // Fetch data from file
-            std::ifstream dataReader(INIT_FILE);        
+            std::ifstream dataReader(INIT_FILE); 
+            if (!dataReader.good())       
+                throw std::runtime_error("Cannot open init file");
             Json::Value data;
             dataReader >> data;
             dataReader.close();
@@ -33,7 +35,7 @@ namespace stay
             mWindow = std::make_unique<RWin>(sf::VideoMode(mAppInfo.width, mAppInfo.height), mAppInfo.name);
             setUpRendering();
 
-            mScene = std::make_unique<Scene>();
+            mScene = std::make_unique<Scene>(data["scene"].asString());
         }
 
         void Application::setUpRendering()
@@ -60,9 +62,10 @@ namespace stay
             auto winSize = mWindow->getSize();
             mAppInfo.width = winSize.x;
             mAppInfo.height = winSize.y;
-
-            // Write
+            // Read file (to keep existing data)
             Json::Value root;
+            std::ifstream(INIT_FILE) >> root;
+            // Write
             root["window"] = mAppInfo.toJSONObject();
             std::ofstream dataWriter(INIT_FILE);
             dataWriter << root;

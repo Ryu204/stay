@@ -106,6 +106,7 @@ namespace stay
                     res["type"] = "box";
                     res["position"] = box.position.toJSONObject();
                     res["angle"] = box.angle;
+                    res["size"] = box.size.toJSONObject();
                 }
             }, *this);
             return res;

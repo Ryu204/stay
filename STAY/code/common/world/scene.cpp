@@ -5,16 +5,17 @@
 
 namespace stay
 {
-    Scene::Scene()
+    Scene::Scene(std::filesystem::path&& filepath)
         : mPhysicsWorld({0.F, -10.F})
         , mPixelsPerMeter(100.F)
-        , mSceneLoader(&mManager, "asset/test.json")
+        , mSceneLoader(&mManager, std::forward<std::filesystem::path>(filepath))
     {
         Node::init(mManager.getRegistry());
         initialize();
     }
     Scene::~Scene()
     {
+        mSceneLoader.save(mSceneRoot.get());
         mSceneRoot.reset();
         Node::shutdown();
     }
@@ -42,9 +43,10 @@ namespace stay
         mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
         mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
         
-        mSceneLoader.registerType<comp::Render>("render");
-        mSceneLoader.registerType<phys::Collider>("collider");
-        mSceneLoader.registerType<phys::RigidBody>("rigidbody");
+        mSceneLoader
+            .registerComponent<comp::Render>("render")
+            .registerComponent<phys::Collider>("collider")
+            .registerComponent<phys::RigidBody>("rigidbody");
         mSceneRoot = mSceneLoader.load();
     }
 } // namespace stay
