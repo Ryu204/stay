@@ -37,7 +37,7 @@ namespace stay
             entity->addComponent<comp::Render>(Color(0x00FF00FF), Vector2(mTileSize, mTileSize) / mPxPerMeter);
         }
     }
-// NOLINTBEGIN
+
     void RawSceneLoader::loadColliders(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
     {
         init(level, layer);
@@ -54,7 +54,23 @@ namespace stay
         node->addComponent<phys::RigidBody>(/*position = */Vector2());
         node->addComponent<phys::Collider>(phys::Chain(chainShape));
     }
-// NOLINTEND
+
+    void RawSceneLoader::loadPlayer(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
+    {
+        init(level, layer);
+        const auto& player = layer.getEntityInstances().at(0);
+        auto* node = currentRoot->createChild();
+        Vector2 pos = Vector2(player.getPx()[0], player.getPx()[1]) + mLayerOffset;
+        pos = fileToWorld(pos);
+        auto& rgbody = node->addComponent<phys::RigidBody>(pos);
+        rgbody.setType(phys::BodyType::DYNAMIC);
+        rgbody.setGravityScale(player.getFieldInstances().at(2).getValue().get<float>());
+        phys::Material mat(1.F, 0.F, 0.0F);
+        node->addComponent<phys::Collider>(phys::Circle(Vector2(), player.getWidth() / 2.F / mPxPerMeter), mat);
+        auto& cmp = node->addComponent<Player>();
+        cmp.speed = player.getFieldInstances().at(0).getValue().get<float>();
+        cmp.jumpHeight = player.getFieldInstances().at(1).getValue().get<float>();
+    }
 
     Uptr<Node> RawSceneLoader::load(Path &&filename, const std::string& switchReason)
     {
@@ -72,9 +88,11 @@ namespace stay
             const auto layers = level.getLayerInstances();
             const auto& platform = layers->at(1);
             const auto& collider = layers->at(0);
+            const auto& player = layers->at(2);
 
             loadTiles(root.get(), level, platform);
             loadColliders(root.get(), level, collider);
+            loadPlayer(root.get(), level, player);
 
             return std::move(root);
         }

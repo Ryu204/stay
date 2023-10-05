@@ -5,6 +5,8 @@ namespace stay
     namespace phys
     {
         RigidBody::RigidBody(const Vector2& position, float angle, BodyType type)
+            : mWorld(nullptr)
+            , mBody(nullptr)
         {
             mBodyDef.position = utils::convertVec2<b2Vec2>(position);
             mBodyDef.angle = angle * DEG2RAD;
@@ -17,6 +19,25 @@ namespace stay
             mWorld = world;
             mBody = mWorld->CreateBody(&mBodyDef);
             mBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+        }
+
+        BodyType RigidBody::type() const
+        {
+            bool started = mBody != nullptr;
+            if (started)
+                return static_cast<BodyType>(mBody->GetType());
+            else 
+                return static_cast<BodyType>(mBodyDef.type);
+        }
+
+        void RigidBody::setType(const BodyType& type)
+        {
+            bool started = mBody != nullptr;
+            auto b2type = static_cast<b2BodyType>(type);
+            if (started)
+                mBody->SetType(b2type);
+            else
+                mBodyDef.type = b2type;
         }
 
         RigidBody::~RigidBody()
@@ -72,12 +93,30 @@ namespace stay
 
         void RigidBody::setFixedRotation(bool fixed)
         {
-            mBody->SetFixedRotation(fixed);
+            bool started = mBody != nullptr;
+            if (!started)
+                mBodyDef.fixedRotation = fixed;
+            else
+                mBody->SetFixedRotation(fixed);
         }
 
         void RigidBody::setGravityScale(float scale)
         {
-            mBody->SetGravityScale(scale);
+            if (mBody != nullptr)
+                mBody->SetGravityScale(scale);
+            else
+                mBodyDef.gravityScale = scale;
+        }
+
+        Vector2 RigidBody::gravity() const
+        {
+            assert(mWorld != nullptr && "RigidBody not started yet");
+            return utils::convertVec2<Vector2>(mWorld->GetGravity());
+        }
+
+        float RigidBody::gravityScale() const
+        {
+            return (mBody == nullptr) ? mBodyDef.gravityScale : mBody->GetGravityScale();
         }
         
         b2Fixture* RigidBody::attachFixture(const b2FixtureDef& properties)

@@ -20,6 +20,11 @@ namespace stay
         };
         struct Circle : public Serializable
         {
+            Circle(Vector2 position = Vector2(), float radius = 1.F)
+            {
+                this->position = position;
+                this->radius = radius;
+            }
             Vector2 position;
             float radius;
             SERIALIZE(position, radius)

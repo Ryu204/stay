@@ -21,6 +21,7 @@ namespace stay
             void init(const ldtk::Level& level, const ldtk::LayerInstance& layer);
             void loadTiles(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer);
             void loadColliders(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer);
+            void loadPlayer(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer);
             Vector2 fileToWorld(const Vector2& pos) const;
 
             static std::string& error();

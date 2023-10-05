@@ -31,7 +31,7 @@ namespace stay
         {
             RawSceneLoader altLoader;
             auto res = altLoader.load(mFile/"in.ldtk", e.what());
-            save(res.get(), true);
+            save(res.get(), false);
             return std::move(res);
         }
     }

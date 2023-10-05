@@ -39,14 +39,16 @@ namespace stay
     void Scene::initialize()
     {
         // mManager.registerSystem<sys::RawRenderSystem>();
-        mManager.registerSystem<sys::OrderedRenderSystem>();
+        // mManager.registerSystem<sys::OrderedRenderSystem>();
         mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize(&mPhysicsWorld);
         mManager.registerSystem<sys::PhysicsSystem>()->initialize(&mPhysicsWorld);
+        mManager.registerSystem<PlayerSystem>();
         
         mSceneLoader
             .registerComponent<comp::Render>("render")
             .registerComponent<phys::Collider>("collider")
-            .registerComponent<phys::RigidBody>("rigidbody");
+            .registerComponent<phys::RigidBody>("rigidbody")
+            .registerComponent<Player>("player");
         mSceneRoot = mSceneLoader.load();
     }
 } // namespace stay
