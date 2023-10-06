@@ -2,6 +2,7 @@
 #include "rigidBody.hpp"
 #include "../utility/typedef.hpp"
 #include "../world/node.hpp"
+#include "../utility/math.hpp"
 
 namespace stay
 {
@@ -38,7 +39,7 @@ namespace stay
         void Collider::start()
         {
             assert(getNode()->hasComponent<RigidBody>() && "Collider created without a rigidbody");
-            attachToRigidBody();
+            attachToRigidBody(getNode()->getComponent<RigidBody>());
         }
 
         void Collider::setMaterial(const Material& mat)
@@ -48,6 +49,7 @@ namespace stay
             mFixture->GetBody()->ResetMassData();
             mFixture->SetFriction(def.friction);
             mFixture->SetRestitution(def.restitution);
+            setLayer(mat.layerID());
         }   
 
         void Collider::setTrigger(bool isTrigger)
@@ -60,12 +62,44 @@ namespace stay
             return mFixture->IsSensor();
         }
 
-        void Collider::attachToRigidBody()
+        const std::string& Collider::layer() const
+        {
+            std::uint16_t mask = (mFixture == nullptr) ? 
+                mMaterial.getFixtureDef().filter.categoryBits :
+                mFixture->GetFilterData().categoryBits;
+            assert(mask != 0 && "zero collision mask");
+            return mCollisionLayer().name(utils::mostSignificantBit(mask));
+        }
+
+        void Collider::setLayer(const std::string& layer)
+        {
+            auto mask = mCollisionLayer().getLayerMask(layer);
+            auto colMask = mCollisionLayer().getCollisionMask(layer);
+            if (mFixture == nullptr)
+            {
+                mMaterial.getFixtureDef().filter.categoryBits = mask;
+                mMaterial.getFixtureDef().filter.maskBits = colMask;
+            }                
+            else
+            {
+                auto filter = mFixture->GetFilterData();
+                filter.categoryBits = mask;
+                filter.maskBits = colMask;
+                mFixture->SetFilterData(filter);
+            }
+        }
+
+        void Collider::setLayer(int id)
+        {
+            setLayer(mCollisionLayer().name(id));
+        }
+
+        void Collider::attachToRigidBody(RigidBody& rgbody)
         {
             b2FixtureDef def = mMaterial.getFixtureDef();
             auto shape = mShapeInfo.createShape();
             def.shape = shape.get();
-            mFixture = getNode()->getComponent<RigidBody>().attachFixture(def);
+            mFixture = rgbody.attachFixture(def);
             mFixture->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
         }
 
@@ -92,9 +126,19 @@ namespace stay
             mDef.restitution = restituition;
         }
 
-        b2FixtureDef Material::getFixtureDef() const
+        const b2FixtureDef& Material::getFixtureDef() const
         {
             return mDef;
+        }
+
+        b2FixtureDef& Material::getFixtureDef() 
+        {
+            return mDef;
+        }
+
+        int Material::layerID() const
+        {
+            return mLayerID;
         }
 
         Json::Value Material::toJSONObject() const
@@ -103,16 +147,19 @@ namespace stay
             res["density"] = mDef.density;
             res["friction"] = mDef.friction;
             res["restituition"] = mDef.restitution;
+            res["layerID"] = utils::mostSignificantBit(mDef.filter.categoryBits);
             return res;
         }
 
         bool Material::fetch(const Json::Value& value)
         {
-            if (!(value["density"].isNumeric() && value["friction"].isNumeric() && value["restituition"].isNumeric()))
+            if (!(value["density"].isNumeric() && value["friction"].isNumeric() 
+                && value["restituition"].isNumeric() && value["layerID"].isNumeric()))
                 return false;
             mDef.density = value["density"].asFloat();
             mDef.friction = value["friction"].asFloat();
             mDef.restitution = value["restituition"].asFloat();
+            mLayerID = value["layerID"].asFloat();
             return true;
         }
     } // namespace phys

@@ -1,4 +1,5 @@
 #include "PhysicsSystem.hpp"
+#include "../../common/physics/world.hpp"
 
 namespace stay
 {
@@ -44,20 +45,24 @@ namespace stay
             : ecs::StartSystem(0)
             , ecs::UpdateSystem(-1)
             , ecs::System(manager)
-        { }
+        { 
+            phys::Collider::mCollisionLayer()
+                .set(0, "Default")
+                .set(1, "Player")
+                .set(2, "Bullet")
+                .set("Player", "Bullet", false);
+        }
 
         PhysicsSystem::~PhysicsSystem()
         {
-            mPhysicsWorld->SetContactListener(nullptr);
+            if (phys::World::avail())
+            {
+                phys::World::get().SetContactListener(nullptr);
+            }
         }
 
         void PhysicsSystem::start()
         {
-            auto view = mManager->getRegistryRef().view<phys::RigidBody>();
-            for (auto entity : view)
-            {
-                view.get<phys::RigidBody>(entity).start(mPhysicsWorld);
-            }
             auto view2 = mManager->getRegistryRef().view<phys::Collider>();
             for (auto entity : view2)
             {
@@ -65,17 +70,16 @@ namespace stay
             }
         }
 
-        void PhysicsSystem::initialize(b2World* world)
+        void PhysicsSystem::initialize()
         {
-            mPhysicsWorld = world;
-            world->SetContactListener(&mContactListener);
+            phys::World::get().SetContactListener(&mContactListener);
         }
 
         void PhysicsSystem::update(float dt)
         {
             static const int velIterCount = 8;
             static const int posIterCount = 3;
-            mPhysicsWorld->Step(dt, velIterCount, posIterCount);
+            phys::World::get().Step(dt, velIterCount, posIterCount);
             
             auto view = mManager->getRegistryRef().view<phys::RigidBody>();
             mBatched.clear();

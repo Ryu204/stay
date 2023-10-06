@@ -67,9 +67,9 @@ namespace stay
     void PlayerSystem::update(float /*dt*/)
     {
         Vector2 dir{0.F, 0.F};
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Left))
             dir.x -= 1.F;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Right))
             dir.x += 1.F;
         auto view = mManager->getRegistryRef().view<Player>();
         for (auto [entity, player] : view.each())

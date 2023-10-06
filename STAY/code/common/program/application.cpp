@@ -33,6 +33,7 @@ namespace stay
             mAppInfo.fetch(data["window"]);
             
             mWindow = std::make_unique<RWin>(sf::VideoMode(mAppInfo.width, mAppInfo.height), mAppInfo.name);
+            mWindow->setKeyRepeatEnabled(false);
             setUpRendering();
 
             mScene = std::make_unique<Scene>(data["scene"].asString());

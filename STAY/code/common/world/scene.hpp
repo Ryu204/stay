@@ -1,7 +1,5 @@
 #pragma once
 
-#include <box2d/box2d.h>
-
 #include "../ecs/manager.hpp"
 #include "camera.hpp"
 #include "../loader/sceneLoader.hpp"
@@ -19,7 +17,6 @@ namespace stay
             void render(RTarget* target);
         private:
             void initialize();
-            b2World mPhysicsWorld;
             Camera mCamera;
             ecs::Manager mManager;
             Uptr<Node> mSceneRoot;

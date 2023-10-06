@@ -13,6 +13,12 @@ namespace stay
     {
         struct Box : public Serializable
         {
+            Box(Vector2 pos = Vector2(), Vector2 size = Vector2(1.F, 1.F), float angle = 0.F)
+            {
+                position = pos;
+                this->size = size;
+                this->angle = angle;
+            }
             Vector2 position;
             Vector2 size;
             float angle; // in game coords

@@ -29,12 +29,11 @@ namespace stay
                 PhysicsSystem(ecs::Manager* manager);
                 virtual ~PhysicsSystem();
                 void start() override;
-                void initialize(b2World* world);
+                void initialize();
                 void update(float dt) override;
             private:
                 void batchSingle(ecs::Entity entity);
 
-                b2World* mPhysicsWorld;
                 detail::ContactListener mContactListener;
                 std::unordered_set<ecs::Entity> mBatched;
         };
