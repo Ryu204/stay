@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_set>
+
 #include "../../common/ecs/manager.hpp"
 
 namespace stay
@@ -22,8 +24,13 @@ namespace stay
             void update(float dt) override;
             void input(const sf::Event& event) override;
         private:
-            void fixOnSurface(Hook& hook);
+            void addToFixQueue(Hook& hook);
             void updateCooldown(float dt);
             void generateBullet(Hook& hook);
+            void updateDirection();
+            void fixQueued();
+
+            Vector2 mDirection;
+            std::unordered_set<Hook*> mQueueFixing;
     };
 } // namespace stay

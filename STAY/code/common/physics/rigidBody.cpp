@@ -100,6 +100,16 @@ namespace stay
         {
             return mBody->GetGravityScale();
         }
+
+        bool RigidBody::bullet() const
+        {
+            return mBody->IsBullet();
+        }
+
+        void RigidBody::setBullet(bool isBullet)
+        {
+            mBody->SetBullet(isBullet);
+        }
         
         b2Fixture* RigidBody::attachFixture(const b2FixtureDef& properties)
         {

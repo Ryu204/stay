@@ -45,6 +45,8 @@ namespace stay
                 void setGravityScale(float scale);
                 Vector2 gravity() const;
                 float gravityScale() const;
+                bool bullet() const;
+                void setBullet(bool isBullet);
                 b2Fixture* attachFixture(const b2FixtureDef& properties);
 
                 Json::Value toJSONObject() const override;

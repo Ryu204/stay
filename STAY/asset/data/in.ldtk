@@ -2488,9 +2488,9 @@
 							"px": [952,72],
 							"fieldInstances": [
 								{ "__identifier": "speed", "__type": "Float", "__value": 5, "__tile": null, "defUid": 75, "realEditorValues": [null] },
-								{ "__identifier": "jumpHeight", "__type": "Float", "__value": 3, "__tile": null, "defUid": 76, "realEditorValues": [{ "id": "V_Float", "params": [3] }] },
+								{ "__identifier": "jumpHeight", "__type": "Float", "__value": 4, "__tile": null, "defUid": 76, "realEditorValues": [{ "id": "V_Float", "params": [4] }] },
 								{ "__identifier": "gravityScale", "__type": "Float", "__value": 3, "__tile": null, "defUid": 77, "realEditorValues": [null] },
-								{ "__identifier": "bulletSpeed", "__type": "Float", "__value": 12, "__tile": null, "defUid": 78, "realEditorValues": [] },
+								{ "__identifier": "bulletSpeed", "__type": "Float", "__value": 30, "__tile": null, "defUid": 78, "realEditorValues": [{ "id": "V_Float", "params": [30] }] },
 								{ "__identifier": "Cooldown", "__type": "Float", "__value": 1, "__tile": null, "defUid": 79, "realEditorValues": [] }
 							]
 						}
