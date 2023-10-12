@@ -1,9 +1,8 @@
 #pragma once
 
-#include <box2d/box2d.h>
-
 #include "../../common/ecs/manager.hpp"
 #include "../../common/physics/debugDraw.hpp"
+#include "../../common/physics/world.hpp"
 
 /*
     Render colliders and other physics components using `b2World::DebugDraw()`
@@ -22,36 +21,31 @@ namespace stay
                 virtual ~PhysicsDebugSystem()
                 {
                     // Clear the drawer
-                    if (mPhysicsWorld != nullptr)
+                    if (phys::World::avail())
                     {
-                        mPhysicsWorld->SetDebugDraw(nullptr);
+                        phys::World::get().SetDebugDraw(nullptr);
                     }
                 }
 
-                void initialize(b2World* world)
+                void initialize()
                 {
                     mDrawer = std::make_unique<phys::DebugDraw>();
-                    mPhysicsWorld = world;
-                    if (mPhysicsWorld != nullptr)
-                    {
-                        uint32 flags = 0;
-                        flags += b2Draw::e_shapeBit;
-                        flags += b2Draw::e_jointBit;
-                        // flags += b2Draw::e_aabbBit;
-                        flags += b2Draw::e_centerOfMassBit;
-                        mDrawer->SetFlags(flags);
-                        mPhysicsWorld->SetDebugDraw(mDrawer.get());
-                    }
+                    uint32 flags = 0;
+                    flags += b2Draw::e_shapeBit;
+                    flags += b2Draw::e_jointBit;
+                    // flags += b2Draw::e_aabbBit;
+                    flags += b2Draw::e_centerOfMassBit;
+                    mDrawer->SetFlags(flags);
+                    phys::World::get().SetDebugDraw(mDrawer.get());
                 }
 
                 void render(RTarget* target, Node* /*root*/) override
                 {
                     mDrawer->setRenderTarget(target);
-                    mPhysicsWorld->DebugDraw();
+                    phys::World::get().DebugDraw();
                 }
 
             private:
-                b2World* mPhysicsWorld;
                 Uptr<phys::DebugDraw> mDrawer;
         };
     } // namespace sys

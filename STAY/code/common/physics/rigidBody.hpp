@@ -28,7 +28,8 @@ namespace stay
                 // @param `angle` angle from OY+ to object's local OY+ in degree, positive if the angle is anti-clockwise
                 RigidBody(const Vector2& position = Vector2(10.F, -10.F), float angle = 0.F, BodyType type = BodyType::STATIC);
                 ~RigidBody();
-                void start(b2World* world);
+                BodyType type() const;
+                void setType(const BodyType& type);
                 void setPosition(const Vector2& position);
                 Vector2 getPosition() const;
                 // @param `angle` the angle between OY+ and object's local OY+ in degree, positive if anti-clockwise
@@ -42,12 +43,16 @@ namespace stay
                 float getAngularVelocity() const;
                 void setFixedRotation(bool fixed);
                 void setGravityScale(float scale);
+                Vector2 gravity() const;
+                float gravityScale() const;
+                bool bullet() const;
+                void setBullet(bool isBullet);
                 b2Fixture* attachFixture(const b2FixtureDef& properties);
 
                 Json::Value toJSONObject() const override;
                 bool fetch(const Json::Value& value) override;
             private:
-                b2BodyDef mBodyDef;
+                
                 b2World* mWorld;
                 b2Body* mBody;
         };

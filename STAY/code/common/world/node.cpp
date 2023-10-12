@@ -75,7 +75,7 @@ namespace stay
         assert(newParent != nullptr && "cannot set null as parent");
         assert(newParent->childOf(this) == false && "a cycle exists in the scene");
 
-        bool alreadyParent = newParent->mEntity == mParent;
+        const bool alreadyParent = newParent->mEntity == mParent;
         if (alreadyParent)
             return;
         // move unique_ptr to new parent container

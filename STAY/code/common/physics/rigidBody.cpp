@@ -1,28 +1,39 @@
 #include "rigidBody.hpp"
+#include "world.hpp"
 
 namespace stay
 {
     namespace phys
     {
         RigidBody::RigidBody(const Vector2& position, float angle, BodyType type)
+            : mWorld(nullptr)
+            , mBody(nullptr)
         {
-            mBodyDef.position = utils::convertVec2<b2Vec2>(position);
-            mBodyDef.angle = angle * DEG2RAD;
-            mBodyDef.type = static_cast<b2BodyType>(type);
-            mBodyDef.angularDamping = 0.01F;
+            b2BodyDef bodyDef;
+            bodyDef.position = utils::convertVec2<b2Vec2>(position);
+            bodyDef.angle = angle * DEG2RAD;
+            bodyDef.type = static_cast<b2BodyType>(type);
+            bodyDef.angularDamping = 0.01F;
+            
+            mWorld = &phys::World::get();
+            mBody = mWorld->CreateBody(&bodyDef);
+            mBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
         }
 
-        void RigidBody::start(b2World* world)
+        BodyType RigidBody::type() const
         {
-            mWorld = world;
-            mBody = mWorld->CreateBody(&mBodyDef);
-            mBody->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+            return static_cast<BodyType>(mBody->GetType());
+        }
+
+        void RigidBody::setType(const BodyType& type)
+        {
+            auto b2type = static_cast<b2BodyType>(type);
+                mBody->SetType(b2type);
         }
 
         RigidBody::~RigidBody()
         {
-            if (mWorld != nullptr)
-                mWorld->DestroyBody(mBody);
+            mWorld->DestroyBody(mBody);
         }
         
         void RigidBody::setPosition(const Vector2& position)
@@ -79,6 +90,26 @@ namespace stay
         {
             mBody->SetGravityScale(scale);
         }
+
+        Vector2 RigidBody::gravity() const
+        {
+            return utils::convertVec2<Vector2>(mWorld->GetGravity());
+        }
+
+        float RigidBody::gravityScale() const
+        {
+            return mBody->GetGravityScale();
+        }
+
+        bool RigidBody::bullet() const
+        {
+            return mBody->IsBullet();
+        }
+
+        void RigidBody::setBullet(bool isBullet)
+        {
+            mBody->SetBullet(isBullet);
+        }
         
         b2Fixture* RigidBody::attachFixture(const b2FixtureDef& properties)
         {
@@ -88,9 +119,9 @@ namespace stay
         Json::Value RigidBody::toJSONObject() const
         {
             Json::Value res;
-            res["position"] = utils::convertVec2<Vector2>(mBodyDef.position).toJSONObject();
-            res["angle"] = mBodyDef.angle;
-            res["type"] = mBodyDef.type;
+            res["position"] = utils::convertVec2<Vector2>(getPosition()).toJSONObject();
+            res["angle"] = getAngle();
+            res["type"] = static_cast<int>(type());
             return res;
         }
         bool RigidBody::fetch(const Json::Value& value)
@@ -98,9 +129,9 @@ namespace stay
             Vector2 position;
             if (!(value["angle"].isNumeric() && value["type"].isInt() && position.fetch(value["position"])))
                 return false;
-            mBodyDef.angle = value["angle"].asFloat();
-            mBodyDef.position = utils::convertVec2<b2Vec2>(position);
-            mBodyDef.type = static_cast<b2BodyType>(value["type"].asInt());
+            setAngle(value["angle"].asFloat());
+            setPosition(position);
+            setType(static_cast<BodyType>(value["type"].asInt()));
             return true;
         }
     } // namespace phys

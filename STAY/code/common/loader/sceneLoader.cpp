@@ -31,7 +31,7 @@ namespace stay
         {
             RawSceneLoader altLoader;
             auto res = altLoader.load(mFile/"in.ldtk", e.what());
-            save(res.get(), true);
+            save(res.get(), false);
             return std::move(res);
         }
     }
@@ -47,7 +47,7 @@ namespace stay
         auto rootID = static_cast<ecs::Entity>(data["root"].asInt());
         auto sceneMaxEntity = data["maxEntity"].asInt();
         {
-            bool exceededThreshold = sceneMaxEntity > (1 << 20);
+            const bool exceededThreshold = sceneMaxEntity > (1 << 20);
             if (exceededThreshold)
                 throw std::runtime_error("internal error");
         }
@@ -86,12 +86,12 @@ namespace stay
 
     void SceneLoader::loadEntity(Node* currentRoot, const Json::Value& data)
     {
-        bool hasValidIDs = data["id"].isInt() && data["parent"].isInt();
+        const bool hasValidIDs = data["id"].isInt() && data["parent"].isInt();
         if (!hasValidIDs)
             throw std::runtime_error("entity or parent id not found");
         auto id = static_cast<ecs::Entity>(data["id"].asInt());
         auto* created = currentRoot->createChild(id);
-        bool hasTransform = created->localTransform().fetch(data["transform"]);
+        const bool hasTransform = created->localTransform().fetch(data["transform"]);
         if (!hasTransform)
             throw std::runtime_error("transform data not found");
         mParentOf[id] = static_cast<ecs::Entity>(data["parent"].asInt());
