@@ -64,7 +64,7 @@ namespace stay
 
         const std::string& Collider::layer() const
         {
-            std::uint16_t mask = (mFixture == nullptr) ? 
+            const std::uint16_t mask = (mFixture == nullptr) ? 
                 mMaterial.getFixtureDef().filter.categoryBits :
                 mFixture->GetFilterData().categoryBits;
             assert(mask != 0 && "zero collision mask");

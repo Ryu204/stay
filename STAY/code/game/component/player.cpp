@@ -45,6 +45,8 @@ namespace stay
                 case sf::Keyboard::Scan::Space:
                     mEntered = true;
                     break;
+                default:
+                    break;
             }
         }
 

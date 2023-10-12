@@ -11,7 +11,7 @@ namespace stay
             { 
                 auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
                 auto* bCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureB()->GetUserData().pointer);
-                bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
+                const bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
                 if (!isTrigger)
                 {
                     aCol->OnCollisionEnter.invoke(*bCol, *contact);
@@ -27,7 +27,7 @@ namespace stay
             { 
                 auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
                 auto* bCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureB()->GetUserData().pointer);
-                bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
+                const bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
                 if (!isTrigger)
                 {
                     aCol->OnCollisionExit.invoke(*bCol, *contact);
@@ -108,7 +108,7 @@ namespace stay
                 mBatched.insert(entity);
                 return;
             }
-            bool parentIsBatched = mBatched.count(node->parent()->entity()) > 0;
+            const bool parentIsBatched = mBatched.count(node->parent()->entity()) > 0;
             if (!parentIsBatched)
                 batchSingle(node->parent()->entity());
             node->setGlobalTransform(tf);

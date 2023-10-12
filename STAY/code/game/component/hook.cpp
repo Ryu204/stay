@@ -54,7 +54,7 @@ namespace stay
             mDirection.y -= 1.F;
         if (mDirection == Vector2())
         {
-            Vector2 bestVector = vectorUp;
+            const Vector2 bestVector = vectorUp;
             mDirection = bestVector;
         }
         else

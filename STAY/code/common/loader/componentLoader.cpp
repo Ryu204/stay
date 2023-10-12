@@ -21,7 +21,7 @@ namespace stay
         {
             const auto& obj = componentsArray[i];
             const std::string name = obj["name"].asString();
-            bool nameFound = mLoaderList.find(name) != mLoaderList.end();
+            const bool nameFound = mLoaderList.find(name) != mLoaderList.end();
             utils::throwIfFalse(nameFound, "name \"" + name + "\" not recognized");
             loadComponent(entity, name, obj["data"]);
         }
@@ -41,7 +41,7 @@ namespace stay
         for (const auto [id, storage] : reg.storage())
         {
             auto type = storage.type();
-            bool hasComponent = storage.contains(entity);
+            const bool hasComponent = storage.contains(entity);
             if (!hasComponent)
                 continue;
             arr.append(saveComponent(entity, type.name()));   
@@ -52,7 +52,7 @@ namespace stay
     Json::Value ComponentsLoader::saveComponent(ecs::Entity entity, const std::string_view& name) const
     {
         Json::Value res;
-        std::string nameStr(name);
+        const std::string nameStr(name);
         res["name"] = mTypenameToLoader.at(nameStr);
         const auto& loader = *mLoaderList.at(mTypenameToLoader.at(std::string(name)));
         res["data"] = loader.serialize(mManager, entity);

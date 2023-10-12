@@ -47,7 +47,7 @@ namespace stay
         for (const auto& i : list)
         {
             auto point = i.get<ldtk::GridPoint>();
-            Vector2 filePos = Vector2(point.getCx(), point.getCy()) * mTileSize + mLayerOffset;
+            const Vector2 filePos = Vector2(point.getCx(), point.getCy()) * mTileSize + mLayerOffset;
             chainShape.emplace_back(fileToWorld(filePos));
         }
         auto* node = currentRoot->createChild();
@@ -88,7 +88,7 @@ namespace stay
             reader.open(filename);
             std::stringstream buffer;
             buffer << reader.rdbuf();
-            ldtk::Coordinate coord = nlohmann::json::parse(buffer.str());
+            const ldtk::Coordinate coord = nlohmann::json::parse(buffer.str());
             reader.close();
 
             Uptr<Node> root = std::make_unique<Node>();

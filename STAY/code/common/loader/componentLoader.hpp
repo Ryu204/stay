@@ -37,7 +37,7 @@ namespace stay
             {
                 return manager->getComponent<T>(entity).toJSONObject();
             }
-            void createDefault(ecs::Registry* reg, ecs::Entity entity) const
+            void createDefault(ecs::Registry* reg, ecs::Entity entity) const override
             {
                 reg->emplace<T>(entity);
             }
