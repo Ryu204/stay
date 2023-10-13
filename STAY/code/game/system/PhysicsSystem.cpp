@@ -1,5 +1,6 @@
 #include "PhysicsSystem.hpp"
 #include "../../common/physics/world.hpp"
+#include "../../common/utility/math.hpp"
 
 namespace stay
 {
@@ -9,34 +10,38 @@ namespace stay
         {
             void ContactListener::BeginContact(b2Contact* contact)
             { 
-                auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
-                auto* bCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureB()->GetUserData().pointer);
+                phys::Collision aInfo(contact, /*isA=*/true);
+                phys::Collision bInfo(contact, /*isA=*/false);
+                auto* aCol = bInfo.other;
+                auto* bCol = aInfo.other;
                 const bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
                 if (!isTrigger)
                 {
-                    aCol->OnCollisionEnter.invoke(*bCol, *contact);
-                    bCol->OnCollisionEnter.invoke(*aCol, *contact);
+                    aCol->OnCollisionEnter.invoke(*bCol, aInfo);
+                    bCol->OnCollisionEnter.invoke(*aCol, bInfo);
                 }
                 else
                 {
-                    aCol->OnTriggerEnter.invoke(*bCol, *contact);
-                    bCol->OnTriggerEnter.invoke(*aCol, *contact);
+                    aCol->OnTriggerEnter.invoke(*bCol, bInfo);
+                    bCol->OnTriggerEnter.invoke(*aCol, aInfo);
                 }
             }
             void ContactListener::EndContact(b2Contact* contact) 
             { 
-                auto* aCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureA()->GetUserData().pointer);
-                auto* bCol = reinterpret_cast<phys::Collider*>(contact->GetFixtureB()->GetUserData().pointer);
+                phys::Collision aInfo(contact, /*isA=*/true);
+                phys::Collision bInfo(contact, /*isA=*/false);
+                auto* aCol = bInfo.other;
+                auto* bCol = aInfo.other;
                 const bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
                 if (!isTrigger)
                 {
-                    aCol->OnCollisionExit.invoke(*bCol, *contact);
-                    bCol->OnCollisionExit.invoke(*aCol, *contact);
+                    aCol->OnCollisionExit.invoke(*bCol, aInfo);
+                    bCol->OnCollisionExit.invoke(*aCol, bInfo);
                 }
                 else
                 {
-                    aCol->OnTriggerExit.invoke(*bCol, *contact);
-                    bCol->OnTriggerExit.invoke(*aCol, *contact);
+                    aCol->OnTriggerExit.invoke(*bCol, bInfo);
+                    bCol->OnTriggerExit.invoke(*aCol, aInfo);
                 }
             }
         } // namespace detail

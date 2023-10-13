@@ -22,5 +22,10 @@ namespace stay
             }
             return res;
         }
+        template <typename T>
+        float lengthVec2(const T& t)
+        {
+            return std::sqrt(t.x * t.x + t.y * t.y);
+        }
     } // namespace utils
 } // namespace stay

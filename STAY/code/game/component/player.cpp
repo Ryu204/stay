@@ -1,5 +1,6 @@
 #include <optional>
 #include <cmath>
+/*debug*/ #include <iostream>
 
 #include "player.hpp"
 #include "../../common/physics/collider.hpp"
@@ -24,12 +25,23 @@ namespace stay
             player.rgbody->setFixedRotation(true);
             auto& collider = player.getNode()->getComponent<phys::Collider>();
             collider.OnCollisionEnter.addEventListener(
-                [&player](phys::Collider& /*other*/, b2Contact& contact)
+                [&player](phys::Collider& /*other*/, phys::Collision& contact)
                 {
-                    b2WorldManifold info;
-                    contact.GetWorldManifold(&info);
-                    if (info.normal.y > 0.5F)
+                    if (contact.normal.y > 0.5F)
+                    {
                         player.canJump = true;
+                        player.onGround = true;
+                    }
+                }
+            );
+            collider.OnCollisionExit.addEventListener(
+                [&player](phys::Collider&, phys::Collision& contact) 
+                {
+                    if (contact.normal.y > 0.5F)
+                    {
+                        /*debug*/ std::cout << "out" << std::endl;
+                        player.onGround = false;
+                    }
                 }
             );
         }
@@ -76,9 +88,14 @@ namespace stay
         auto view = mManager->getRegistryRef().view<Player>();
         for (auto [entity, player] : view.each())
         {
-            auto vel = player.rgbody->getVelocity();
-            vel.x = dir.x * player.speed;
-            player.rgbody->setVelocity(vel);
+            const auto vel = player.rgbody->getVelocity();
+            auto force = utils::convertVec2<Vector2>(dir * player.moveStrength);
+            const auto isLeft = vel.x < 5.F;
+            const auto isRight = vel.x > -5.F;
+            const bool mayIncreaseForce = (dir.x < 0.F && isRight) || (dir.x > 0.F && isLeft);
+            if (player.onGround && mayIncreaseForce)
+                force = player.oppositeScale * force;
+            player.rgbody->applyForce(force);
         }
     }
 } // namespace stay
