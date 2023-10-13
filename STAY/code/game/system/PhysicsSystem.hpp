@@ -33,6 +33,7 @@ namespace stay
                 void update(float dt) override;
             private:
                 void batchSingle(ecs::Entity entity);
+                void applyHorizontalDamping(float dt);
 
                 detail::ContactListener mContactListener;
                 std::unordered_set<ecs::Entity> mBatched;

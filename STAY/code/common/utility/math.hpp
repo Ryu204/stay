@@ -27,5 +27,14 @@ namespace stay
         {
             return std::sqrt(t.x * t.x + t.y * t.y);
         }
+        template <typename T>
+        T clamp(const T& val, const T& min, const T& max)
+        {
+            return std::min<T>(max, std::max<T>(val, min));
+        }
+        inline float clamp01(float t)
+        {
+            return clamp(t, 0.F, 1.F);
+        }
     } // namespace utils
 } // namespace stay

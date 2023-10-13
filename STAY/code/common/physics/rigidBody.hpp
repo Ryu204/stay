@@ -49,6 +49,8 @@ namespace stay
                 void setBullet(bool isBullet);
                 float linearDamping() const;
                 void setLinearDamping(float damp);
+                float horizontalDamping() const;
+                void setHorizontalDamping(float damp);
                 b2Fixture* attachFixture(const b2FixtureDef& properties);
 
                 Json::Value toJSONObject() const override;
@@ -57,7 +59,7 @@ namespace stay
                 
                 b2World* mWorld;
                 b2Body* mBody;
-                float mAirFriction;
+                float mHorizontalDamping;
         };
     } // namespace phys
 } // namespace stay

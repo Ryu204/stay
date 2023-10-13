@@ -93,8 +93,10 @@ namespace stay
             const auto isLeft = vel.x < 5.F;
             const auto isRight = vel.x > -5.F;
             const bool mayIncreaseForce = (dir.x < 0.F && isRight) || (dir.x > 0.F && isLeft);
-            if (player.onGround && mayIncreaseForce)
-                force = player.oppositeScale * force;
+            if (mayIncreaseForce)
+            {
+                force = force * (player.onGround ? player.oppositeScale : player.airScale);
+            }
             player.rgbody->applyForce(force);
         }
     }

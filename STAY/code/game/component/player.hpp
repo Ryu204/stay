@@ -12,6 +12,8 @@ namespace stay
         float jumpHeight{5.F};
         // Set this to a higher-than-one float to create snappy movement
         float oppositeScale{1.F};
+        // Same but apply to airbone moments
+        float airScale{1.F};
 
         bool canJump{false};
         bool onGround{false};

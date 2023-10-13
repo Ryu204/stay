@@ -82,6 +82,8 @@ namespace stay
 
         void PhysicsSystem::update(float dt)
         {
+            applyHorizontalDamping(dt);
+
             static const int velIterCount = 8;
             static const int posIterCount = 3;
             phys::World::get().Step(dt, velIterCount, posIterCount);
@@ -118,6 +120,17 @@ namespace stay
                 batchSingle(node->parent()->entity());
             node->setGlobalTransform(tf);
             mBatched.insert(entity);
+        }
+
+        void PhysicsSystem::applyHorizontalDamping(float dt)
+        {
+            auto view = mManager->getRegistryRef().view<phys::RigidBody>();
+            for (auto [entity, rgbody] : view.each())
+            {
+                const float lostRatio = 1 - utils::clamp01(rgbody.horizontalDamping());
+                const auto vel = rgbody.getVelocity();
+                rgbody.setVelocity(vel * std::pow(lostRatio, dt));
+            }
         }
     } // namespace sys
 } // namespace stay
