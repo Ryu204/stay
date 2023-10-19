@@ -1,5 +1,6 @@
 #include "rigidBody.hpp"
 #include "world.hpp"
+#include "../utility/convert.hpp"
 
 namespace stay
 {

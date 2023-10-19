@@ -1,14 +1,9 @@
 #pragma once
 
-#include <optional>
-
 #include <box2d/box2d.h>
-#include <SFML/System/NonCopyable.hpp>
 
-#include "../utility/convert.hpp"
-#include "../utility/typedef.hpp"
-#include "../utility/assignable.hpp"
 #include "../ecs/component.hpp"
+#include "../type/vector.hpp"
 
 namespace stay
 {

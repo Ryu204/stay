@@ -2,7 +2,6 @@
 
 #include <unordered_map>
 #include <functional>
-#include <cstdint>
 
 #include <SFML/System/NonCopyable.hpp>
 

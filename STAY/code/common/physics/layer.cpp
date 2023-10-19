@@ -1,5 +1,7 @@
 #include "layer.hpp"
 
+#include <cassert>
+
 namespace stay
 {
     namespace phys

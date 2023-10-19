@@ -25,7 +25,8 @@ namespace stay
             : mMaterial(mat)
             , mShapeInfo(info)
             , mFixture(nullptr)
-        { }     
+        { 
+        }     
 
         Collider::~Collider()
         {
@@ -159,8 +160,8 @@ namespace stay
             mDef.density = value["density"].asFloat();
             mDef.friction = value["friction"].asFloat();
             mDef.restitution = value["restituition"].asFloat();
-            mLayerID = value["layerID"].asFloat();
+            mLayerID = value["layerID"].asInt();
             return true;
         }
-    } // namespace phys
+    } // namespace phys 
 } // namespace stay

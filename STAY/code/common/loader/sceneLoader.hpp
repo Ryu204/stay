@@ -2,15 +2,12 @@
 
 #include <unordered_map>
 #include <filesystem>
-#include <iostream>
-#include <fstream>
-#include <cstdarg>
 
-#include "../world/node.hpp"
 #include "componentLoader.hpp"
 
 namespace stay
 {
+    class Node;
     struct SceneLoader
     {
             using Path = typename std::filesystem::path;

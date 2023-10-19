@@ -1,8 +1,6 @@
 #pragma once
 
-#include <memory>
 #include <vector>
-#include <algorithm>
 
 #include "system.hpp"
 #include "../utility/typedef.hpp"

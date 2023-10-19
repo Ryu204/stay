@@ -2,8 +2,9 @@
 
 #include <filesystem>
 
-#include "../../ecs/manager.hpp"
-#include "quicktype.hpp"
+#include "../../ecs/type.hpp"
+#include "../../type/vector.hpp"
+#include "quicktypefwd.hpp"
 
 /*
     This class is used in case there is no suitable file found for `SceneLoader`
@@ -11,6 +12,7 @@
 
 namespace stay
 {
+    class Node;
     class RawSceneLoader
     {
         public:

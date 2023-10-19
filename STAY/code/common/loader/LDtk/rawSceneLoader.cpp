@@ -1,5 +1,6 @@
 #include "rawSceneLoader.hpp"
 #include "../../../game/component/list.hpp"
+#include "quicktype.hpp"
 
 #include <iostream>
 #include <fstream>

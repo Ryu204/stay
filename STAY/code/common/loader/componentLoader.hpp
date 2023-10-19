@@ -1,7 +1,6 @@
 #pragma once
 
 #include <unordered_map>
-#include <exception>
 
 #include <json/json.h>
 #include <entt/meta/resolve.hpp>

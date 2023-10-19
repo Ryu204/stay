@@ -9,5 +9,8 @@
 # CMake build folder
 build/*
 
+# Clangd cache folder
+.cache/*
+
 # CMake user preset
 CMakeUserPresets.json
