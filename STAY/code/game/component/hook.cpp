@@ -74,7 +74,7 @@ namespace stay
         rg.setBullet(true);
         rg.setVelocity(mDirection * hook.speed);
         col.OnCollisionEnter.addEventListener(
-            [this, &hook](phys::Collider& /*collider*/, b2Contact& /*contact*/)
+            [this, &hook](phys::Collider& /*collider*/, phys::Collision& /*contact*/)
             {
                 addToFixQueue(hook);
             });

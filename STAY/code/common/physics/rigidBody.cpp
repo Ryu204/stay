@@ -8,6 +8,7 @@ namespace stay
         RigidBody::RigidBody(const Vector2& position, float angle, BodyType type)
             : mWorld(nullptr)
             , mBody(nullptr)
+            , mHorizontalDamping(0.05F)
         {
             b2BodyDef bodyDef;
             bodyDef.position = utils::convertVec2<b2Vec2>(position);
@@ -110,6 +111,26 @@ namespace stay
         {
             mBody->SetBullet(isBullet);
         }
+
+        float RigidBody::linearDamping() const
+        {
+            return mBody->GetLinearDamping();
+        }
+
+        float RigidBody::horizontalDamping() const
+        {
+            return mHorizontalDamping;
+        }
+
+        void RigidBody::setHorizontalDamping(float damp)
+        {
+            mHorizontalDamping = damp;
+        }
+
+        void RigidBody::setLinearDamping(float damp)
+        {
+            mBody->SetLinearDamping(damp);
+        }
         
         b2Fixture* RigidBody::attachFixture(const b2FixtureDef& properties)
         {
@@ -122,16 +143,24 @@ namespace stay
             res["position"] = utils::convertVec2<Vector2>(getPosition()).toJSONObject();
             res["angle"] = getAngle();
             res["type"] = static_cast<int>(type());
+            res["hdamping"] = mHorizontalDamping;
+            res["damping"] = mBody->GetLinearDamping();
             return res;
         }
         bool RigidBody::fetch(const Json::Value& value)
         {
             Vector2 position;
-            if (!(value["angle"].isNumeric() && value["type"].isInt() && position.fetch(value["position"])))
+            if (!( value["angle"].isNumeric() 
+                && value["type"].isInt() 
+                && position.fetch(value["position"])
+                && value["hdamping"].isNumeric()
+                && value["damping"].isNumeric()))
                 return false;
             setAngle(value["angle"].asFloat());
             setPosition(position);
             setType(static_cast<BodyType>(value["type"].asInt()));
+            mHorizontalDamping = value["hdamping"].asFloat();
+            mBody->SetLinearDamping(value["damping"].asFloat());
             return true;
         }
     } // namespace phys

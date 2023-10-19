@@ -13,6 +13,7 @@
 #include "../ecs/component.hpp"
 #include "../event/event.hpp"
 #include "layer.hpp"
+#include "collision.hpp"
 
 namespace stay
 {
@@ -27,7 +28,7 @@ namespace stay
         class Material : public Serializable
         {
             public:
-                Material(float density = 1.F, float friction = 0.2F, float restituition = 0.F);
+                Material(float density = 1.F, float friction = 0.F, float restituition = 0.F);
                 void setDensity(float density);
                 void setFriction(float friction);
                 void setRestituition(float restituition);
@@ -57,10 +58,10 @@ namespace stay
                 void setLayer(const std::string& layer);
                 void setLayer(int id);
 
-                event::Event<Collider&, b2Contact&> OnCollisionEnter;
-                event::Event<Collider&, b2Contact&> OnCollisionExit;
-                event::Event<Collider&, b2Contact&> OnTriggerEnter;
-                event::Event<Collider&, b2Contact&> OnTriggerExit;
+                event::Event<Collider&, Collision&> OnCollisionEnter;
+                event::Event<Collider&, Collision&> OnCollisionExit;
+                event::Event<Collider&, Collision&> OnTriggerEnter;
+                event::Event<Collider&, Collision&> OnTriggerExit;
 
                 SERIALIZE(mMaterial, mShapeInfo)
             private:

@@ -52,7 +52,8 @@ namespace stay
         }
         auto* node = currentRoot->createChild();
         node->addComponent<phys::RigidBody>(/*position = */Vector2());
-        node->addComponent<phys::Collider>(phys::Chain(chainShape));
+        phys::Material mat(1.F, 1.F, 0.F);
+        node->addComponent<phys::Collider>(phys::Chain(chainShape), mat);
     }
 
     void RawSceneLoader::loadPlayer(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
@@ -66,14 +67,19 @@ namespace stay
         pos = fileToWorld(pos);
         auto& rgbody = node->addComponent<phys::RigidBody>(pos, 0.F, phys::BodyType::DYNAMIC);
         rgbody.setGravityScale(player.getFieldInstances().at(2).getValue().get<float>());
+        rgbody.setHorizontalDamping(player.getFieldInstances().at(5).getValue().get<float>());
+        rgbody.setLinearDamping(player.getFieldInstances().at(8).getValue().get<float>());
         // Collider
-        phys::Material mat(1.F, 0.F, 0.0F);
+        float friction = player.getFieldInstances().at(6).getValue().get<float>();
+        phys::Material mat(1.0F, friction, 0.0F);
         auto& col = node->addComponent<phys::Collider>(phys::Circle(Vector2(), player.getWidth() / 2.F / mPxPerMeter), mat);
         col.setLayer("Player");
         // Player
         auto& cmp = node->addComponent<Player>();
-        cmp.speed = player.getFieldInstances().at(0).getValue().get<float>();
+        cmp.moveStrength = player.getFieldInstances().at(0).getValue().get<float>();
         cmp.jumpHeight = player.getFieldInstances().at(1).getValue().get<float>();
+        cmp.oppositeScale = player.getFieldInstances().at(7).getValue().get<float>();
+        cmp.airScale = player.getFieldInstances().at(9).getValue().get<float>();
         // Hook
         auto& hk = node->addComponent<Hook>();
         hk.speed = player.getFieldInstances().at(3).getValue().get<float>();
