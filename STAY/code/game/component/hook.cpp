@@ -1,6 +1,7 @@
 #include "hook.hpp"
 #include "../../common/physics/collider.hpp"
 #include "../../common/physics/rigidBody.hpp"
+#include "../../common/physics/joint.hpp"
 
 namespace stay
 {
@@ -102,7 +103,10 @@ namespace stay
     {
         for (const auto& hook : mQueueFixing)
         {
-            hook->created->getComponent<phys::RigidBody>().setType(phys::BodyType::STATIC);
+            auto& bullet = hook->created->getComponent<phys::RigidBody>();
+            bullet.setType(phys::BodyType::STATIC);
+            auto& joint = hook->created->addComponent<phys::Joint>();
+            joint.start(hook->get(), phys::Prismatic{bullet.getPosition(), -mDirection}, false);
         }
         mQueueFixing.clear();
     }

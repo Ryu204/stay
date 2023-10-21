@@ -8,19 +8,6 @@ namespace stay
 {
     namespace phys
     {
-        namespace detail
-        {
-            // Variant visitor
-            template <typename... funcs>
-            struct Visitor : funcs...
-            {
-                using funcs::operator()...;
-            };
-            // deduction guide
-            template <typename... funcs>
-            Visitor(funcs...) -> Visitor<funcs...>;
-        } // namespace detail
-
         Collider::Collider(const ColliderInfo& info, const Material& mat) // NOLINT
             : mMaterial(mat)
             , mShapeInfo(info)

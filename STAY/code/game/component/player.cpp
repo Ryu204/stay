@@ -39,7 +39,6 @@ namespace stay
                 {
                     if (contact.normal.y > 0.5F)
                     {
-                        /*debug*/ std::cout << "out" << std::endl;
                         player.onGround = false;
                     }
                 }

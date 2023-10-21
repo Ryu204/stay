@@ -138,6 +138,11 @@ namespace stay
             return mBody->CreateFixture(&properties);
         }
 
+        b2Body* RigidBody::body()
+        {
+            return mBody;
+        }
+
         Json::Value RigidBody::toJSONObject() const
         {
             Json::Value res;
