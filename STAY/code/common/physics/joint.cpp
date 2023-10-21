@@ -3,11 +3,21 @@
 #include "../world/node.hpp"
 #include "rigidBody.hpp"
 #include "world.hpp"
+#include <cstddef>
 
 namespace stay
 {
     namespace phys
     {
+        Joint::~Joint()
+        {
+            if (World::avail() && mJoint != nullptr)
+                World::get().DestroyJoint(mJoint);
+            if (mOther != nullptr)
+                mOther->OnRemoval.removeListener(mOtherEventID);
+            if (mBody != nullptr)
+                mBody->OnRemoval.removeListener(mBodyEventID);
+        }
         void Joint::start(ecs::Entity other, const JointInfo& info, bool collide)
         {
             mBody = &getNode()->getComponent<RigidBody>();
@@ -16,14 +26,14 @@ namespace stay
             def->collideConnected = collide;
             def->userData.pointer = reinterpret_cast<uintptr_t>(this);
 
-            World::get().CreateJoint(def.get());
+            mJoint = World::get().CreateJoint(def.get());
 
             // Auto erase if either body gets destructed
-            mBody->OnRemoval.addEventListener([this]() {
-                getNode()->removeComponents<Joint>();
+            mBodyEventID = mBody->OnRemoval.addEventListener([&]() {
+                delete this;
             });
-            mOther->OnRemoval.addEventListener([this]() {
-                getNode()->removeComponents<Joint>();
+            mOtherEventID = mOther->OnRemoval.addEventListener([&]() {
+                delete this;
             });
         }
 

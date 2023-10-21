@@ -18,7 +18,7 @@ namespace stay
         {
                 using utils::Assignable<Entity>::get;
                 Node* getNode() const;
-                virtual ~Component() = default;
+                virtual ~Component();
                 event::Event<> OnRemoval;
         };
     } // namespace ecs

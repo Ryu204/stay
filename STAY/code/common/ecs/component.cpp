@@ -5,6 +5,11 @@ namespace stay
 {
     namespace ecs
     {
+        Component::~Component()
+        {
+            OnRemoval.invoke();
+        }
+        
         Node* Component::getNode() const
         {
             return Node::getNode(get());

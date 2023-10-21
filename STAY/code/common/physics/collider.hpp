@@ -58,10 +58,10 @@ namespace stay
                 void setLayer(const std::string& layer);
                 void setLayer(int id);
 
-                event::Event<Collider&, Collision&> OnCollisionEnter;
-                event::Event<Collider&, Collision&> OnCollisionExit;
-                event::Event<Collider&, Collision&> OnTriggerEnter;
-                event::Event<Collider&, Collision&> OnTriggerExit;
+                event::Event<Collision&> OnCollisionEnter;
+                event::Event<Collision&> OnCollisionExit;
+                event::Event<Collision&> OnTriggerEnter;
+                event::Event<Collision&> OnTriggerExit;
 
                 SERIALIZE(mMaterial, mShapeInfo)
             private:

@@ -7,8 +7,8 @@ namespace stay
     {
         Collision::Collision(b2Contact* contact, bool isA)
         {
-            other = isA ? reinterpret_cast<Collider*>(contact->GetFixtureA()->GetUserData().pointer)
-                        : reinterpret_cast<Collider*>(contact->GetFixtureB()->GetUserData().pointer);
+            other = isA ? reinterpret_cast<Collider*>(contact->GetFixtureB()->GetUserData().pointer)
+                        : reinterpret_cast<Collider*>(contact->GetFixtureA()->GetUserData().pointer);
             b2WorldManifold info;
             contact->GetWorldManifold(&info);
             position = utils::convertVec2<Vector2>(info.points[0]);

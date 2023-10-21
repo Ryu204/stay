@@ -24,7 +24,7 @@ namespace stay
     {
         updateCooldown(dt);
         updateDirection();
-        fixQueued();
+        processQueue();
     }
 
     void HookSystem::input(const sf::Event& event)
@@ -69,15 +69,16 @@ namespace stay
 
         auto* bullet = node->createChild();
         auto& rg = bullet->addComponent<phys::RigidBody>(baseRg.getPosition(), 45.F, phys::BodyType::DYNAMIC);
-        auto& col = bullet->addComponent<phys::Collider>(phys::Box{Vector2(), Vector2{0.2F, 0.2F}});
+        phys::Material mat(5.F, 1.F, 0.F);
+        auto& col = bullet->addComponent<phys::Collider>(phys::Box{Vector2(), Vector2{0.2F, 0.2F}}, mat);
         col.start();
         col.setLayer("Bullet");
         rg.setBullet(true);
         rg.setVelocity(mDirection * hook.speed);
         col.OnCollisionEnter.addEventListener(
-            [this, &hook](phys::Collider& /*collider*/, phys::Collision& /*contact*/)
+            [this, &hook](phys::Collision& contact)
             {
-                addToFixQueue(hook);
+                queueForAttachment(&hook, &contact.other->getNode()->getComponent<phys::RigidBody>());
             });
 
         hook.created = bullet;
@@ -99,19 +100,24 @@ namespace stay
         }
     }
 
-    void HookSystem::fixQueued()
+    void HookSystem::processQueue()
     {
-        for (const auto& hook : mQueueFixing)
+        for (const auto [hook, obstacle] : mQueueFixing)
         {
             auto& bullet = hook->created->getComponent<phys::RigidBody>();
-            bullet.setType(phys::BodyType::STATIC);
-            auto& joint = hook->created->addComponent<phys::Joint>();
-            joint.start(hook->get(), phys::Prismatic{bullet.getPosition(), -mDirection}, false);
+            auto& base = hook->getNode()->getComponent<phys::RigidBody>();
+            auto& slider = hook->getNode()->addComponent<phys::Joint>();
+            slider.start(
+                hook->created->entity(), 
+                phys::Prismatic{bullet.getPosition(), bullet.getPosition() - base.getPosition()}, 
+                false);
+            auto& rotation = hook->created->addComponent<phys::Joint>();
+            rotation.start(obstacle->get(), phys::Revolute{bullet.getPosition()}, false);
         }
         mQueueFixing.clear();
     }
-    void HookSystem::addToFixQueue(Hook& hook)
+    void HookSystem::queueForAttachment(Hook* hook, phys::RigidBody* body)
     {
-        mQueueFixing.emplace(&hook);
+        mQueueFixing.emplace_back(AttachInfo{ hook, body });
     }
 } // namespace stay

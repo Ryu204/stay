@@ -1,6 +1,5 @@
 #include <optional>
 #include <cmath>
-/*debug*/ #include <iostream>
 
 #include "player.hpp"
 #include "../../common/physics/collider.hpp"
@@ -22,12 +21,12 @@ namespace stay
         {
             auto& player = mManager->getComponent<Player>(entity);
             player.rgbody = &player.getNode()->getComponent<phys::RigidBody>();
-            player.rgbody->setFixedRotation(true);
+            // player.rgbody->setFixedRotation(true);
             auto& collider = player.getNode()->getComponent<phys::Collider>();
             collider.OnCollisionEnter.addEventListener(
-                [&player](phys::Collider& /*other*/, phys::Collision& contact)
+                [&player](phys::Collision& contact)
                 {
-                    if (contact.normal.y > 0.5F)
+                    if (contact.normal.y < 0.5F)
                     {
                         player.canJump = true;
                         player.onGround = true;
@@ -35,9 +34,9 @@ namespace stay
                 }
             );
             collider.OnCollisionExit.addEventListener(
-                [&player](phys::Collider&, phys::Collision& contact) 
+                [&player](phys::Collision& contact) 
                 {
-                    if (contact.normal.y > 0.5F)
+                    if (contact.normal.y < 0.5F)
                     {
                         player.onGround = false;
                     }

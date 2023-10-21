@@ -21,12 +21,14 @@ namespace stay
         };
         struct Revolute : Serializable
         {
-
+            Revolute(Vector2 anchor);
+            Vector2 anchor;
+            SERIALIZE(anchor);
         };
 
         namespace detail 
         {
-            using JointInfoBase = std::variant<Prismatic>;
+            using JointInfoBase = std::variant<Prismatic, Revolute>;
         } // namespace detail
 
         struct JointInfo : public detail::JointInfoBase, public Serializable
