@@ -27,7 +27,6 @@ A bunch of them, actually :octocat:
 * [glm](https://github.com/g-truc/glm)
 * [EnTT](https://github.com/skypjack/entt)
 * [Box2D](https://github.com/erincatto/box2d)
-* [LDtkLoader](https://github.com/Madour/LDtkLoader)
 * [Jsoncpp](https://github.com/open-source-parsers/jsoncpp)
 
 # Trivial info
@@ -36,3 +35,4 @@ A bunch of them, actually :octocat:
 * Each system orders a few moments to perform their tasks (start, update, render, late update,.etc)
 * Entity and game object are interchangable
 * Each entity along with components is able to be serialized to and deserialized from json
+* Currently the loading process uses generated quicktype file from [LDtk's website](https://ldtk.io/docs/game-dev/json-overview/json-schema/)'s schema, so it's very ugly.
