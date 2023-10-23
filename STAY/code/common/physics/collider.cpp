@@ -54,6 +54,14 @@ namespace stay
             return mFixture->IsSensor();
         }
 
+        float Collider::mass() const
+        {
+            check();
+            b2MassData data;
+            mFixture->GetMassData(&data);
+            return data.mass;
+        }
+
         const std::string& Collider::layer() const
         {
             check();

@@ -66,11 +66,11 @@ namespace stay
     {
         auto* node = hook.getNode();
         auto& baseRg = node->getComponent<phys::RigidBody>();
-
         auto* bullet = node->createChild();
         auto& rg = bullet->addComponent<phys::RigidBody>(baseRg.getPosition(), 45.F, phys::BodyType::DYNAMIC);
         phys::Material mat(5.F, 1.F, 0.F);
         auto& col = bullet->addComponent<phys::Collider>(phys::Box{Vector2(), Vector2{0.2F, 0.2F}}, mat);
+
         col.start();
         col.setLayer("Bullet");
         rg.setBullet(true);
@@ -109,14 +109,18 @@ namespace stay
             auto& bullet = hook->created->getComponent<phys::RigidBody>();
             auto& bulletCol = hook->created->getComponent<phys::Collider>();
             auto& base = hook->getNode()->getComponent<phys::RigidBody>();
+             auto& baseCol = hook->getNode()->getComponent<phys::Collider>();
             auto& slider = hook->getNode()->addComponent<phys::Joint>();
             auto& rotation = hook->created->addComponent<phys::Joint>();
             
             bulletCol.setLayer("Isolate");
             slider.start(
                 hook->created->entity(), 
-                phys::Prismatic{bullet.getPosition(), bullet.getPosition() - base.getPosition()}, 
+                phys::Prismatic{base.getPosition(), bullet.getPosition(), bullet.getPosition() - base.getPosition()}, 
                 false);
+            auto* nativeJoint = slider.getNativeHandle<b2PrismaticJoint>();
+            nativeJoint->EnableLimit(true);
+            nativeJoint->SetLimits(0.F, 10.F);
             rotation.start(obstacle->get(), phys::Revolute{bullet.getPosition()}, false);
         }
         mQueued.clear();

@@ -13,8 +13,9 @@ namespace stay
 {
     namespace phys
     {
-        Prismatic::Prismatic(Vector2 anchor, Vector2 axis)
-            : anchor(std::move(anchor))
+        Prismatic::Prismatic(Vector2 anchorA, Vector2 anchorB, Vector2 axis)
+            : anchorA(std::move(anchorA))
+            , anchorB(std::move(anchorB))
             , axis(std::move(axis))
         {}
 
@@ -60,12 +61,17 @@ namespace stay
             return std::visit(utils::VariantVisitor{
                 [&](const Prismatic& pris) -> Uptr<b2JointDef>{
                     auto r1 = std::make_unique<b2PrismaticJointDef>();
-                    r1->Initialize(
-                        A.body(), 
-                        B.body(), 
-                        utils::convertVec2<b2Vec2>(pris.anchor),
-                        utils::convertVec2<b2Vec2>(pris.axis)
-                    );
+                    // r1->Initialize(
+                    //     A.body(), 
+                    //     B.body(), 
+                    //     utils::convertVec2<b2Vec2>(pris.anchor),
+                    //     utils::convertVec2<b2Vec2>(pris.axis));
+                    r1->bodyA = A.body();
+                    r1->bodyB = B.body();
+                    r1->localAnchorA = A.body()->GetLocalPoint(utils::convertVec2<b2Vec2>(pris.anchorA));
+                    r1->localAnchorB = B.body()->GetLocalPoint(utils::convertVec2<b2Vec2>(pris.anchorB));
+                    r1->referenceAngle = r1->bodyB->GetAngle() - r1->bodyA->GetAngle();
+                    r1->localAxisA = r1->bodyA->GetLocalVector(utils::convertVec2<b2Vec2>(pris.axis));
                     return std::move(r1);
                 },
                 [&](const Revolute& rev) -> Uptr<b2JointDef> {

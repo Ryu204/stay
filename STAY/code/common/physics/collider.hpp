@@ -57,6 +57,7 @@ namespace stay
                 const std::string& layer() const;
                 void setLayer(const std::string& layer);
                 void setLayer(int id);
+                float mass() const;
 
                 event::Event<Collision&> OnCollisionEnter;
                 event::Event<Collision&> OnCollisionExit;

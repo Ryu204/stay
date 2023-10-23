@@ -31,6 +31,12 @@ namespace stay
                 void start(ecs::Entity other, const JointInfo& info, bool collide = true);
                 RigidBody& body();
                 RigidBody& other();
+                template<typename T>
+                T* getNativeHandle()
+                {
+                    check();
+                    return dynamic_cast<T*>(mJoint);
+                }
 
                 Json::Value toJSONObject() const override {return Json::Value(); };
                 bool fetch(const Json::Value& data) override {return true; };

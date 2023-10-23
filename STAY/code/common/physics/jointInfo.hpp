@@ -14,10 +14,11 @@ namespace stay
         class RigidBody;
         struct Prismatic : Serializable
         {
-            Prismatic(Vector2 anchor = Vector2{0.F, 0.F}, Vector2 axis = vectorDown);
-            Vector2 anchor;
+            Prismatic(Vector2 anchorA = Vector2{0.F, 0.F}, Vector2 anchorB = Vector2{0.F, 3.F}, Vector2 axis = vectorDown);
+            Vector2 anchorA;
+            Vector2 anchorB;
             Vector2 axis;
-            SERIALIZE(anchor, axis);
+            SERIALIZE(anchorA, anchorB, axis);
         };
         struct Revolute : Serializable
         {
