@@ -27,7 +27,7 @@ namespace stay
         {
             public:
                 Joint() = default;
-                ~Joint();
+                ~Joint() override;
                 void start(ecs::Entity other, const JointInfo& info, bool collide = true);
                 RigidBody& body();
                 RigidBody& other();
@@ -35,12 +35,13 @@ namespace stay
                 Json::Value toJSONObject() const override {return Json::Value(); };
                 bool fetch(const Json::Value& data) override {return true; };
             private:
+                void check() const;
+
                 b2Joint* mJoint{nullptr};
                 RigidBody* mBody{nullptr};
                 RigidBody* mOther{nullptr};
 
-                std::size_t mBodyEventID{0};
-                std::size_t mOtherEventID{0};
+                friend class DestructRegister;
         };
     } // namespace phys
 } // namespace stay

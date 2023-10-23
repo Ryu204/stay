@@ -50,7 +50,7 @@ namespace stay
                 // @param entity The entity this collider attaches to
                 Collider(const ColliderInfo& info = Box{}, const Material& mat = Material());
                 void start();
-                virtual ~Collider();
+                ~Collider() override;
                 void setMaterial(const Material& mat);
                 void setTrigger(bool isTrigger);
                 bool getTrigger() const;
@@ -71,12 +71,12 @@ namespace stay
                 ColliderInfo mShapeInfo;
                 b2Fixture* mFixture;
 
-                static Layer& mCollisionLayer() {
-                    static Layer res; 
-                    return res;
-                }
+                static Layer& mCollisionLayer();
 
                 friend class sys::PhysicsSystem;
+
+                void check() const;
+                friend class DestructRegister;
         };
     } // namespace phys
 } // namespace stay

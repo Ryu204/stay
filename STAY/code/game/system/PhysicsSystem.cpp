@@ -55,7 +55,9 @@ namespace stay
                 .set(0, "Default")
                 .set(1, "Player")
                 .set(2, "Bullet")
-                .set("Player", "Bullet", false);
+                .set(3, "Isolate")
+                .set("Player", "Bullet", false)
+                .isolate("Isolate");
         }
 
         PhysicsSystem::~PhysicsSystem()
@@ -63,6 +65,7 @@ namespace stay
             if (phys::World::avail())
             {
                 phys::World::get().SetContactListener(nullptr);
+                phys::World::get().SetDestructionListener(nullptr);
             }
         }
 
@@ -78,6 +81,7 @@ namespace stay
         void PhysicsSystem::initialize()
         {
             phys::World::get().SetContactListener(&mContactListener);
+            phys::World::get().SetDestructionListener(&mDestructListener);
         }
 
         void PhysicsSystem::update(float dt)

@@ -39,6 +39,12 @@ namespace stay
             return set(mLayerBits.at(name1), mLayerBits.at(name2), collide);
         }
 
+        Layer& Layer::isolate(const std::string& name)
+        {
+            mMatrix.at(mLayerBits.at(name)) = 0;
+            return *this;
+        }
+
         int Layer::getID(const std::string& name) const
         {
             return mLayerBits.at(name);

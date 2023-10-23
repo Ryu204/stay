@@ -21,6 +21,7 @@ namespace stay
                 // @brief Set `layer1` and `layer2` to collide in scene
                 Layer& set(int layer1, int layer2, bool collide = false);
                 Layer& set(const std::string& name1, const std::string& name2, bool collide = false);
+                Layer& isolate(const std::string& name);
                 int getID(const std::string& name) const;
                 const std::string& name(int id) const;
                 Mask getLayerMask(const std::string& name) const;

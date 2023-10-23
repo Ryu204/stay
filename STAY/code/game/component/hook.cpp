@@ -78,7 +78,9 @@ namespace stay
         col.OnCollisionEnter.addEventListener(
             [this, &hook](phys::Collision& contact)
             {
-                queueForAttachment(&hook, &contact.other->getNode()->getComponent<phys::RigidBody>());
+                bool generated = hook.getNode()->hasComponent<phys::Joint>();
+                if (!generated)
+                    queueForAttachment(&hook, &contact.other->getNode()->getComponent<phys::RigidBody>());
             });
 
         hook.created = bullet;
@@ -102,22 +104,25 @@ namespace stay
 
     void HookSystem::processQueue()
     {
-        for (const auto [hook, obstacle] : mQueueFixing)
+        for (const auto [hook, obstacle] : mQueued)
         {
             auto& bullet = hook->created->getComponent<phys::RigidBody>();
+            auto& bulletCol = hook->created->getComponent<phys::Collider>();
             auto& base = hook->getNode()->getComponent<phys::RigidBody>();
             auto& slider = hook->getNode()->addComponent<phys::Joint>();
+            auto& rotation = hook->created->addComponent<phys::Joint>();
+            
+            bulletCol.setLayer("Isolate");
             slider.start(
                 hook->created->entity(), 
                 phys::Prismatic{bullet.getPosition(), bullet.getPosition() - base.getPosition()}, 
                 false);
-            auto& rotation = hook->created->addComponent<phys::Joint>();
             rotation.start(obstacle->get(), phys::Revolute{bullet.getPosition()}, false);
         }
-        mQueueFixing.clear();
+        mQueued.clear();
     }
     void HookSystem::queueForAttachment(Hook* hook, phys::RigidBody* body)
     {
-        mQueueFixing.emplace_back(AttachInfo{ hook, body });
+        mQueued.emplace(hook, body);
     }
 } // namespace stay

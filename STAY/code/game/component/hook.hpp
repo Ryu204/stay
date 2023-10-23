@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <unordered_map>
 
 #include "../../common/ecs/manager.hpp"
 
@@ -34,13 +34,8 @@ namespace stay
             void generateBullet(Hook& hook);
             void updateDirection();
             void processQueue();
-
-            struct AttachInfo {
-                Hook* hook;
-                phys::RigidBody* other;
-            };
-
+            
             Vector2 mDirection;
-            std::vector<AttachInfo> mQueueFixing;
+            std::unordered_map<Hook*, phys::RigidBody*> mQueued;
     };
 } // namespace stay

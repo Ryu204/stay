@@ -4,6 +4,7 @@
 #include "rigidBody.hpp"
 #include "world.hpp"
 #include <cstddef>
+#include <stdexcept>
 
 namespace stay
 {
@@ -11,12 +12,8 @@ namespace stay
     {
         Joint::~Joint()
         {
-            if (World::avail() && mJoint != nullptr)
+            if (mJoint != nullptr)
                 World::get().DestroyJoint(mJoint);
-            if (mOther != nullptr)
-                mOther->OnRemoval.removeListener(mOtherEventID);
-            if (mBody != nullptr)
-                mBody->OnRemoval.removeListener(mBodyEventID);
         }
         void Joint::start(ecs::Entity other, const JointInfo& info, bool collide)
         {
@@ -27,24 +24,24 @@ namespace stay
             def->userData.pointer = reinterpret_cast<uintptr_t>(this);
 
             mJoint = World::get().CreateJoint(def.get());
-
-            // Auto erase if either body gets destructed
-            mBodyEventID = mBody->OnRemoval.addEventListener([&]() {
-                delete this;
-            });
-            mOtherEventID = mOther->OnRemoval.addEventListener([&]() {
-                delete this;
-            });
         }
 
         RigidBody& Joint::body()
         {
+            check();
             return *mBody; 
         }
 
         RigidBody& Joint::other()
         {
+            check();
             return *mOther;
+        }
+
+        void Joint::check() const
+        {
+            if (mJoint == nullptr)  
+                throw std::runtime_error("acess a joint with null data (probably has not started)");
         }
     } // namespace phys
 } // namespace stay

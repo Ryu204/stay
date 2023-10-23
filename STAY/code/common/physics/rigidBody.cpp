@@ -35,7 +35,8 @@ namespace stay
 
         RigidBody::~RigidBody()
         {
-            mWorld->DestroyBody(mBody);
+            if (mBody != nullptr)
+                mWorld->DestroyBody(mBody);
         }
         
         void RigidBody::setPosition(const Vector2& position)
