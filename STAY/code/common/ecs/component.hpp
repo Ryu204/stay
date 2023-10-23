@@ -5,6 +5,7 @@
 #include "system.hpp"
 #include "../utility/assignable.hpp"
 #include "../type/serializable.hpp"
+#include "../event/event.hpp"
 
 namespace stay
 {
@@ -17,7 +18,8 @@ namespace stay
         {
                 using utils::Assignable<Entity>::get;
                 Node* getNode() const;
-                virtual ~Component() = default;
+                virtual ~Component();
+                event::Event<> OnRemoval;
         };
     } // namespace ecs
 } // namespace stay

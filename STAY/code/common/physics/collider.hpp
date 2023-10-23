@@ -50,18 +50,19 @@ namespace stay
                 // @param entity The entity this collider attaches to
                 Collider(const ColliderInfo& info = Box{}, const Material& mat = Material());
                 void start();
-                virtual ~Collider();
+                ~Collider() override;
                 void setMaterial(const Material& mat);
                 void setTrigger(bool isTrigger);
                 bool getTrigger() const;
                 const std::string& layer() const;
                 void setLayer(const std::string& layer);
                 void setLayer(int id);
+                float mass() const;
 
-                event::Event<Collider&, Collision&> OnCollisionEnter;
-                event::Event<Collider&, Collision&> OnCollisionExit;
-                event::Event<Collider&, Collision&> OnTriggerEnter;
-                event::Event<Collider&, Collision&> OnTriggerExit;
+                event::Event<Collision&> OnCollisionEnter;
+                event::Event<Collision&> OnCollisionExit;
+                event::Event<Collision&> OnTriggerEnter;
+                event::Event<Collision&> OnTriggerExit;
 
                 SERIALIZE(mMaterial, mShapeInfo)
             private:
@@ -71,12 +72,12 @@ namespace stay
                 ColliderInfo mShapeInfo;
                 b2Fixture* mFixture;
 
-                static Layer& mCollisionLayer() {
-                    static Layer res; 
-                    return res;
-                }
+                static Layer& mCollisionLayer();
 
                 friend class sys::PhysicsSystem;
+
+                void check() const;
+                friend class DestructRegister;
         };
     } // namespace phys
 } // namespace stay

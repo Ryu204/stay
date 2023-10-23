@@ -1,11 +1,16 @@
 #pragma once
 
-#include <unordered_set>
+#include <unordered_map>
 
 #include "../../common/ecs/manager.hpp"
 
 namespace stay
 {
+    namespace phys
+    {
+        class RigidBody;
+    } // namespace phys
+
     struct Hook : public ecs::Component
     {
         float speed{5.F};
@@ -24,13 +29,13 @@ namespace stay
             void update(float dt) override;
             void input(const sf::Event& event) override;
         private:
-            void addToFixQueue(Hook& hook);
+            void queueForAttachment(Hook* hook, phys::RigidBody* obstacle);
             void updateCooldown(float dt);
             void generateBullet(Hook& hook);
             void updateDirection();
-            void fixQueued();
-
+            void processQueue();
+            
             Vector2 mDirection;
-            std::unordered_set<Hook*> mQueueFixing;
+            std::unordered_map<Hook*, phys::RigidBody*> mQueued;
     };
 } // namespace stay

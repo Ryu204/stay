@@ -1,23 +1,11 @@
 #include "colliderInfo.hpp"
 #include "../utility/convert.hpp"
+#include "../utility/variantHelper.hpp"
 
 namespace stay
 {
     namespace phys
     {
-        namespace detail
-        {
-            // Variant visitor
-            template <typename... funcs>
-            struct Visitor : funcs...
-            {
-                using funcs::operator()...;
-            };
-            // deduction guide
-            template <typename... funcs>
-            Visitor(funcs...) -> Visitor<funcs...>;
-        } // namespace detail
-
         Chain::Chain(std::vector<Vector2>& points)
             : mPoints(std::move(points))
         {}
@@ -41,7 +29,7 @@ namespace stay
 
         Uptr<b2Shape> ColliderInfo::createShape() const
         {
-            auto res = std::visit(detail::Visitor{
+            auto res = std::visit(utils::VariantVisitor{
                 [](const Circle& cir) -> Uptr<b2Shape>
                 {
                     Uptr<b2CircleShape> res = std::make_unique<b2CircleShape>();
@@ -70,7 +58,7 @@ namespace stay
         Json::Value ColliderInfo::toJSONObject() const
         {
             Json::Value res;
-            std::visit(detail::Visitor{
+            std::visit(utils::VariantVisitor{
                 [&res](const Circle& cir)
                 {
                     res["type"] = "circle";
@@ -101,7 +89,8 @@ namespace stay
                 operator=(Box{});
             else if (type == "chain")
                 operator=(Chain{});
-            return std::visit(detail::Visitor{
+            else return false;
+            return std::visit(utils::VariantVisitor{
                 [&](Circle& obj)
                 {
                     return obj.fetch(value["data"]);

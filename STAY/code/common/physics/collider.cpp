@@ -3,24 +3,12 @@
 #include "../utility/typedef.hpp"
 #include "../world/node.hpp"
 #include "../utility/math.hpp"
+#include <stdexcept>
 
 namespace stay
 {
     namespace phys
     {
-        namespace detail
-        {
-            // Variant visitor
-            template <typename... funcs>
-            struct Visitor : funcs...
-            {
-                using funcs::operator()...;
-            };
-            // deduction guide
-            template <typename... funcs>
-            Visitor(funcs...) -> Visitor<funcs...>;
-        } // namespace detail
-
         Collider::Collider(const ColliderInfo& info, const Material& mat) // NOLINT
             : mMaterial(mat)
             , mShapeInfo(info)
@@ -31,7 +19,7 @@ namespace stay
         Collider::~Collider()
         {
             // Must enable this check since `RigidBody` could have been destroyed prior to this call
-            if (mFixture != nullptr && getNode()->hasComponent<RigidBody>())
+            if (mFixture != nullptr)
             {
                 mFixture->GetBody()->DestroyFixture(mFixture);
             }
@@ -45,6 +33,7 @@ namespace stay
 
         void Collider::setMaterial(const Material& mat)
         {
+            check();
             const auto& def = mat.getFixtureDef();
             mFixture->SetDensity(def.density);
             mFixture->GetBody()->ResetMassData();
@@ -55,16 +44,27 @@ namespace stay
 
         void Collider::setTrigger(bool isTrigger)
         {
+            check();
             mFixture->SetSensor(isTrigger);
         }
 
         bool Collider::getTrigger() const
         {
+            check();
             return mFixture->IsSensor();
+        }
+
+        float Collider::mass() const
+        {
+            check();
+            b2MassData data;
+            mFixture->GetMassData(&data);
+            return data.mass;
         }
 
         const std::string& Collider::layer() const
         {
+            check();
             const std::uint16_t mask = (mFixture == nullptr) ? 
                 mMaterial.getFixtureDef().filter.categoryBits :
                 mFixture->GetFilterData().categoryBits;
@@ -102,6 +102,18 @@ namespace stay
             def.shape = shape.get();
             mFixture = rgbody.attachFixture(def);
             mFixture->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
+        }
+
+        void Collider::check() const
+        {
+            if (mFixture == nullptr)
+                throw std::runtime_error("attempt to access a collider with null fixture");
+        }
+
+        Layer& Collider::mCollisionLayer() 
+        {   
+            static Layer res; 
+            return res;
         }
 
         Material::Material(float density, float friction, float restituition)

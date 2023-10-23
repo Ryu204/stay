@@ -47,6 +47,7 @@ namespace stay
                 float horizontalDamping() const;
                 void setHorizontalDamping(float damp);
                 b2Fixture* attachFixture(const b2FixtureDef& properties);
+                b2Body* body();
 
                 Json::Value toJSONObject() const override;
                 bool fetch(const Json::Value& value) override;

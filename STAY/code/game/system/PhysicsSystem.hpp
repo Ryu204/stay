@@ -6,6 +6,7 @@
 
 #include "../../common/physics/rigidBody.hpp"
 #include "../../common/physics/collider.hpp"
+#include "../../common/physics/destructRegister.hpp"
 #include "../../common/ecs/manager.hpp"
 
 namespace stay
@@ -27,7 +28,7 @@ namespace stay
             , public ecs::System
         {
                 PhysicsSystem(ecs::Manager* manager);
-                virtual ~PhysicsSystem();
+                ~PhysicsSystem() override;
                 void start() override;
                 void initialize();
                 void update(float dt) override;
@@ -36,6 +37,7 @@ namespace stay
                 void applyHorizontalDamping(float dt);
 
                 detail::ContactListener mContactListener;
+                phys::DestructRegister mDestructListener;
                 std::unordered_set<ecs::Entity> mBatched;
         };
     } // namespace sys

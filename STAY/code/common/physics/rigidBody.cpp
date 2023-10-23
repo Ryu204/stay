@@ -35,7 +35,8 @@ namespace stay
 
         RigidBody::~RigidBody()
         {
-            mWorld->DestroyBody(mBody);
+            if (mBody != nullptr)
+                mWorld->DestroyBody(mBody);
         }
         
         void RigidBody::setPosition(const Vector2& position)
@@ -136,6 +137,11 @@ namespace stay
         b2Fixture* RigidBody::attachFixture(const b2FixtureDef& properties)
         {
             return mBody->CreateFixture(&properties);
+        }
+
+        b2Body* RigidBody::body()
+        {
+            return mBody;
         }
 
         Json::Value RigidBody::toJSONObject() const

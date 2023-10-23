@@ -17,13 +17,13 @@ namespace stay
                 const bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
                 if (!isTrigger)
                 {
-                    aCol->OnCollisionEnter.invoke(*bCol, aInfo);
-                    bCol->OnCollisionEnter.invoke(*aCol, bInfo);
+                    aCol->OnCollisionEnter.invoke(aInfo);
+                    bCol->OnCollisionEnter.invoke(bInfo);
                 }
                 else
                 {
-                    aCol->OnTriggerEnter.invoke(*bCol, bInfo);
-                    bCol->OnTriggerEnter.invoke(*aCol, aInfo);
+                    aCol->OnTriggerEnter.invoke(aInfo);
+                    bCol->OnTriggerEnter.invoke(bInfo);
                 }
             }
             void ContactListener::EndContact(b2Contact* contact) 
@@ -35,13 +35,13 @@ namespace stay
                 const bool isTrigger = aCol->getTrigger() || bCol->getTrigger();
                 if (!isTrigger)
                 {
-                    aCol->OnCollisionExit.invoke(*bCol, aInfo);
-                    bCol->OnCollisionExit.invoke(*aCol, bInfo);
+                    aCol->OnCollisionExit.invoke(aInfo);
+                    bCol->OnCollisionExit.invoke(bInfo);
                 }
                 else
                 {
-                    aCol->OnTriggerExit.invoke(*bCol, bInfo);
-                    bCol->OnTriggerExit.invoke(*aCol, aInfo);
+                    aCol->OnTriggerExit.invoke(aInfo);
+                    bCol->OnTriggerExit.invoke(bInfo);
                 }
             }
         } // namespace detail
@@ -55,7 +55,9 @@ namespace stay
                 .set(0, "Default")
                 .set(1, "Player")
                 .set(2, "Bullet")
-                .set("Player", "Bullet", false);
+                .set(3, "Isolate")
+                .set("Player", "Bullet", false)
+                .isolate("Isolate");
         }
 
         PhysicsSystem::~PhysicsSystem()
@@ -63,6 +65,7 @@ namespace stay
             if (phys::World::avail())
             {
                 phys::World::get().SetContactListener(nullptr);
+                phys::World::get().SetDestructionListener(nullptr);
             }
         }
 
@@ -78,6 +81,7 @@ namespace stay
         void PhysicsSystem::initialize()
         {
             phys::World::get().SetContactListener(&mContactListener);
+            phys::World::get().SetDestructionListener(&mDestructListener);
         }
 
         void PhysicsSystem::update(float dt)
