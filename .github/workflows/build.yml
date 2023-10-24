@@ -35,9 +35,6 @@ jobs:
         unzip -qq -d "C:\Program Files" mingw64.zip
         echo "C:\Program Files\mingw64\bin" >> $GITHUB_PATH
 
-    - name: Check tools version
-      run: clang-tidy --version && gcc --version && clang --version
-
     - name: Checkout source
       uses: actions/checkout@v4
     
@@ -71,14 +68,21 @@ jobs:
       if: matrix.platform.os == 'ubuntu-latest'
       run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
     
-    - name: Update clang-tidy (Linux)
+    - name: Update llvm (Linux)
       if: matrix.platform.os == 'ubuntu-latest'
       run: |
-        # remove old clang-tidy
-        sudo apt remove clang-tidy
+        sudo apt remove '^llvm-*'
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
         sudo ./llvm.sh 17
+
+    - name: Rename llvm tools (Linux && clang)
+      if: matrix.platform.os == 'ubuntu-latest'
+      run: |
+        sudo apt install clang-tidy-17
+        sudo mv /usr/bin/clang-tidy-17  /usr/bin/clang-tidy
+        sudo mv /usr/bin/clang-17       /usr/bin/clang
+        sudo mv /usr/bin/clang++-17     /usr/bin/clang++  
 
     - name: Install MinGW (Windows)
       if: matrix.platform.os == 'windows-latest'
@@ -86,9 +90,6 @@ jobs:
         curl -Lo mingw64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/12.2.0-16.0.0-10.0.0-msvcrt-r5/winlibs-x86_64-posix-seh-gcc-12.2.0-llvm-16.0.0-mingw-w64msvcrt-10.0.0-r5.zip
         unzip -qq -d "C:\Program Files" mingw64.zip
         echo "C:\Program Files\mingw64\bin" >> $GITHUB_PATH
-
-    - name: Check tools version
-      run: clang-tidy --version && gcc --version && clang --version
 
     - name: Checkout source
       uses: actions/checkout@v4

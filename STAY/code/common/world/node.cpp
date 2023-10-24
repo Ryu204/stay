@@ -74,7 +74,7 @@ namespace stay
     {
         assert(stray() == false && "cannot set parent of top-level node");
         assert(newParent != nullptr && "cannot set null as parent");
-        assert(newParent->childOf(this) == false && "a cycle exists in the scene"); // NOLINT(clang-analyzer-core.CallAndMessage)
+        assert(newParent->childOf(this) == false && "a cycle exists in the scene");
 
         const bool alreadyParent = newParent->mEntity == mParent;
         if (alreadyParent)
