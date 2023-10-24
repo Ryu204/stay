@@ -15,6 +15,15 @@
             "cacheVariables": {
                 "USER_DEFINED_CLANG_TIDY" : "clang-tidy;--header-filter=${sourceDir}/*.hpp"
             }
+        },
+        {
+            "name": "ci-debug",
+            "inherits" : "base",
+            "cacheVariables": {
+                "BOX2D_BUILD_TESTBED" : "OFF",
+                "JSONCPP_WITH_TESTS" : "OFF",
+                "CMAKE_BUILD_TYPE" : "Debug"
+            }
         }
     ]
 }
