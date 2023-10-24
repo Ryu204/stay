@@ -1,0 +1,101 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+
+  build:
+
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      matrix:
+        platform: 
+          - { name: Ubuntu with gcc,   os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc }
+          - { name: Ubuntu with clang, os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang }
+          - { name: Windows with gcc,  os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja }
+        buildType: ["Debug", "Release"]
+
+    name: Build on ${{ matrix.platform.name }} - ${{ matrix.buildType }}
+
+    runs-on: ${{ matrix.platform.os }}
+
+    steps:
+
+    - name: Install SFML dependencies (Linux)
+      if: matrix.platform.os == 'ubuntu-latest'
+      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
+
+    - name: Install MinGW (Windows)
+      if: matrix.platform.os == 'windows-latest'
+      run: |
+        curl -Lo mingw64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/12.2.0-16.0.0-10.0.0-msvcrt-r5/winlibs-x86_64-posix-seh-gcc-12.2.0-llvm-16.0.0-mingw-w64msvcrt-10.0.0-r5.zip
+        unzip -qq -d "C:\Program Files" mingw64.zip
+        echo "C:\Program Files\mingw64\bin" >> $GITHUB_PATH
+
+    - name: Checkout source
+      uses: actions/checkout@v4
+    
+    - name: Configure
+      run: cmake --preset ci ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
+    
+    - name: Build
+      run: cmake --build build -j
+  
+  lint:
+
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      matrix:
+        platform: 
+          - { name: Ubuntu with gcc,   os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc }
+          - { name: Ubuntu with clang, os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang }
+          - { name: Windows with gcc,  os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja }
+        buildType: ["Debug", "Release"]
+
+    name: Analyze on ${{ matrix.platform.name }} - ${{ matrix.buildType }}
+
+    runs-on: ${{ matrix.platform.os }}
+
+    steps:
+
+    - name: Install SFML dependencies (Linux)
+      if: matrix.platform.os == 'ubuntu-latest'
+      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
+    
+    - name: Update llvm (Linux)
+      if: matrix.platform.os == 'ubuntu-latest'
+      run: |
+        sudo apt remove '^llvm-*'
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 17
+
+    - name: Rename llvm tools (Linux)
+      if: matrix.platform.os == 'ubuntu-latest'
+      run: |
+        sudo apt install clang-tidy-17
+        sudo mv /usr/bin/clang-tidy-17  /usr/bin/clang-tidy
+        sudo mv /usr/bin/clang-17       /usr/bin/clang
+        sudo mv /usr/bin/clang++-17     /usr/bin/clang++  
+
+    - name: Install MinGW (Windows)
+      if: matrix.platform.os == 'windows-latest'
+      run: |
+        curl -Lo mingw64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/12.2.0-16.0.0-10.0.0-msvcrt-r5/winlibs-x86_64-posix-seh-gcc-12.2.0-llvm-16.0.0-mingw-w64msvcrt-10.0.0-r5.zip
+        unzip -qq -d "C:\Program Files" mingw64.zip
+        echo "C:\Program Files\mingw64\bin" >> $GITHUB_PATH
+
+    - name: Checkout source
+      uses: actions/checkout@v4
+    
+    - name: Configure
+      run: cmake --preset ci-lint ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
+    
+    - name: Build
+      run: cmake --build build -j

@@ -7,7 +7,6 @@
 
 namespace stay
 {
-   
     SceneLoader::SceneLoader(ecs::Manager* manager, Path&& filepath)
         : mFile(filepath)
         , mLoader(manager)
@@ -109,7 +108,7 @@ namespace stay
         Json::StreamWriterBuilder builder;
         builder["indentation"] = "";
         builder["commentStyle"] = "None";
-        std::ofstream(output) << Json::writeString(builder, createSaveObject(root)) << std::endl;
+        std::ofstream(output) << Json::writeString(builder, createSaveObject(root)) << '\n';
     }
 
     Json::Value SceneLoader::createSaveObject(Node* root) const
