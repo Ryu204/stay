@@ -18,7 +18,7 @@
         },
         {
             "name": "ci-debug",
-            "inherits" : "base",
+            "inherits" : "clang-tidy",
             "cacheVariables": {
                 "BOX2D_BUILD_TESTBED" : "OFF",
                 "JSONCPP_WITH_TESTS" : "OFF",
