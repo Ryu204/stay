@@ -6,6 +6,7 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Build or search for dependencies
+MESSAGE("-- Fetching dependencies from Github")
 INCLUDE(CMakeDependencies)
 
 # Collect source files
@@ -36,3 +37,4 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC nlohmann_json::nlohmann_json sfml-g
 
 # Copy asset folder
 FILE(COPY "${PROJECT_NAME}/asset" DESTINATION ".")
+MESSAGE("-- Asset folder is copied to ${CMAKE_BINARY_DIR}/asset")

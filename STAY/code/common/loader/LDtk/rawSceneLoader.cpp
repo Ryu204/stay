@@ -83,8 +83,10 @@ namespace stay
         cmp.airScale = player.getFieldInstances().at(9).getValue().get<float>();
         // Hook
         auto& hk = node->addComponent<Hook>();
-        hk.speed = player.getFieldInstances().at(3).getValue().get<float>();
-        hk.cooldown = player.getFieldInstances().at(4).getValue().get<float>();
+        hk.props.speed = player.getFieldInstances().at(3).getValue().get<float>();
+        hk.props.cooldown = player.getFieldInstances().at(4).getValue().get<float>();
+        hk.props.maxLength = player.getFieldInstances().at(10).getValue().get<float>();
+        hk.props.stiffness = player.getFieldInstances().at(11).getValue().get<float>();
     }
 
     Uptr<Node> RawSceneLoader::load(Path &&filename, const std::string& switchReason)

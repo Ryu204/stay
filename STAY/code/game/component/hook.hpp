@@ -1,41 +1,36 @@
 #pragma once
 
-#include <unordered_map>
-
-#include "../../common/ecs/manager.hpp"
+#include "../../common/ecs/component.hpp"
 
 namespace stay
 {
-    namespace phys
-    {
-        class RigidBody;
-    } // namespace phys
-
     struct Hook : public ecs::Component
     {
-        float speed{5.F};
-        float cooldown{1.F};
-        float timeToCD{0.F};
-        Node* created{nullptr};
-        bool shootable{true};
-        SERIALIZE(speed, cooldown)
+            enum State
+            {
+                NONE, SHOT, CONNECTED,
+            };
 
-        void reset();
-    };
+            struct Properties : Serializable
+            {  
+                float speed{5.F};
+                float cooldown{1.F};
+                float maxLength{5.F};
+                float stiffness{1.F};
+                SERIALIZE(speed, cooldown, maxLength);
+            };
 
-    struct HookSystem : public ecs::System, public ecs::UpdateSystem, public ecs::InputSystem
-    {
-            HookSystem(ecs::Manager* manager);
-            void update(float dt) override;
-            void input(const sf::Event& event) override;
-        private:
-            void queueForAttachment(Hook* hook, phys::RigidBody* obstacle);
-            void updateCooldown(float dt);
-            void generateBullet(Hook& hook);
-            void updateDirection();
-            void processQueue();
+            struct Status
+            {
+                State state{NONE};
+                bool shootable{true};
+                float timeToCD{0.F};
+                Node* created{nullptr};
+            };
+
+            Properties props{};
+            Status status{};        
             
-            Vector2 mDirection;
-            std::unordered_map<Hook*, phys::RigidBody*> mQueued;
+            SERIALIZE(props);
     };
 } // namespace stay
