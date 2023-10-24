@@ -7,7 +7,14 @@
     "configurePresets" : [
         {
             "name" : "base",
-            "binaryDir": "build"
+            "binaryDir": "build",
+            "description": "remove broken tests of dependencies",
+            "cacheVariables": {
+                "BOX2D_BUILD_TESTBED" : "OFF",
+                "JSONCPP_WITH_TESTS" : "OFF",
+                "BOX2D_BUILD_UNIT_TESTS" : "OFF",
+                "JSONCPP_WITH_POST_BUILD_UNITTEST" : "OFF"
+            }
         },
         {
             "name": "clang-tidy",
@@ -15,6 +22,14 @@
             "cacheVariables": {
                 "USER_DEFINED_CLANG_TIDY" : "clang-tidy;--header-filter=${sourceDir}/*.hpp"
             }
+        },
+        {
+            "name": "ci",
+            "inherits" : "base"
+        },
+        {
+            "name" : "ci-lint",
+            "inherits" : "clang-tidy"
         }
     ]
 }
