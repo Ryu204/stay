@@ -71,6 +71,15 @@ jobs:
       if: matrix.platform.os == 'ubuntu-latest'
       run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
     
+    - name: Update clang-tidy (Linux)
+      if: matrix.platform.os == 'ubuntu-latest'
+      run: |
+        # remove old clang-tidy
+        sudo apt remove clang-tidy
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 17
+
     - name: Install MinGW (Windows)
       if: matrix.platform.os == 'windows-latest'
       run: |

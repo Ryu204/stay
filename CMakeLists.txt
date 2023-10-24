@@ -20,12 +20,13 @@ FILE(GLOB_RECURSE
 
 # Initialize clang-tidy if used
 IF(USER_DEFINED_CLANG_TIDY)
+    MESSAGE("-- clang-tidy will be used")
     SET(CMAKE_CXX_CLANG_TIDY "${USER_DEFINED_CLANG_TIDY}")
 ENDIF()
 
 # Problem with big obj file size when compiling with MinGW
 IF (MINGW)
-    MESSAGE("Adjusting compiler flags for MinGW")
+    MESSAGE("-- Adjusting compiler flags for MinGW")
     ADD_COMPILE_OPTIONS(-Wa,-mbig-obj -Os)
 ENDIF()
 
