@@ -23,6 +23,12 @@ IF(USER_DEFINED_CLANG_TIDY)
     SET(CMAKE_CXX_CLANG_TIDY "${USER_DEFINED_CLANG_TIDY}")
 ENDIF()
 
+# Problem with big obj file size when compiling with MinGW
+IF (MINGW)
+    MESSAGE("Adjusting compiler flags for MinGW")
+    ADD_COMPILE_OPTIONS(-Wa,-mbig-obj -Os)
+ENDIF()
+
 # Add target and link libraries
 ADD_EXECUTABLE(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCE_CODE})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC nlohmann_json::nlohmann_json sfml-graphics sfml-audio jsoncpp_lib glm::glm EnTT::EnTT box2d)
