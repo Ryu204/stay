@@ -8,6 +8,9 @@
 #include "../../common/physics/world.hpp"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
+#include <box2d/b2_prismatic_joint.h>
+#include <box2d/b2_revolute_joint.h>
+#include <glm/ext/quaternion_geometric.hpp>
 
 namespace stay
 {
@@ -23,12 +26,13 @@ namespace stay
         updateDirection();
         processQueue();
 
-        auto view = mManager->getRegistryRef().view<Hook, phys::RigidBody>();
-        for (auto [entity, hook, rigidbody] : view.each())
+        auto view = mManager->getRegistryRef().view<Hook, phys::RigidBody, Player>();
+        for (auto [entity, hook, rigidbody, player] : view.each())
         {
             switch (hook.status.state)
             {
                 case Hook::NONE:
+                    player.onRope = false;
                     break;
                 case Hook::SHOT:
                 {
@@ -40,6 +44,7 @@ namespace stay
                     break;
                 }
                 case Hook::CONNECTED:
+                    updateControl(hook, dt);
                     break;
             }         
         }
@@ -89,6 +94,19 @@ namespace stay
         }
         else
             mDirection = glm::normalize(mDirection);
+    }
+
+    void HookSystem::updateControl(Hook& hook, float dt)
+    {
+        int up = 0;
+        up += sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up);
+        up -= sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down);
+
+        auto* prismatic = hook.getNode()->getComponent<phys::Joint>().getNativeHandle<b2PrismaticJoint>();
+        float currentLength = prismatic->GetJointTranslation();
+        currentLength -= up * hook.props.pullSpeed * dt;
+        currentLength = std::min(hook.props.maxLength, currentLength);
+        prismatic->SetLimits(0, currentLength);
     }
 
     void HookSystem::generateBullet(Hook& hook)
@@ -156,12 +174,9 @@ namespace stay
             auto* nativePrisJoint = playerPrisJoint.getNativeHandle<b2PrismaticJoint>();
             nativePrisJoint->EnableLimit(true);
             nativePrisJoint->SetLimits(0.F, hook->props.maxLength);
-            nativePrisJoint->EnableMotor(true);
-            nativePrisJoint->SetMotorSpeed(0.F);
-            const float playerP = playerBody.gravityScale() * playerCollider.mass() * phys::World::get().GetGravity().y;
-            nativePrisJoint->SetMaxMotorForce(std::abs(hook->props.stiffness * playerP));
 
             hook->status.state = Hook::CONNECTED;
+            hook->getNode()->getComponent<Player>().onRope = true;
         }
         mQueued.clear();
     }

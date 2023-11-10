@@ -16,7 +16,8 @@ namespace stay
                 float speed{5.F};
                 float cooldown{1.F};
                 float maxLength{5.F};
-                float stiffness{1.F};
+                float pullSpeed{5.F};
+                float swingSpeed{90.F};
                 SERIALIZE(speed, cooldown, maxLength);
             };
 

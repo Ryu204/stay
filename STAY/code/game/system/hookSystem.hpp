@@ -25,6 +25,7 @@ namespace stay
             void queueForAttachment(Hook* hook, phys::RigidBody* obstacle);
             void updateCooldown(float dt);
             void updateDirection();
+            void updateControl(Hook& hook, float dt);
             void processQueue();
             
             Vector2 mDirection;
