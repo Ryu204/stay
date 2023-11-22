@@ -17,7 +17,6 @@ namespace stay
                 float cooldown{1.F};
                 float maxLength{5.F};
                 float pullSpeed{5.F};
-                float swingSpeed{90.F};
                 SERIALIZE(speed, cooldown, maxLength);
             };
 
@@ -26,7 +25,8 @@ namespace stay
                 State state{NONE};
                 bool shootable{true};
                 float timeToCD{0.F};
-                Node* created{nullptr};
+                Node* createdPin{nullptr};
+                Node* collisionChecker{nullptr};
             };
 
             Properties props{};

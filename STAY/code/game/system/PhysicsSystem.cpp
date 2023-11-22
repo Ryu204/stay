@@ -8,6 +8,10 @@ namespace stay
     {
         namespace detail
         {
+            void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* manifold) 
+            {
+                
+            }
             void ContactListener::BeginContact(b2Contact* contact)
             { 
                 phys::Collision aInfo(contact, /*isA=*/true);

@@ -87,7 +87,6 @@ namespace stay
         hk.props.cooldown = player.getFieldInstances().at(4).getValue().get<float>();
         hk.props.maxLength = player.getFieldInstances().at(10).getValue().get<float>();
         hk.props.pullSpeed = player.getFieldInstances().at(12).getValue().get<float>();
-        hk.props.swingSpeed = player.getFieldInstances().at(13).getValue().get<float>();
     }
 
     Uptr<Node> RawSceneLoader::load(Path &&filename, const std::string& switchReason)

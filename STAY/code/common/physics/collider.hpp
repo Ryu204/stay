@@ -63,6 +63,7 @@ namespace stay
                 event::Event<Collision&> OnCollisionExit;
                 event::Event<Collision&> OnTriggerEnter;
                 event::Event<Collision&> OnTriggerExit;
+                event::Event<Collision&> OnCollisionDetection;
 
                 SERIALIZE(mMaterial, mShapeInfo)
             private:
@@ -78,6 +79,18 @@ namespace stay
 
                 void check() const;
                 friend class DestructRegister;
+        };
+
+        // @brief Placeholder to provide a mean for an entity to hold more than 1 collider
+        class Collider01 : public Collider 
+        {
+            public:
+                using Collider::Collider;
+        };
+        class Collider02 : public Collider 
+        {
+            public:
+                using Collider::Collider;
         };
     } // namespace phys
 } // namespace stay

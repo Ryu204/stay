@@ -53,7 +53,9 @@ namespace stay
             .registerComponent<phys::RigidBody>("rigidbody")
             .registerComponent<Player>("player")
             .registerComponent<Hook>("hook")
-            .registerComponent<phys::Joint>("joint");
+            .registerComponent<phys::Joint>("joint")
+            .registerComponent<phys::Collider01>("collider01")
+            .registerComponent<phys::Collider02>("collider02");
         mSceneRoot = mSceneLoader.load();
     }
 } // namespace stay

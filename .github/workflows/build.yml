@@ -42,7 +42,7 @@ jobs:
       run: cmake --preset ci ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
     
     - name: Build
-      run: cmake --build build -j
+      run: cmake --build build/default -j
   
   lint:
 
@@ -98,4 +98,4 @@ jobs:
       run: cmake --preset ci-lint ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
     
     - name: Build
-      run: cmake --build build -j
+      run: cmake --build build/clang-tidy -j
