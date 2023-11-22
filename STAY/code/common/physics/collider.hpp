@@ -59,11 +59,11 @@ namespace stay
                 void setLayer(int id);
                 float mass() const;
 
-                event::Event<Collision&> OnCollisionEnter;
-                event::Event<Collision&> OnCollisionExit;
-                event::Event<Collision&> OnTriggerEnter;
-                event::Event<Collision&> OnTriggerExit;
-                event::Event<Collision&> OnCollisionDetection;
+                event::Event<Collision& /*info*/> OnCollisionEnter;
+                event::Event<Collision& /*info*/> OnCollisionExit;
+                event::Event<Collision& /*info*/> OnTriggerEnter;
+                event::Event<Collision& /*info*/> OnTriggerExit;
+                event::Event<Collision& /*info*/, b2Contact& /*native info*/> OnCollisionDetection;
 
                 SERIALIZE(mMaterial, mShapeInfo)
             private:

@@ -10,7 +10,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <box2d/b2_math.h>
 #include <box2d/box2d.h>
-#include <glm/ext/quaternion_geometric.hpp>
+#include <iostream>/*debug*/
 
 namespace 
 {
@@ -220,8 +220,11 @@ namespace
         stay::phys::Box box{center, stay::Vector2{0.2F, length - 2 * margin}, angle};
         static stay::phys::Material mat{0.005F};
         auto& collider = pin->addComponent<stay::phys::Collider01>(box, mat);
-        collider.setLayer("Isolate");
-
+        collider.setLayer("Player");
+        collider.OnCollisionDetection.addEventListener([](stay::phys::Collision& /*contact*/, b2Contact& nativeInfo) {
+            std::cout << "collided ey\t"; /*debug*/
+            nativeInfo.SetEnabled(false);
+        });
         collider.start();
     }
 } // namespace
