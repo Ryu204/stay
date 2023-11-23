@@ -15,9 +15,9 @@ namespace stay
             {  
                 float speed{5.F};
                 float cooldown{1.F};
-                float maxLength{5.F};
+                float ropeLength{5.F};
                 float pullSpeed{5.F};
-                SERIALIZE(speed, cooldown, maxLength);
+                SERIALIZE(speed, cooldown, ropeLength, pullSpeed);
             };
 
             struct Status
@@ -25,7 +25,9 @@ namespace stay
                 State state{NONE};
                 bool shootable{true};
                 float timeToCD{0.F};
-                Node* createdPin{nullptr};
+                float maxLength{0.F};
+                Node* bullet;
+                std::vector<Node*> createdPins{};
                 Node* collisionChecker{nullptr};
             };
 

@@ -22,7 +22,7 @@ namespace stay
             public:
                 // @param `angle` angle from OY+ to object's local OY+ in degree, positive if the angle is anti-clockwise
                 RigidBody(const Vector2& position = Vector2(10.F, -10.F), float angle = 0.F, BodyType type = BodyType::STATIC);
-                ~RigidBody();
+                ~RigidBody() override;
                 BodyType type() const;
                 void setType(const BodyType& type);
                 void setPosition(const Vector2& position);

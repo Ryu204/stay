@@ -32,7 +32,7 @@ namespace stay
                     mDrawer = std::make_unique<phys::DebugDraw>();
                     uint32 flags = 0;
                     flags += b2Draw::e_shapeBit;
-                    flags += b2Draw::e_jointBit;
+                    // flags += b2Draw::e_jointBit;
                     // flags += b2Draw::e_aabbBit;
                     flags += b2Draw::e_centerOfMassBit;
                     mDrawer->SetFlags(flags);
