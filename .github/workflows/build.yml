@@ -74,15 +74,15 @@ jobs:
         sudo apt remove '^llvm-*'
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 17
+        sudo ./llvm.sh 16
 
     - name: Rename llvm tools (Linux)
       if: matrix.platform.os == 'ubuntu-latest'
       run: |
-        sudo apt install clang-tidy-17
-        sudo mv /usr/bin/clang-tidy-17  /usr/bin/clang-tidy
-        sudo mv /usr/bin/clang-17       /usr/bin/clang
-        sudo mv /usr/bin/clang++-17     /usr/bin/clang++  
+        sudo apt install clang-tidy-16
+        sudo mv /usr/bin/clang-tidy-16  /usr/bin/clang-tidy
+        sudo mv /usr/bin/clang-16       /usr/bin/clang
+        sudo mv /usr/bin/clang++-16     /usr/bin/clang++  
 
     - name: Install MinGW (Windows)
       if: matrix.platform.os == 'windows-latest'
