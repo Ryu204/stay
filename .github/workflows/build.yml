@@ -93,7 +93,7 @@ jobs:
 
     - name: Check tools versions
       run: |
-        clang-tidy --vesion
+        clang-tidy --version
 
     - name: Checkout source
       uses: actions/checkout@v4
