@@ -20,7 +20,7 @@ namespace stay
             void input(const sf::Event& event) override;
         private:
             void generateBullet(Hook& hook);
-            void resetHook(Hook& hook);
+            static void resetHook(Hook& hook);
             
             void queueForAttachment(Hook* hook, phys::RigidBody* obstacle);
             void attachQueuedBullets();
@@ -30,7 +30,7 @@ namespace stay
 
             void updateCooldown(float dt);
             void updateDirection();
-            void updateControl(Hook& hook, float dt);
+            static void updateControl(Hook& hook, float dt);
             
             Vector2 mDirection;
             std::unordered_map<Hook*, phys::RigidBody*> mQueuedAttaches;

@@ -15,6 +15,7 @@ namespace
 {
     const stay::Vector2 bulletSize{0.5F, 0.5F};
     const stay::Vector2 pinSize{0.2F, 0.2F};
+    const stay::phys::Material heavyMaterial{5.F};
 } // namespace
 
 namespace stay
@@ -105,8 +106,8 @@ namespace stay
     void HookSystem::updateControl(Hook& hook, float dt)
     {
         int up = 0;
-        up += sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up);
-        up -= sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down);
+        up += (int)sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up);
+        up -= (int)sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down);
 
         auto* prismatic = hook.getNode()->getComponent<phys::Joint>().getNativeHandle<b2PrismaticJoint>();
         float currentLength = prismatic->GetJointTranslation();
@@ -121,7 +122,7 @@ namespace stay
         auto& playerBody = playerNode->getComponent<phys::RigidBody>();
         auto* bullet = playerNode->createChild();
         auto& bulletBody = bullet->addComponent<phys::RigidBody>(playerBody.getPosition(), 0.F, phys::BodyType::DYNAMIC);
-        auto& bulletCollider = bullet->addComponent<phys::Collider>(phys::Box{Vector2(), bulletSize}, phys::Material{5.F, 1.F, 0.F});
+        auto& bulletCollider = bullet->addComponent<phys::Collider>(phys::Box{Vector2(), bulletSize}, heavyMaterial);
 
         bulletBody.setBullet(true);
         bulletBody.setVelocity(mDirection * hook.props.speed);
@@ -140,9 +141,6 @@ namespace stay
 
     void HookSystem::resetHook(Hook& hook)
     {
-        int c, d;
-        bool a = true;
-        int a_dsaf = (int)0.F;
         if (hook.status.bullet != nullptr)
         {
             hook.getNode()->destroy(hook.status.bullet);
@@ -201,9 +199,9 @@ namespace stay
         mQueuedSplitting.clear();
     }
 
-    void HookSystem::queueForAttachment(Hook* hook, phys::RigidBody* body)
+    void HookSystem::queueForAttachment(Hook* hook, phys::RigidBody* obstacle)
     {
-        mQueuedAttaches.emplace(hook, body);
+        mQueuedAttaches.emplace(hook, obstacle);
     }
 
     void HookSystem::createBoxConnect(Node* player, Node* pin, float length, float margin) 
