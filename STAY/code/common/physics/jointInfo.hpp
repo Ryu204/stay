@@ -37,7 +37,7 @@ namespace stay
             using detail::JointInfoBase::variant;
             Json::Value toJSONObject() const override;
             bool fetch(const Json::Value& value) override;
-            Uptr<b2JointDef> createDef(RigidBody& A, RigidBody& B) const;
+            Uptr<b2JointDef> createDef(RigidBody& a, RigidBody& b) const;
         };
     } // namespace phys
 } // namespace stay

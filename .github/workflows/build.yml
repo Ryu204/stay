@@ -91,6 +91,10 @@ jobs:
         unzip -qq -d "C:\Program Files" mingw64.zip
         echo "C:\Program Files\mingw64\bin" >> $GITHUB_PATH
 
+    - name: Check tools versions
+      run: |
+        clang-tidy --vesion
+
     - name: Checkout source
       uses: actions/checkout@v4
     

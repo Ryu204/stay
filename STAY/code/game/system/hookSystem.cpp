@@ -220,7 +220,7 @@ namespace stay
         auto absoluteAngle = angleToOx - 90.F;
         auto angle = absoluteAngle - pinBody.getAngle();
 
-        auto& basePinCollider = pin->addComponent<phys::Collider>(phys::Box{Vector2{}, pinSize}, phys::Material{5.F});
+        auto& basePinCollider = pin->addComponent<phys::Collider>(phys::Box{Vector2{}, pinSize}, heavyMaterial);
         basePinCollider.setLayer("Isolate");
         basePinCollider.start();
 
