@@ -112,7 +112,7 @@ namespace stay
         auto* prismatic = hook.getNode()->getComponent<phys::Joint>().getNativeHandle<b2PrismaticJoint>();
         float currentLength = prismatic->GetJointTranslation();
         currentLength -= up * hook.props.pullSpeed * dt;
-        currentLength = std::min(hook.props.ropeLength, currentLength);
+        currentLength = std::min(hook.status.maxLength, currentLength);
         prismatic->SetLimits(0, currentLength);
     }
 
@@ -250,7 +250,9 @@ namespace stay
         if (!hook->status.createdPins.empty())
         {
             hook->getNode()->removeComponents<phys::Joint>();
-            hook->status.createdPins.back()->removeComponents<phys::Collider01>();
+            auto* lastPin = hook->status.createdPins.back();
+            lastPin->removeComponents<phys::Collider01>();
+            hook->status.maxLength -= std::min(hook->status.maxLength, utils::lengthVec2(position - lastPin->getComponent<phys::RigidBody>().getPosition()));
         }
         auto& playerPrisJoint = hook->getNode()->addComponent<phys::Joint>();
         auto& bulletRevJoint = pin->addComponent<phys::Joint>();
