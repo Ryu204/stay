@@ -62,7 +62,7 @@ namespace stay
             return res;
         }
 
-        Layer::Mask Layer::getLayerMask(int id) const
+        Layer::Mask Layer::getLayerMask(int id)
         {
             assert(id >= 0 && id < 16 && "invalid layer range");
             Mask res = 0;

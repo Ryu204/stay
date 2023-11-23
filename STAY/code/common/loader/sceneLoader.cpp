@@ -21,8 +21,8 @@ namespace stay
             auto* maybeRes = tryLoad(log);
             if (maybeRes != nullptr)
                 return Uptr<Node>(maybeRes);
-            else
-                throw std::runtime_error(log);
+            
+            throw std::runtime_error(log);
         }
         catch (std::exception& e)
         {

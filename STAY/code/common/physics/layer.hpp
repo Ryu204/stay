@@ -26,7 +26,7 @@ namespace stay
                 const std::string& name(int id) const;
                 Mask getLayerMask(const std::string& name) const;
                 Mask getCollisionMask(const std::string& name) const;
-                Mask getLayerMask(int id) const;
+                static Mask getLayerMask(int id);
                 Mask getCollisionMask(int id) const;
                 void reset();
             private:
