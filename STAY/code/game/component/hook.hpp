@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../common/ecs/component.hpp"
+#include "../../common/type/vector.hpp"
 
 namespace stay
 {
@@ -22,12 +23,20 @@ namespace stay
 
             struct Status
             {
+                struct Pin
+                {
+                    bool clockwise{};
+                    Node* node{nullptr};
+                    Vector2 savedPosition{};
+                    Pin(Node* node, Vector2 savedPosition, bool clockwise = true) 
+                        : clockwise{clockwise}, node{node}, savedPosition{std::move(savedPosition)} {}
+                };
                 State state{NONE};
                 bool shootable{true};
                 float timeToCD{0.F};
                 float maxLength{0.F};
                 Node* bullet;
-                std::vector<Node*> createdPins{};
+                std::vector<Pin> createdPins{};
                 Node* collisionChecker{nullptr};
             };
 

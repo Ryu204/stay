@@ -6,9 +6,8 @@
 #include "../../common/physics/joint.hpp"
 #include "../../common/utility/math.hpp"
 #include "../../common/physics/world.hpp"
-#include <SFML/Window/Event.hpp>
-#include <SFML/Window/Keyboard.hpp>
-#include <box2d/b2_math.h>
+
+#include <SFML/Window.hpp>
 #include <box2d/box2d.h>
 
 namespace 
@@ -16,6 +15,8 @@ namespace
     const stay::Vector2 bulletSize{0.5F, 0.5F};
     const stay::Vector2 pinSize{0.2F, 0.2F};
     const stay::phys::Material heavyMaterial{5.F};
+    constexpr float ropeMargin = 0.6F;
+    constexpr float ropeWidth = 0.2F;
 } // namespace
 
 namespace stay
@@ -52,6 +53,7 @@ namespace stay
                 }
                 case Hook::CONNECTED:
                     updateControl(hook, dt);
+                    checkRopeForRejoin();
                     break;
             }         
         }
@@ -85,7 +87,7 @@ namespace stay
 
     void HookSystem::updateDirection()
     {
-        mDirection = Vector2();
+        mDirection = Vector2{};
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
             mDirection.x -= 1.F;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
@@ -94,7 +96,7 @@ namespace stay
             mDirection.y += 1.F;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
             mDirection.y -= 1.F;
-        if (mDirection == Vector2())
+        if (mDirection == Vector2{})
         {
             const Vector2 bestVector = vectorUp;
             mDirection = bestVector;
@@ -147,7 +149,7 @@ namespace stay
             hook.status.bullet = nullptr;
         }
 
-        for (auto* pin : hook.status.createdPins)
+        for (auto [unused, pin, unused2] : hook.status.createdPins)
             hook.getNode()->destroy(pin);
         hook.status.createdPins.clear();
 
@@ -182,7 +184,7 @@ namespace stay
             // Delete the bullet
             hook->getNode()->destroy(hook->status.bullet);
             hook->status.bullet = nullptr;
-            createPinAt(position, hook, obstacle->getNode());
+            createPinAt(position, hook, obstacle->getNode(), /*does not matter because this is first pin*/false);
             hook->getNode()->getComponent<Player>().onRope = true;
         }
         mQueuedAttaches.clear();
@@ -193,10 +195,54 @@ namespace stay
         for (const auto& [hook, tup] : mQueuedSplitting)
         {
             const auto& [pos, plat] = tup;
-            createPinAt(pos, hook, plat);
+            auto& lastPinJoint = hook->status.createdPins.back().node->getComponent<phys::Joint>();
+            createPinAt(pos, hook, plat, lastPinJoint.getNativeHandle<b2RevoluteJoint>()->GetJointSpeed() < 0.F);
         }
 
         mQueuedSplitting.clear();
+    }
+
+    void HookSystem::checkRopeForRejoin() 
+    {
+        static constexpr float tolerance = 0.5F;
+        auto view = mManager->getRegistryRef().view<Hook, phys::RigidBody>();
+        std::vector<std::tuple<Hook*, float /*abLength*/, phys::RigidBody* /*playerBody*/>> rejoinList;
+        for (const auto& [entity, hook, playerBody] : view.each())
+        {
+            const bool unsplitted = hook.status.createdPins.size() <= 1;
+            if (unsplitted)
+                continue;
+            const auto& pin = hook.status.createdPins.back();
+            const auto currentSwingSpeed = pin.node->getComponent<phys::Joint>().getNativeHandle<b2RevoluteJoint>()->GetJointSpeed();
+            const auto sameDirection = pin.clockwise ? currentSwingSpeed < tolerance : currentSwingSpeed > -tolerance;
+            if (sameDirection)
+                continue;
+            // A = lastPin, B = pin next to it, c = player position
+            const auto b = (hook.status.createdPins.end() - 2)->node->getComponent<phys::RigidBody>().getPosition();
+            const auto a = pin.node->getComponent<phys::RigidBody>().getPosition();            
+            const auto ba = b - a;
+            const auto ca = glm::normalize(hook.getNode()->getComponent<phys::RigidBody>().getPosition() - a);
+            const auto crossZ = ba.x * ca.y - ba.y * ca.x;
+            const auto sameSide = pin.clockwise ? crossZ < tolerance : crossZ > -tolerance;
+            if (sameSide)
+                continue;
+            rejoinList.emplace_back(&hook, glm::length(b - a), &playerBody);
+        }
+        for (const auto& [hook, length, playerBody] : rejoinList)
+        {
+            auto& pinList = hook->status.createdPins;
+            hook->status.maxLength += length;
+            hook->getNode()->destroy(pinList.back().node);
+            pinList.pop_back();
+            
+            // Reconnect to last pin
+            auto* pinToConnect = pinList.back().node;
+            auto& playerPrisJoint = hook->getNode()->addComponent<phys::Joint>();
+            const auto playerPosition = playerBody->getPosition();
+            const auto position = pinToConnect->getComponent<phys::RigidBody>().getPosition();
+            connectToPin(hook, pinToConnect, position, playerPosition);
+            createBoxConnect(hook->getNode(), pinToConnect, hook->status.maxLength, ropeMargin);
+        }
     }
 
     void HookSystem::queueForAttachment(Hook* hook, phys::RigidBody* obstacle)
@@ -204,7 +250,8 @@ namespace stay
         mQueuedAttaches.emplace(hook, obstacle);
     }
 
-    void HookSystem::createBoxConnect(Node* player, Node* pin, float length, float margin) 
+    void HookSystem::
+    createBoxConnect(Node* player, Node* pin, float length, float margin) 
     {
         auto& playerBody = player->getComponent<phys::RigidBody>();
         const auto playerPosition = playerBody.getPosition();
@@ -220,11 +267,7 @@ namespace stay
         auto absoluteAngle = angleToOx - 90.F;
         auto angle = absoluteAngle - pinBody.getAngle();
 
-        auto& basePinCollider = pin->addComponent<phys::Collider>(phys::Box{Vector2{}, pinSize}, heavyMaterial);
-        basePinCollider.setLayer("Isolate");
-        basePinCollider.start();
-
-        phys::Box box{center, Vector2{0.2F, length - 2 * margin}, angle};
+        phys::Box box{center, Vector2{ropeWidth, length - 2 * margin}, angle};
         static phys::Material mat{0.005F};
         auto& collider = pin->addComponent<phys::Collider01>(box, mat);
         collider.setLayer("Player");
@@ -239,36 +282,43 @@ namespace stay
         collider.start();
     }
 
-    void HookSystem::createPinAt(const Vector2& position, Hook* hook, Node* platform)
+    void HookSystem::createPinAt(const Vector2& position, Hook* hook, Node* platform, bool clockwise)
     {
         auto* pin = hook->getNode()->createChild();
         auto& pinBody = pin->addComponent<phys::RigidBody>(position, 0.F, phys::BodyType::DYNAMIC);
         auto& playerBody = hook->getNode()->getComponent<phys::RigidBody>();
         const auto playerPosition = playerBody.getPosition();
 
+        auto& basePinCollider = pin->addComponent<phys::Collider>(phys::Box{Vector2{}, pinSize}, heavyMaterial);
+        basePinCollider.setLayer("Isolate");
+        basePinCollider.start();
+
         // Create joint to the pin
         if (!hook->status.createdPins.empty())
         {
             hook->getNode()->removeComponents<phys::Joint>();
-            auto* lastPin = hook->status.createdPins.back();
+            auto* lastPin = hook->status.createdPins.back().node;
             lastPin->removeComponents<phys::Collider01>();
             hook->status.maxLength -= std::min(hook->status.maxLength, utils::lengthVec2(position - lastPin->getComponent<phys::RigidBody>().getPosition()));
         }
-        auto& playerPrisJoint = hook->getNode()->addComponent<phys::Joint>();
         auto& bulletRevJoint = pin->addComponent<phys::Joint>();
-        
-        // Set up the pin
-        playerPrisJoint.start(pin->entity(), phys::Prismatic{playerPosition, position, position - playerPosition}, false);
         bulletRevJoint.start(platform->entity(), phys::Revolute{position}, true);
-
+        connectToPin(hook, pin, position, playerPosition);
         // Create collision checker
-        createBoxConnect(hook->getNode(), pin, hook->status.maxLength, 0.6F);
-        
-        auto* nativePrisJoint = playerPrisJoint.getNativeHandle<b2PrismaticJoint>();
-        nativePrisJoint->EnableLimit(true);
-        nativePrisJoint->SetLimits(0.F, hook->status.maxLength);
+        createBoxConnect(hook->getNode(), pin, hook->status.maxLength, ropeMargin);
 
         hook->status.state = Hook::CONNECTED;
-        hook->status.createdPins.push_back(pin);
+        hook->status.createdPins.emplace_back(pin, playerPosition, clockwise);
+    }
+
+    void HookSystem::connectToPin(Hook* hook, Node* pin, const Vector2& pinPosition, const Vector2& playerPosition)
+    {
+        if (hook->getNode()->hasComponent<phys::Joint>())
+            hook->getNode()->removeComponents<phys::Joint>();
+        auto& playerPrisJoint = hook->getNode()->addComponent<phys::Joint>();
+        playerPrisJoint.start(pin->entity(), phys::Prismatic{playerPosition, pinPosition, pinPosition - playerPosition}, false);
+        auto* nativePrisJoint = playerPrisJoint.getNativeHandle<b2PrismaticJoint>();
+        nativePrisJoint->EnableLimit(true);
+        nativePrisJoint->SetLimits(0.F, glm::length(pinPosition - playerPosition));
     }
 } // namespace stay

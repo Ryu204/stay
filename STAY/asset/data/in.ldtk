@@ -2884,7 +2884,7 @@
 								{ "__identifier": "airScale", "__type": "Float", "__value": 10, "__tile": null, "defUid": 84, "realEditorValues": [{ "id": "V_Float", "params": [10] }] },
 								{ "__identifier": "ropeLength", "__type": "Float", "__value": 10, "__tile": null, "defUid": 85, "realEditorValues": [{ "id": "V_Float", "params": [10] }] },
 								{ "__identifier": "pullForceScaler", "__type": "Float", "__value": 2.3, "__tile": null, "defUid": 86, "realEditorValues": [] },
-								{ "__identifier": "pullSpeed", "__type": "Float", "__value": 5, "__tile": null, "defUid": 87, "realEditorValues": [] },
+								{ "__identifier": "pullSpeed", "__type": "Float", "__value": 13, "__tile": null, "defUid": 87, "realEditorValues": [{ "id": "V_Float", "params": [13] }] },
 								{ "__identifier": "swingSpeed", "__type": "Float", "__value": 180, "__tile": null, "defUid": 88, "realEditorValues": [] },
 								{ "__identifier": "unreachableAngle", "__type": "Float", "__value": 100, "__tile": null, "defUid": 89, "realEditorValues": [] },
 								{ "__identifier": "rotateStrength", "__type": "Float", "__value": 1000, "__tile": null, "defUid": 90, "realEditorValues": [{ "id": "V_Float", "params": [1000] }] }
