@@ -13,9 +13,10 @@ jobs:
     strategy:
       matrix:
         platform: 
-          - { name: Ubuntu with gcc,   os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc }
-          - { name: Ubuntu with clang, os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang }
-          - { name: Windows with gcc,  os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja }
+          - { name: Ubuntu with gcc,   os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc,                version: gcc --version && g++ --version && make --version }
+          - { name: Ubuntu with clang, os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang,          version: clang --version && clang++ --version && make --version }
+          - { name: Windows with gcc,  os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja,        version: gcc --version && g++ --version && ninja --version}
+          - { name: Windows with clang, os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja, version: clang --version && clang++ --version && ninja --version}
         buildType: ["Debug", "Release"]
 
     name: Build on ${{ matrix.platform.name }} - ${{ matrix.buildType }}
@@ -23,6 +24,9 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
 
     steps:
+
+    - name: Check tools version
+      run: ${{ matrix.platform.version }} 
 
     - name: Install SFML dependencies (Linux)
       if: matrix.platform.os == 'ubuntu-latest'
@@ -53,9 +57,10 @@ jobs:
     strategy:
       matrix:
         platform: 
-          - { name: Ubuntu with gcc,   os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc }
-          - { name: Ubuntu with clang, os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang }
-          - { name: Windows with gcc,  os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja }
+          - { name: Ubuntu with gcc,    os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc,               version: gcc --version && g++ --version && make --version }
+          - { name: Ubuntu with clang,  os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang,         version: clang --version && clang++ --version && make --version}
+          - { name: Windows with gcc,   os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja,       version: gcc --version && g++ --version && ninja --version}
+          - { name: Windows with clang, os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja, version: clang --version && clang++ --version && ninja --version}
         buildType: ["Debug", "Release"]
 
     name: Analyze on ${{ matrix.platform.name }} - ${{ matrix.buildType }}
@@ -91,9 +96,8 @@ jobs:
         unzip -qq -d "C:\Program Files" mingw64.zip
         echo "C:\Program Files\mingw64\bin" >> $GITHUB_PATH
 
-    - name: Check tools versions
-      run: |
-        clang-tidy --version
+    - name: Check tools version
+      run: ${{ matrix.platform.version }} && clang-tidy --version
 
     - name: Checkout source
       uses: actions/checkout@v4
