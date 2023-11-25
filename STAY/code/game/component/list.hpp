@@ -6,3 +6,4 @@
 #include "../../common/physics/rigidBody.hpp"
 #include "hook.hpp"
 #include "../../common/physics/joint.hpp"
+#include "playerDebug.hpp"

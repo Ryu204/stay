@@ -114,7 +114,7 @@ namespace stay
         auto* prismatic = hook.getNode()->getComponent<phys::Joint>().getNativeHandle<b2PrismaticJoint>();
         float currentLength = prismatic->GetJointTranslation();
         currentLength -= up * hook.props.pullSpeed * dt;
-        currentLength = std::min(hook.status.maxLength, currentLength);
+        currentLength = utils::clamp(currentLength, 0.F, hook.status.maxLength);
         prismatic->SetLimits(0, currentLength);
     }
 
@@ -184,7 +184,7 @@ namespace stay
             // Delete the bullet
             hook->getNode()->destroy(hook->status.bullet);
             hook->status.bullet = nullptr;
-            createPinAt(position, hook, obstacle->getNode(), /*does not matter because this is first pin*/false);
+            createPinAt(position, hook, obstacle->getNode());
             hook->getNode()->getComponent<Player>().onRope = true;
         }
         mQueuedAttaches.clear();
@@ -195,8 +195,10 @@ namespace stay
         for (const auto& [hook, tup] : mQueuedSplitting)
         {
             const auto& [pos, plat] = tup;
-            auto& lastPinJoint = hook->status.createdPins.back().node->getComponent<phys::Joint>();
-            createPinAt(pos, hook, plat, lastPinJoint.getNativeHandle<b2RevoluteJoint>()->GetJointSpeed() < 0.F);
+            auto& lastPin = hook->status.createdPins.back();
+            auto& lastPinJoint = lastPin.node->getComponent<phys::Joint>();
+            const auto swingSpeed = lastPinJoint.getNativeHandle<b2RevoluteJoint>()->GetJointSpeed();
+            createPinAt(pos, hook, plat);
         }
 
         mQueuedSplitting.clear();
@@ -204,7 +206,7 @@ namespace stay
 
     void HookSystem::checkRopeForRejoin() 
     {
-        static constexpr float tolerance = 0.5F;
+        static constexpr float tolerance = 0.2F;
         auto view = mManager->getRegistryRef().view<Hook, phys::RigidBody>();
         std::vector<std::tuple<Hook*, float /*abLength*/, phys::RigidBody* /*playerBody*/>> rejoinList;
         for (const auto& [entity, hook, playerBody] : view.each())
@@ -213,16 +215,16 @@ namespace stay
             if (unsplitted)
                 continue;
             const auto& pin = hook.status.createdPins.back();
-            const auto currentSwingSpeed = pin.node->getComponent<phys::Joint>().getNativeHandle<b2RevoluteJoint>()->GetJointSpeed();
-            const auto sameDirection = pin.clockwise ? currentSwingSpeed < tolerance : currentSwingSpeed > -tolerance;
-            if (sameDirection)
-                continue;
+            // const auto currentSwingSpeed = pin.node->getComponent<phys::Joint>().getNativeHandle<b2RevoluteJoint>()->GetJointSpeed();
+            // const auto sameDirection = pin.clockwise ? currentSwingSpeed < tolerance : currentSwingSpeed > -tolerance;
+            // if (sameDirection)
+            //     continue;
             // A = lastPin, B = pin next to it, c = player position
             const auto b = (hook.status.createdPins.end() - 2)->node->getComponent<phys::RigidBody>().getPosition();
             const auto a = pin.node->getComponent<phys::RigidBody>().getPosition();            
-            const auto ba = b - a;
-            const auto ca = glm::normalize(hook.getNode()->getComponent<phys::RigidBody>().getPosition() - a);
-            const auto crossZ = ba.x * ca.y - ba.y * ca.x;
+            const auto ab = glm::normalize(b - a);
+            const auto ac = glm::normalize(hook.getNode()->getComponent<phys::RigidBody>().getPosition() - a);
+            const auto crossZ = ab.x * ac.y - ab.y * ac.x;
             const auto sameSide = pin.clockwise ? crossZ < tolerance : crossZ > -tolerance;
             if (sameSide)
                 continue;
@@ -282,8 +284,9 @@ namespace stay
         collider.start();
     }
 
-    void HookSystem::createPinAt(const Vector2& position, Hook* hook, Node* platform, bool clockwise)
+    void HookSystem::createPinAt(const Vector2& position, Hook* hook, Node* platform)
     {
+        bool clockwise = false; // <- to be calculated
         auto* pin = hook->getNode()->createChild();
         auto& pinBody = pin->addComponent<phys::RigidBody>(position, 0.F, phys::BodyType::DYNAMIC);
         auto& playerBody = hook->getNode()->getComponent<phys::RigidBody>();
@@ -293,20 +296,27 @@ namespace stay
         basePinCollider.setLayer("Isolate");
         basePinCollider.start();
 
-        // Create joint to the pin
         if (!hook->status.createdPins.empty())
         {
+            auto& lastPinInfo = hook->status.createdPins.back();
+            const auto lastPinPosition = lastPinInfo.node->getComponent<phys::RigidBody>().getPosition();   
+            const auto pinsRay = lastPinPosition - position;
+            // Create joint to the pin
             hook->getNode()->removeComponents<phys::Joint>();
-            auto* lastPin = hook->status.createdPins.back().node;
-            lastPin->removeComponents<phys::Collider01>();
-            hook->status.maxLength -= std::min(hook->status.maxLength, utils::lengthVec2(position - lastPin->getComponent<phys::RigidBody>().getPosition()));
+            lastPinInfo.node->removeComponents<phys::Collider01>();
+            hook->status.maxLength -= std::min(hook->status.maxLength, utils::lengthVec2(pinsRay));
+             // Determine the orientation
+            auto* lastJoint = lastPinInfo.node->getComponent<phys::Joint>().getNativeHandle<b2RevoluteJoint>();
+            const auto abNormed = glm::normalize(pinsRay);
+            const auto acNormed = glm::normalize(lastPinInfo.savedPosition - position);
+            clockwise = abNormed.x * acNormed.y - abNormed.y * acNormed.x > 0.F;
         }
         auto& bulletRevJoint = pin->addComponent<phys::Joint>();
         bulletRevJoint.start(platform->entity(), phys::Revolute{position}, true);
         connectToPin(hook, pin, position, playerPosition);
         // Create collision checker
         createBoxConnect(hook->getNode(), pin, hook->status.maxLength, ropeMargin);
-
+        // Update information
         hook->status.state = Hook::CONNECTED;
         hook->status.createdPins.emplace_back(pin, playerPosition, clockwise);
     }

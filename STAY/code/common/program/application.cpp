@@ -36,7 +36,7 @@ namespace stay
             mWindow->setKeyRepeatEnabled(false);
             setUpRendering();
 
-            mScene = std::make_unique<Scene>(data["scene"].asString());
+            mScene = std::make_unique<Scene>(data["scene"].asString(), mWindow.get());
         }
 
         void Application::setUpRendering()
