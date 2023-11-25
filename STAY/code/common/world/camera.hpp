@@ -14,7 +14,7 @@ namespace stay
         public:
             using View = sf::View;
             
-            Camera(float height = 25.F)
+            Camera(float height = 40.F)
                 : mHeight(height)
                 , mView(sf::Vector2f(0.F, 0.F), sf::Vector2f())
             { 
