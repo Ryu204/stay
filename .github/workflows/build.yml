@@ -25,9 +25,6 @@ jobs:
 
     steps:
 
-    - name: Check tools version
-      run: ${{ matrix.platform.version }} 
-
     - name: Install SFML dependencies (Linux)
       if: matrix.platform.os == 'ubuntu-latest'
       run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
@@ -38,6 +35,13 @@ jobs:
         curl -Lo mingw64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/12.2.0-16.0.0-10.0.0-msvcrt-r5/winlibs-x86_64-posix-seh-gcc-12.2.0-llvm-16.0.0-mingw-w64msvcrt-10.0.0-r5.zip
         unzip -qq -d "C:\Program Files" mingw64.zip
         echo "C:\Program Files\mingw64\bin" >> $GITHUB_PATH
+    
+    - name: Install Ninja (Windows)
+      if: matrix.platform.os == 'windows-latest'
+      uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: Check tools version
+      run: ${{ matrix.platform.version }} 
 
     - name: Checkout source
       uses: actions/checkout@v4
