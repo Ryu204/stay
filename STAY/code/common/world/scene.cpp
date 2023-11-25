@@ -6,13 +6,13 @@
 
 namespace stay
 {
-    Scene::Scene(std::filesystem::path&& filepath)
+    Scene::Scene(std::filesystem::path&& filepath, RWin* window)
         : mPixelsPerMeter(100.F)
         , mSceneLoader(&mManager, std::forward<std::filesystem::path>(filepath))
     {
         Node::init(mManager.getRegistry());
         phys::World::init();
-        initialize();
+        initialize(window);
     }
     Scene::~Scene()
     {
@@ -38,14 +38,15 @@ namespace stay
         mCamera.setOn(target);
         mManager.render(target, mSceneRoot.get());
     }
-    void Scene::initialize()
+    void Scene::initialize(RWin* window)
     {
         // mManager.registerSystem<sys::RawRenderSystem>();
-        // mManager.registerSystem<sys::OrderedRenderSystem>();
+        mManager.registerSystem<sys::OrderedRenderSystem>();
         mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize();
         mManager.registerSystem<sys::PhysicsSystem>()->initialize();
         mManager.registerSystem<PlayerSystem>();
         mManager.registerSystem<HookSystem>();
+        mManager.registerSystem<DebugSystem>()->initialize(&mCamera, window);
         
         mSceneLoader
             .registerComponent<comp::Render>("render")
@@ -54,6 +55,7 @@ namespace stay
             .registerComponent<phys::RigidBody01>("rigidbody01")
             .registerComponent<phys::RigidBody02>("rigidbody02")
             .registerComponent<Player>("player")
+            .registerComponent<PlayerDebug>("debug")
             .registerComponent<Hook>("hook")
             .registerComponent<phys::Joint>("joint")
             .registerComponent<phys::Collider01>("collider01")

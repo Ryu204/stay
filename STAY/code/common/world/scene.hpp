@@ -9,14 +9,14 @@ namespace stay
     class Scene
     {
         public:
-            Scene(std::filesystem::path&& filepath);
+            Scene(std::filesystem::path&& filepath, RWin* window);
             ~Scene();
             void update(float dt);
             void start();
             void input(const sf::Event& event);
             void render(RTarget* target);
         private:
-            void initialize();
+            void initialize(RWin* window);
             Camera mCamera;
             ecs::Manager mManager;
             Uptr<Node> mSceneRoot;

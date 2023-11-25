@@ -42,19 +42,21 @@ namespace stay
     void RawSceneLoader::loadColliders(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
     {
         init(level, layer);
-        const auto& entity = layer.getEntityInstances().at(0);
-        const auto& list = entity.getFieldInstances().at(0).getValue();
-        std::vector<Vector2> chainShape;
-        for (const auto& i : list)
+        for (const auto& entity : layer.getEntityInstances())
         {
-            auto point = i.get<ldtk::GridPoint>();
-            const Vector2 filePos = Vector2(point.getCx(), point.getCy()) * mTileSize + mLayerOffset;
-            chainShape.emplace_back(fileToWorld(filePos));
+            const auto& list = entity.getFieldInstances().at(0).getValue();
+            std::vector<Vector2> chainShape;
+            for (const auto& i : list)
+            {
+                auto point = i.get<ldtk::GridPoint>();
+                const Vector2 filePos = Vector2(point.getCx(), point.getCy()) * mTileSize + mLayerOffset;
+                chainShape.emplace_back(fileToWorld(filePos));
+            }
+            auto* node = currentRoot->createChild();
+            node->addComponent<phys::RigidBody>(/*position = */Vector2());
+            phys::Material mat(1.F, 1.F, 0.F);
+            node->addComponent<phys::Collider>(phys::Chain(chainShape), mat);
         }
-        auto* node = currentRoot->createChild();
-        node->addComponent<phys::RigidBody>(/*position = */Vector2());
-        phys::Material mat(1.F, 1.F, 0.F);
-        node->addComponent<phys::Collider>(phys::Chain(chainShape), mat);
     }
 
     void RawSceneLoader::loadPlayer(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
@@ -97,6 +99,8 @@ namespace stay
         hk.props.cooldown = player.getFieldInstances().at(4).getValue().get<float>();
         hk.props.ropeLength = player.getFieldInstances().at(10).getValue().get<float>();
         hk.props.pullSpeed = player.getFieldInstances().at(12).getValue().get<float>();
+        // Debug
+        node->addComponent<PlayerDebug>();
     }
 
     Uptr<Node> RawSceneLoader::load(Path &&filename, const std::string& switchReason)
