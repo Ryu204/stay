@@ -1,41 +1,48 @@
 #pragma once
 
-#include <unordered_map>
-
-#include "../../common/ecs/manager.hpp"
+#include "../../common/ecs/component.hpp"
+#include "../../common/type/vector.hpp"
 
 namespace stay
 {
-    namespace phys
-    {
-        class RigidBody;
-    } // namespace phys
-
     struct Hook : public ecs::Component
     {
-        float speed{5.F};
-        float cooldown{1.F};
-        float timeToCD{0.F};
-        Node* created{nullptr};
-        bool shootable{true};
-        SERIALIZE(speed, cooldown)
+            enum State
+            {
+                NONE, SHOT, CONNECTED,
+            };
 
-        void reset();
-    };
+            struct Properties : Serializable
+            {  
+                float speed{5.F};
+                float cooldown{1.F};
+                float ropeLength{5.F};
+                float pullSpeed{5.F};
+                SERIALIZE(speed, cooldown, ropeLength, pullSpeed);
+            };
 
-    struct HookSystem : public ecs::System, public ecs::UpdateSystem, public ecs::InputSystem
-    {
-            HookSystem(ecs::Manager* manager);
-            void update(float dt) override;
-            void input(const sf::Event& event) override;
-        private:
-            void queueForAttachment(Hook* hook, phys::RigidBody* obstacle);
-            void updateCooldown(float dt);
-            void generateBullet(Hook& hook);
-            void updateDirection();
-            void processQueue();
+            struct Status
+            {
+                struct Pin
+                {
+                    bool clockwise{};
+                    Node* node{nullptr};
+                    Vector2 savedPosition{};
+                    Pin(Node* node, Vector2 savedPosition, bool clockwise = true) 
+                        : clockwise{clockwise}, node{node}, savedPosition{std::move(savedPosition)} {}
+                };
+                State state{NONE};
+                bool shootable{true};
+                float timeToCD{0.F};
+                float maxLength{0.F};
+                Node* bullet;
+                std::vector<Pin> createdPins{};
+                Node* collisionChecker{nullptr};
+            };
+
+            Properties props{};
+            Status status{};        
             
-            Vector2 mDirection;
-            std::unordered_map<Hook*, phys::RigidBody*> mQueued;
+            SERIALIZE(props);
     };
 } // namespace stay

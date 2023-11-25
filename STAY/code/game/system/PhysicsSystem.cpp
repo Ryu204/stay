@@ -8,6 +8,16 @@ namespace stay
     {
         namespace detail
         {
+            void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* /*manifold*/) 
+            {
+                phys::Collision aInfo(contact, /*isA=*/true);
+                phys::Collision bInfo(contact, /*isA=*/false);
+                auto* aCol = bInfo.other;
+                auto* bCol = aInfo.other;
+                aCol->OnCollisionDetection.invoke(aInfo, *contact);
+                bCol->OnCollisionDetection.invoke(bInfo, *contact);
+            }
+
             void ContactListener::BeginContact(b2Contact* contact)
             { 
                 phys::Collision aInfo(contact, /*isA=*/true);
@@ -57,6 +67,7 @@ namespace stay
                 .set(2, "Bullet")
                 .set(3, "Isolate")
                 .set("Player", "Bullet", false)
+                .set("Player", "Player", false)
                 .isolate("Isolate");
         }
 

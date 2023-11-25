@@ -7,25 +7,39 @@
     "configurePresets" : [
         {
             "name" : "base",
-            "binaryDir": "build",
             "description": "remove broken tests of dependencies",
             "cacheVariables": {
                 "BOX2D_BUILD_TESTBED" : "OFF",
                 "JSONCPP_WITH_TESTS" : "OFF",
                 "BOX2D_BUILD_UNIT_TESTS" : "OFF",
-                "JSONCPP_WITH_POST_BUILD_UNITTEST" : "OFF"
+                "JSONCPP_WITH_POST_BUILD_UNITTEST" : "OFF",
+                "CMAKE_EXPORT_COMPILE_COMMANDS" : "TRUE"
             }
         },
         {
-            "name": "clang-tidy",
+            "name" : "fast",
+            "description" : "fast compilation",
+            "inherits" : "base", 
+            "generator" : "Ninja",
+            "binaryDir" : "build/fast"
+        },
+        {
+            "name" : "default",
+            "description" : "default compile mode",
             "inherits" : "base",
+            "binaryDir" : "build/default"
+        },
+        {
+            "name": "clang-tidy",
+            "inherits" : "default",
+            "binaryDir" : "build/clang-tidy",
             "cacheVariables": {
                 "USER_DEFINED_CLANG_TIDY" : "clang-tidy;--header-filter=${sourceDir}/*.hpp"
             }
         },
         {
             "name": "ci",
-            "inherits" : "base"
+            "inherits" : "default"
         },
         {
             "name" : "ci-lint",

@@ -58,11 +58,14 @@ namespace stay
                 void setLayer(const std::string& layer);
                 void setLayer(int id);
                 float mass() const;
+                // @return size of the AABB box bounding the shape
+                Vector2 getLocalBound() const;
 
-                event::Event<Collision&> OnCollisionEnter;
-                event::Event<Collision&> OnCollisionExit;
-                event::Event<Collision&> OnTriggerEnter;
-                event::Event<Collision&> OnTriggerExit;
+                event::Event<Collision& /*info*/> OnCollisionEnter;
+                event::Event<Collision& /*info*/> OnCollisionExit;
+                event::Event<Collision& /*info*/> OnTriggerEnter;
+                event::Event<Collision& /*info*/> OnTriggerExit;
+                event::Event<Collision& /*info*/, b2Contact& /*native info*/> OnCollisionDetection;
 
                 SERIALIZE(mMaterial, mShapeInfo)
             private:
@@ -78,6 +81,16 @@ namespace stay
 
                 void check() const;
                 friend class DestructRegister;
+        };
+
+        // @brief Placeholder to provide a mean for an entity to hold more than 1 collider
+        struct Collider01 : public Collider 
+        {
+            using Collider::Collider;
+        };
+        struct Collider02 : public Collider 
+        {
+            using Collider::Collider;
         };
     } // namespace phys
 } // namespace stay

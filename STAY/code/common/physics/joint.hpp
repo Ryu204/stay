@@ -2,6 +2,7 @@
 
 #include <box2d/b2_joint.h>
 #include <box2d/b2_prismatic_joint.h>
+#include <cassert>
 #include <cstddef>
 #include <json/value.h>
 #include <vector>
@@ -16,13 +17,6 @@ namespace stay
     {
         class RigidBody;
 
-        enum class JointType
-        {
-            PRISMATIC = e_prismaticJoint,
-            REVOLUTE = e_revoluteJoint,
-            UNKNOWN = e_unknownJoint,
-        };
-
         class Joint : public ecs::Component
         {
             public:
@@ -35,7 +29,9 @@ namespace stay
                 T* getNativeHandle()
                 {
                     check();
-                    return dynamic_cast<T*>(mJoint);
+                    auto* res = dynamic_cast<T*>(mJoint);
+                    assert(res != nullptr && "Get wrong internal joint type");
+                    return res;
                 }
 
                 Json::Value toJSONObject() const override {return Json::Value(); };

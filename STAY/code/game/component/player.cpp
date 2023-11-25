@@ -3,6 +3,12 @@
 
 #include "player.hpp"
 #include "../../common/physics/collider.hpp"
+#include "../../common/physics/joint.hpp"
+
+namespace 
+{
+    const stay::Vector2 skinRatio{1.2F, 1.5F};
+}
 
 namespace stay
 {
@@ -16,15 +22,15 @@ namespace stay
 
     void PlayerSystem::start()
     {
-        auto view = mManager->getRegistryRef().view<Player>();
-        for (auto entity : view)
+        auto view = mManager->getRegistryRef().view<Player, phys::RigidBody>();
+        for (const auto [entity, player, body] : view.each())
         {
-            auto& player = mManager->getComponent<Player>(entity);
-            player.rgbody = &player.getNode()->getComponent<phys::RigidBody>();
-            // player.rgbody->setFixedRotation(true);
-            auto& collider = player.getNode()->getComponent<phys::Collider>();
+            player.hookBody = &player.getNode()->getComponent<phys::RigidBody>();
+            auto* skin = player.getNode()->getChildren().at(0);
+            player.movementBody = &skin->getComponent<phys::RigidBody>();
+            auto& collider = skin->getComponent<phys::Collider>();
             collider.OnCollisionEnter.addEventListener(
-                [&player](phys::Collision& contact)
+                [&player = player](phys::Collision& contact)
                 {
                     if (contact.normal.y < 0.5F)
                     {
@@ -34,7 +40,7 @@ namespace stay
                 }
             );
             collider.OnCollisionExit.addEventListener(
-                [&player](phys::Collision& contact) 
+                [&player = player](phys::Collision& contact) 
                 {
                     if (contact.normal.y < 0.5F)
                     {
@@ -67,10 +73,10 @@ namespace stay
             {
                 if (!player.canJump)
                     continue;
-                auto vel = player.rgbody->getVelocity();
-                auto grav = player.rgbody->gravity();
-                vel.y = std::sqrt(std::abs(2 * player.jumpHeight * grav.y * player.rgbody->gravityScale()));
-                player.rgbody->setVelocity(vel);
+                auto vel = player.movementBody->getVelocity();
+                auto grav = player.movementBody->gravity();
+                vel.y = std::sqrt(std::abs(2 * player.jumpHeight * grav.y * player.movementBody->gravityScale()));
+                player.movementBody->setVelocity(vel);
                 player.canJump = false;
             }
         }
@@ -86,16 +92,16 @@ namespace stay
         auto view = mManager->getRegistryRef().view<Player>();
         for (auto [entity, player] : view.each())
         {
-            const auto vel = player.rgbody->getVelocity();
+            const auto vel = player.movementBody->getVelocity();
             auto force = utils::convertVec2<Vector2>(dir * player.moveStrength);
             const auto isLeft = vel.x < 5.F;
             const auto isRight = vel.x > -5.F;
             const bool mayIncreaseForce = (dir.x < 0.F && isRight) || (dir.x > 0.F && isLeft);
-            if (mayIncreaseForce)
+            if (mayIncreaseForce && !player.onRope)
             {
                 force = force * (player.onGround ? player.oppositeScale : player.airScale);
             }
-            player.rgbody->applyForce(force);
+            player.movementBody->applyForce(force);
         }
     }
 } // namespace stay

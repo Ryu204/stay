@@ -17,7 +17,9 @@ namespace stay
 
         bool canJump{false};
         bool onGround{false};
-        phys::RigidBody* rgbody;
+        bool onRope{false};
+        phys::RigidBody* movementBody;
+        phys::RigidBody* hookBody;
         SERIALIZE(moveStrength, jumpHeight, oppositeScale);
     };
 

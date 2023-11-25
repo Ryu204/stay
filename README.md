@@ -8,16 +8,14 @@ It's a game but the "engine" part is taking over.
 You will need `CMake` with version `>= 3.24` to build the project directly.
 
 In the project folder:
-```bash
-cmake --preset=base
-cmake --build build
+```sh
+cmake --preset=default
+cmake --build build/default -j2
 ```
 Run the executable:
-```bash
-cd build
+```sh
+cd build/default
 ./STAY
-# if you're on a Windows machine
-# ./STAY.exe
 ```
 
 # Dependencies
@@ -28,6 +26,7 @@ A bunch of them, actually :octocat:
 * [EnTT](https://github.com/skypjack/entt)
 * [Box2D](https://github.com/erincatto/box2d)
 * [Jsoncpp](https://github.com/open-source-parsers/jsoncpp)
+* [Json](https://github.com/nlohmann/json)
 
 # Trivial info
 
