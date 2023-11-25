@@ -51,6 +51,8 @@ namespace stay
             .registerComponent<comp::Render>("render")
             .registerComponent<phys::Collider>("collider")
             .registerComponent<phys::RigidBody>("rigidbody")
+            .registerComponent<phys::RigidBody01>("rigidbody01")
+            .registerComponent<phys::RigidBody02>("rigidbody02")
             .registerComponent<Player>("player")
             .registerComponent<Hook>("hook")
             .registerComponent<phys::Joint>("joint")

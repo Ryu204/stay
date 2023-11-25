@@ -35,6 +35,7 @@ namespace stay
             bool parentOf(const Node* node) const;
             Node* createChild();
             Node* createChild(ecs::Entity id);
+            std::vector<Node*> getChildren();
 
             const Transform& localTransform() const;
             Transform& localTransform();

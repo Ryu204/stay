@@ -95,6 +95,13 @@ namespace stay
             setLayer(mCollisionLayer().name(id));
         }
 
+        Vector2 Collider::getLocalBound() const
+        {
+            check();
+            const auto& b = mFixture->GetAABB(0);
+            return utils::convertVec2<Vector2>(b.upperBound - b.lowerBound);
+        }
+
         void Collider::attachToRigidBody(RigidBody& rgbody)
         {
             b2FixtureDef def = mMaterial.getFixtureDef();
@@ -138,7 +145,7 @@ namespace stay
         {
             mDef.restitution = restituition;
         }
-
+        
         const b2FixtureDef& Material::getFixtureDef() const
         {
             return mDef;

@@ -63,18 +63,28 @@ namespace stay
         // node
         const auto& player = layer.getEntityInstances().at(0);
         auto* node = currentRoot->createChild();
+        auto* skin = node->createChild();
         // RigidBody
         Vector2 pos = Vector2(player.getPx()[0], player.getPx()[1]) + mLayerOffset;
         pos = fileToWorld(pos);
-        auto& rgbody = node->addComponent<phys::RigidBody>(pos, 0.F, phys::BodyType::DYNAMIC);
-        rgbody.setGravityScale(player.getFieldInstances().at(2).getValue().get<float>());
-        rgbody.setHorizontalDamping(player.getFieldInstances().at(5).getValue().get<float>());
-        rgbody.setLinearDamping(player.getFieldInstances().at(8).getValue().get<float>());
-        // Collider
-        float friction = player.getFieldInstances().at(6).getValue().get<float>();
-        phys::Material mat(1.0F, friction, 0.0F);
-        auto& col = node->addComponent<phys::Collider>(phys::Circle(Vector2(), player.getWidth() / 2.F / mPxPerMeter), mat);
-        col.setLayer("Player");
+        auto& hookBody = node->addComponent<phys::RigidBody>(pos, 0.F, phys::BodyType::DYNAMIC);
+        auto& skinBody = skin->addComponent<phys::RigidBody>(pos, 0.F, phys::BodyType::DYNAMIC);
+        skinBody.setGravityScale(player.getFieldInstances().at(2).getValue().get<float>());
+        skinBody.setHorizontalDamping(player.getFieldInstances().at(5).getValue().get<float>());
+        skinBody.setLinearDamping(player.getFieldInstances().at(8).getValue().get<float>());
+        skinBody.setFixedRotation(true);
+        // Skin
+        const auto friction = player.getFieldInstances().at(6).getValue().get<float>();
+        const auto radius = player.getWidth() / 2.F / mPxPerMeter;
+        phys::Box skinShape{Vector2{}, Vector2{1.15F * 2.F * radius, 1.35F * 2.F * radius}, 0.F};
+        phys::Material playerMat{1.F, friction, 0.F};
+        auto& skinCollider = skin->addComponent<phys::Collider>(skinShape, playerMat);
+        skinCollider.setLayer("Player");
+        skin->addComponent<phys::Joint>().start(node->entity(), phys::Revolute{pos}, false);
+        // Hook collider
+        phys::Material light{0.1F};
+        auto& hookCollider = node->addComponent<phys::Collider>(phys::Circle{Vector2{}, radius}/**/, light);
+        hookCollider.setLayer("Player");
         // Player
         auto& cmp = node->addComponent<Player>();
         cmp.moveStrength = player.getFieldInstances().at(0).getValue().get<float>();

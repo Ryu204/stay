@@ -153,6 +153,15 @@ namespace stay
         return res;
     }
 
+    std::vector<Node*> Node::getChildren() 
+    {
+        std::vector<Node*> res{};
+        res.reserve(mChildren.size());
+        for (const auto& [a, unused] : mChildren)
+            res.emplace_back(getNode(a));
+        return std::move(res);
+    }
+
     const Transform& Node::localTransform() const
     {
         return mLocalTransform;

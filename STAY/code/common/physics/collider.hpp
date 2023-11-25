@@ -58,6 +58,8 @@ namespace stay
                 void setLayer(const std::string& layer);
                 void setLayer(int id);
                 float mass() const;
+                // @return size of the AABB box bounding the shape
+                Vector2 getLocalBound() const;
 
                 event::Event<Collision& /*info*/> OnCollisionEnter;
                 event::Event<Collision& /*info*/> OnCollisionExit;
@@ -82,15 +84,13 @@ namespace stay
         };
 
         // @brief Placeholder to provide a mean for an entity to hold more than 1 collider
-        class Collider01 : public Collider 
+        struct Collider01 : public Collider 
         {
-            public:
-                using Collider::Collider;
+            using Collider::Collider;
         };
-        class Collider02 : public Collider 
+        struct Collider02 : public Collider 
         {
-            public:
-                using Collider::Collider;
+            using Collider::Collider;
         };
     } // namespace phys
 } // namespace stay

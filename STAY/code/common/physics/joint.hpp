@@ -17,13 +17,6 @@ namespace stay
     {
         class RigidBody;
 
-        enum class JointType
-        {
-            PRISMATIC = e_prismaticJoint,
-            REVOLUTE = e_revoluteJoint,
-            UNKNOWN = e_unknownJoint,
-        };
-
         class Joint : public ecs::Component
         {
             public:

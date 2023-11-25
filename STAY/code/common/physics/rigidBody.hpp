@@ -57,5 +57,14 @@ namespace stay
                 b2Body* mBody;
                 float mHorizontalDamping;
         };
+
+        struct RigidBody01 : public RigidBody 
+        {
+            using RigidBody::RigidBody;
+        };
+        struct RigidBody02 : public RigidBody 
+        {
+            using RigidBody::RigidBody;
+        };
     } // namespace phys
 } // namespace stay
