@@ -195,9 +195,6 @@ namespace stay
         for (const auto& [hook, tup] : mQueuedSplitting)
         {
             const auto& [pos, plat] = tup;
-            auto& lastPin = hook->status.createdPins.back();
-            auto& lastPinJoint = lastPin.node->getComponent<phys::Joint>();
-            const auto swingSpeed = lastPinJoint.getNativeHandle<b2RevoluteJoint>()->GetJointSpeed();
             createPinAt(pos, hook, plat);
         }
 
@@ -306,7 +303,6 @@ namespace stay
             lastPinInfo.node->removeComponents<phys::Collider01>();
             hook->status.maxLength -= std::min(hook->status.maxLength, utils::lengthVec2(pinsRay));
              // Determine the orientation
-            auto* lastJoint = lastPinInfo.node->getComponent<phys::Joint>().getNativeHandle<b2RevoluteJoint>();
             const auto abNormed = glm::normalize(pinsRay);
             const auto acNormed = glm::normalize(lastPinInfo.savedPosition - position);
             clockwise = abNormed.x * acNormed.y - abNormed.y * acNormed.x > 0.F;
