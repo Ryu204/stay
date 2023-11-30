@@ -92,8 +92,10 @@ namespace stay
         auto view = mManager->getRegistryRef().view<Player>();
         for (auto [entity, player] : view.each())
         {
-            const auto vel = player.movementBody->getVelocity();
+            if (player.onDash)
+                continue;
             auto force = utils::convertVec2<Vector2>(dir * player.moveStrength);
+            const auto vel = player.movementBody->getVelocity();
             const auto isLeft = vel.x < 5.F;
             const auto isRight = vel.x > -5.F;
             const bool mayIncreaseForce = (dir.x < 0.F && isRight) || (dir.x > 0.F && isLeft);

@@ -3,8 +3,6 @@
 #include "../physics/world.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
-#include <iostream>/*debug*/ 
-#include "../utility/invoke.hpp"/*debug*/ 
 
 namespace stay
 {
@@ -65,7 +63,5 @@ namespace stay
             .registerComponent<phys::Collider02>("collider02")
             .registerComponent<Dash>("dash");
         mSceneRoot = mSceneLoader.load();
-
-        /*debug*/ for (int i = 1; i < 10; ++i) Invoke::after(i, [i]{std::cout << i << std::endl;});
     }
 } // namespace stay

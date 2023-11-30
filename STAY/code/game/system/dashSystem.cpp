@@ -3,6 +3,8 @@
 #include "../component/dash.hpp"
 #include "physics/rigidBody.hpp"
 #include "utility/invoke.hpp"
+#include "../component/player.hpp"
+#include "../component/hook.hpp"
 
 namespace stay 
 {
@@ -16,36 +18,62 @@ namespace stay
     {
         if (event.type != sf::Event::KeyPressed || event.key.scancode != sf::Keyboard::Scan::C)
             return;
-        auto view = registry().view<Dash, phys::RigidBody>();
-        for (const auto [entity, dash, body] : view.each())
+        auto view = registry().view<Dash, Player>();
+        for (const auto [entity, dash, player] : view.each())
         {
-            if (dash.activated || !dash.canDash)
+            auto* playerNode = dash.getNode();
+            auto& body = *player.movementBody;
+            if (isOnRope(playerNode) || dash.activated || !dash.canDash)
                 return;
-            dash.left = sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A);
+
+            dash.left = body.getVelocity().x < 0.F;
             dash.canDash = false;
             dash.activated = true;
-            const float currentGravityScale = body.gravityScale();
-            body.setGravityScale(0.F);
+            const auto dashTime = dash.length / dash.velocity;
             Invoke::after(dash.cooldown, [&dash = dash]{
                 dash.canDash = true;
             });
-            Invoke::after(dash.length / dash.velocity, [currentGravityScale, &dash = dash, &body = body]{
+            Invoke::after(dashTime, [&dash = dash, &body = body, &player = player]{
                 dash.activated = false;
-                body.setGravityScale(currentGravityScale);
+                body.setVelocity(body.getVelocity() * dash.postBrake);
+                player.onDash = false;
             });
+            disableGravity(playerNode, dashTime);
+            player.onDash = true;
         }
     }
 
     void DashSystem::update(float /*dt*/)
     {
-        auto view = registry().view<Dash, phys::RigidBody>();
-        for (const auto [entity, dash, body] : view.each())
+        auto view = registry().view<Dash, Player>();
+        for (const auto [entity, dash, player] : view.each())
         {
             if (dash.activated)
             {
                 const Vector2 velocity{dash.left ? -dash.velocity : dash.velocity, 0.F};
-                body.setVelocity(velocity);
+                player.movementBody->setVelocity(velocity);
             }
         }
+    }
+
+    void DashSystem::disableGravity(Node* player, float duration)
+    {
+        auto& mainBody = player->getComponent<phys::RigidBody>();
+        auto& hookBody = *player->getComponent<Player>().movementBody;
+        const auto bodyScale = mainBody.gravityScale();
+        const auto hookBodyScale = hookBody.gravityScale();
+        mainBody.setGravityScale(0.F);
+        hookBody.setGravityScale(0.F);
+        Invoke::after(duration, [=, &mainBody, &hookBody]{
+            mainBody.setGravityScale(bodyScale);
+            hookBody.setGravityScale(hookBodyScale);
+        });
+    }
+
+    bool DashSystem::isOnRope(Node* player) 
+    {
+        if (!player->hasComponent<Hook>())
+            return false;
+        return player->getComponent<Hook>().status.state != Hook::NONE;
     }
 } // namespace stay
