@@ -1,4 +1,5 @@
 #include "system.hpp"
+#include "manager.hpp"
 
 namespace stay
 {
@@ -7,6 +8,10 @@ namespace stay
         System::System(Manager* manager)
             : mManager(manager)
         {}
+        Registry& System::registry() 
+        {
+            return mManager->getRegistryRef();
+        }
         StartSystem::StartSystem(int order)
             : orderStart(order)
         {}

@@ -17,38 +17,8 @@ namespace stay
                 std::size_t height;
                 std::string name;
                 float updatesPerSec;
-
-                Json::Value toJSONObject() const override
-                {
-                    Json::Value res;
-                    res["width"] = width;
-                    res["height"] = height;
-                    res["name"] = name;
-                    res["updatesPerSec"] = updatesPerSec;
-                    return res;
-                }
-
-                bool fetch(const Json::Value& data) override
-                {
-                    if (data.type() == Json::objectValue && data["width"].isInt() && data["height"].isInt() && data["name"].isString() && data["updatesPerSec"].isNumeric())
-                    {
-                        width = data["width"].asInt();
-                        height = data["height"].asInt();
-                        name = data["name"].asString();
-                        updatesPerSec = data["updatesPerSec"].asFloat();
-                        return true;
-                    }
-                    else
-                    {
-                        // NOLINTBEGIN(*-magic-numbers)
-                        width = 500;
-                        height = 500;
-                        name = "Unknown";
-                        updatesPerSec = 60;
-                        return false;
-                        // NOLINTEND(*-magic-numbers)
-                    }
-                }
+                Json::Value toJSONObject() const override;
+                bool fetch(const Json::Value& data) override;
             };
         } // namespace detail
         

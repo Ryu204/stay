@@ -3,11 +3,13 @@
 #include "../physics/world.hpp"
 #include "camera.hpp"
 #include "scene.hpp"
+#include <iostream>/*debug*/ 
+#include "../utility/invoke.hpp"/*debug*/ 
 
 namespace stay
 {
     Scene::Scene(std::filesystem::path&& filepath, RWin* window)
-        : mPixelsPerMeter(100.F)
+        : PIXELS_PER_METER(100.F)
         , mSceneLoader(&mManager, std::forward<std::filesystem::path>(filepath))
     {
         Node::init(mManager.getRegistry());
@@ -47,6 +49,7 @@ namespace stay
         mManager.registerSystem<PlayerSystem>();
         mManager.registerSystem<HookSystem>();
         mManager.registerSystem<DebugSystem>()->initialize(&mCamera, window);
+        mManager.registerSystem<DashSystem>();
         
         mSceneLoader
             .registerComponent<comp::Render>("render")
@@ -59,7 +62,10 @@ namespace stay
             .registerComponent<Hook>("hook")
             .registerComponent<phys::Joint>("joint")
             .registerComponent<phys::Collider01>("collider01")
-            .registerComponent<phys::Collider02>("collider02");
+            .registerComponent<phys::Collider02>("collider02")
+            .registerComponent<Dash>("dash");
         mSceneRoot = mSceneLoader.load();
+
+        /*debug*/ for (int i = 1; i < 10; ++i) Invoke::after(i, [i]{std::cout << i << std::endl;});
     }
 } // namespace stay
