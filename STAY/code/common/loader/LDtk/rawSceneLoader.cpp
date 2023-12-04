@@ -85,7 +85,7 @@ namespace stay
         skin->addComponent<phys::Joint>().start(node->entity(), phys::Revolute{pos}, false);
         // Hook collider
         phys::Material light{0.1F};
-        auto& hookCollider = node->addComponent<phys::Collider>(phys::Circle{Vector2{}, radius}/**/, light);
+        auto& hookCollider = node->addComponent<phys::Collider>(phys::Circle{Vector2{}, radius}, light);
         hookCollider.setLayer("Player");
         // Player
         auto& cmp = node->addComponent<Player>();
@@ -101,6 +101,12 @@ namespace stay
         hk.props.pullSpeed = player.getFieldInstances().at(11).getValue().get<float>();
         // Debug
         node->addComponent<PlayerDebug>();
+        // Dash
+        auto& dash = node->addComponent<Dash>();
+        dash.velocity = player.getFieldInstances().at(12).getValue().get<float>();
+        dash.length = player.getFieldInstances().at(13).getValue().get<float>();
+        dash.cooldown = player.getFieldInstances().at(14).getValue().get<float>();
+        dash.postBrake = player.getFieldInstances().at(15).getValue().get<float>();
     }
 
     Uptr<Node> RawSceneLoader::load(Path &&filename, const std::string& switchReason)

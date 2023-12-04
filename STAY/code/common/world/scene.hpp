@@ -22,6 +22,6 @@ namespace stay
             Uptr<Node> mSceneRoot;
             SceneLoader mSceneLoader;
 
-            const float mPixelsPerMeter;
+            const float PIXELS_PER_METER;
     };
 } // namespace stay

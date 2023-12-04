@@ -2,7 +2,7 @@
 	"scene" : "asset/data",
 	"window" : 
 	{
-		"height" : 1006,
+		"height" : 1022,
 		"name" : "Stay v0.1",
 		"updatesPerSec" : 120.0,
 		"width" : 1920

@@ -12,9 +12,9 @@ namespace stay
         // Base class for convinience when reference manager
         struct System
         {
-            System(Manager* manager);
-            virtual ~System() = default;
-            
+                System(Manager* manager);
+                virtual ~System() = default;
+                Registry& registry();            
             protected:
                 Manager* mManager;
         };

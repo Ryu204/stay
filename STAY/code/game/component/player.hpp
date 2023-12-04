@@ -18,9 +18,11 @@ namespace stay
         bool canJump{false};
         bool onGround{false};
         bool onRope{false};
+        bool onDash{false};
         phys::RigidBody* movementBody;
         phys::RigidBody* hookBody;
-        SERIALIZE(moveStrength, jumpHeight, oppositeScale);
+
+        SERIALIZE(moveStrength, jumpHeight, oppositeScale, airScale);
     };
 
     struct PlayerSystem 

@@ -5,11 +5,44 @@
 
 #include "application.hpp"
 #include "../type/vector.hpp"
+#include "../utility/invoke.hpp"
 
 namespace stay
 {
+    
     namespace program
     {
+        namespace detail
+        {
+            Json::Value AppInfo::toJSONObject() const
+            {
+                Json::Value res;
+                res["width"] = width;
+                res["height"] = height;
+                res["name"] = name;
+                res["updatesPerSec"] = updatesPerSec;
+                return res;
+            }
+
+            bool AppInfo::fetch(const Json::Value& data)
+            {
+                if (data.type() == Json::objectValue && data["width"].isInt() && data["height"].isInt() && data["name"].isString() && data["updatesPerSec"].isNumeric())
+                {
+                    width = data["width"].asInt();
+                    height = data["height"].asInt();
+                    name = data["name"].asString();
+                    updatesPerSec = data["updatesPerSec"].asFloat();
+                    return true;
+                }
+
+                width = 500;
+                height = 500;
+                name = "Unknown";
+                updatesPerSec = 60;
+                return false;
+            }
+        } // namespace detail
+
         Application::Application()
             : mSprite(sf::TrianglesStrip, 4)
         {
@@ -19,6 +52,7 @@ namespace stay
         Application::~Application()
         {
             saveProperties();
+            Invoke::terminate();
         }
 
         void Application::initialize()
@@ -116,6 +150,7 @@ namespace stay
         void Application::update(float dt)
         {
             mScene->update(dt);
+            Invoke::progress(dt);
         }
 
         void Application::render()

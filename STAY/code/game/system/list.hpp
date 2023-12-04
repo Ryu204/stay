@@ -7,3 +7,4 @@
 #include "hookSystem.hpp"
 #include "debugSystem.hpp"
 #include "../component/list.hpp"
+#include "dashSystem.hpp"

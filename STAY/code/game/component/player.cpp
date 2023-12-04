@@ -58,7 +58,7 @@ namespace stay
         {
             switch (event.key.scancode)
             {
-                case sf::Keyboard::Scan::Space:
+                case sf::Keyboard::Scan::K:
                     mEntered = true;
                     break;
                 default:
@@ -85,15 +85,17 @@ namespace stay
     void PlayerSystem::update(float /*dt*/)
     {
         Vector2 dir{0.F, 0.F};
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Left))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A))
             dir.x -= 1.F;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Right))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D))
             dir.x += 1.F;
         auto view = mManager->getRegistryRef().view<Player>();
         for (auto [entity, player] : view.each())
         {
-            const auto vel = player.movementBody->getVelocity();
+            if (player.onDash)
+                continue;
             auto force = utils::convertVec2<Vector2>(dir * player.moveStrength);
+            const auto vel = player.movementBody->getVelocity();
             const auto isLeft = vel.x < 5.F;
             const auto isRight = vel.x > -5.F;
             const bool mayIncreaseForce = (dir.x < 0.F && isRight) || (dir.x > 0.F && isLeft);
