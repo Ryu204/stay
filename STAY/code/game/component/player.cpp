@@ -58,7 +58,7 @@ namespace stay
         {
             switch (event.key.scancode)
             {
-                case sf::Keyboard::Scan::Space:
+                case sf::Keyboard::Scan::K:
                     mEntered = true;
                     break;
                 default:
@@ -85,9 +85,9 @@ namespace stay
     void PlayerSystem::update(float /*dt*/)
     {
         Vector2 dir{0.F, 0.F};
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Left))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A))
             dir.x -= 1.F;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Right))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D))
             dir.x += 1.F;
         auto view = mManager->getRegistryRef().view<Player>();
         for (auto [entity, player] : view.each())

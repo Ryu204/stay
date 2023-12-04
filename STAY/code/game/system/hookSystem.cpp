@@ -62,8 +62,8 @@ namespace stay
     void HookSystem::input(const sf::Event& event)
     {
         const bool keyPressed = event.type == sf::Event::KeyPressed;
-        const bool shot = keyPressed && event.key.scancode == sf::Keyboard::Scancode::X;
-        const bool dispatch = keyPressed && event.key.scancode == sf::Keyboard::Scancode::Space;
+        const bool shot = keyPressed && event.key.scancode == sf::Keyboard::Scancode::J;
+        const bool dispatch = keyPressed && event.key.scancode == sf::Keyboard::Scancode::K;
 
         auto view = mManager->getRegistryRef().view<Hook, Player>();
         for (auto [entity, hook, player] : view.each())
@@ -88,13 +88,13 @@ namespace stay
     void HookSystem::updateDirection()
     {
         mDirection = Vector2{};
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
             mDirection.x -= 1.F;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
             mDirection.x += 1.F;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
             mDirection.y += 1.F;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
             mDirection.y -= 1.F;
         if (mDirection == Vector2{})
         {
@@ -108,8 +108,8 @@ namespace stay
     void HookSystem::updateControl(Hook& hook, float dt)
     {
         int up = 0;
-        up += (int)sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Up);
-        up -= (int)sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::Down);
+        up += (int)sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::W);
+        up -= (int)sf::Keyboard::isKeyPressed(sf::Keyboard::Scancode::S);
 
         auto* prismatic = hook.getNode()->getComponent<phys::Joint>().getNativeHandle<b2PrismaticJoint>();
         float currentLength = prismatic->GetJointTranslation();

@@ -1,5 +1,6 @@
 #include "dashSystem.hpp"
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include "../component/dash.hpp"
 #include "physics/rigidBody.hpp"
 #include "utility/invoke.hpp"
@@ -16,7 +17,9 @@ namespace stay
 
     void DashSystem::input(const sf::Event& event)
     {
-        if (event.type != sf::Event::KeyPressed || event.key.scancode != sf::Keyboard::Scan::C)
+        if (event.type != sf::Event::KeyPressed 
+        || event.key.scancode != sf::Keyboard::Scan::K 
+        || !sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::S))
             return;
         auto view = registry().view<Dash, Player>();
         for (const auto [entity, dash, player] : view.each())
