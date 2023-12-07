@@ -41,6 +41,10 @@ jobs:
       if: matrix.platform.os == 'windows-latest'
       uses: seanmiddleditch/gha-setup-ninja@master
 
+    - name: Install MSVC
+      if: contains(matrix.platform.name, 'MSVC')
+      uses: ilammy/msvc-dev-cmd@v1
+
     - name: Check tools version
       run: ${{ matrix.platform.version }} 
 
@@ -101,6 +105,10 @@ jobs:
         curl -Lo mingw64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/12.2.0-16.0.0-10.0.0-msvcrt-r5/winlibs-x86_64-posix-seh-gcc-12.2.0-llvm-16.0.0-mingw-w64msvcrt-10.0.0-r5.zip
         unzip -qq -d "C:\Program Files" mingw64.zip
         echo "C:\Program Files\mingw64\bin" >> $GITHUB_PATH
+
+    - name: Install MSVC
+      if: contains(matrix.platform.name, 'MSVC')
+      uses: ilammy/msvc-dev-cmd@v1
 
     - name: Check tools version
       run: ${{ matrix.platform.version }} && clang-tidy --version
