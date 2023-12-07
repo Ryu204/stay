@@ -73,11 +73,11 @@ namespace stay
 #define SERIALIZE(...) \
     Json::Value toJSONObject() const override {\
         Json::Value res;\
-        FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
+        stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
         return res;\
     }\
     bool fetch(const Json::Value& val) override {\
-        FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
+        stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
         return true;\
     }
 
@@ -98,11 +98,11 @@ namespace stay
 #define SERIALIZE_POSTPROCESSING(...) \
     Json::Value toJSONObject() const override {\
         Json::Value res;\
-        FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
+        stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
         return res;\
     }\
     bool fetch(const Json::Value& val) override {\
-        FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
+        stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
         postSerialization();\
         return true;\
     }

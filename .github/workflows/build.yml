@@ -17,6 +17,7 @@ jobs:
           - { name: Ubuntu with clang, os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang,          version: clang --version && clang++ --version && make --version }
           - { name: Windows with gcc,  os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja,        version: gcc --version && g++ --version && ninja --version}
           - { name: Windows with clang, os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja, version: clang --version && clang++ --version && ninja --version}
+          - { name: Windows with MSVC2019, os: windows-latest, flags: -GNinja,                                                      version: msbuild --version && cl}
         buildType: ["Debug", "Release"]
 
     name: Build on ${{ matrix.platform.name }} - ${{ matrix.buildType }}
@@ -30,7 +31,7 @@ jobs:
       run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
 
     - name: Install MinGW (Windows)
-      if: matrix.platform.os == 'windows-latest'
+      if: matrix.platform.os == 'windows-latest' && !contains(matrix.platform.name, 'MSVC')
       run: |
         curl -Lo mingw64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/12.2.0-16.0.0-10.0.0-msvcrt-r5/winlibs-x86_64-posix-seh-gcc-12.2.0-llvm-16.0.0-mingw-w64msvcrt-10.0.0-r5.zip
         unzip -qq -d "C:\Program Files" mingw64.zip
@@ -65,6 +66,7 @@ jobs:
           - { name: Ubuntu with clang,  os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang,         version: clang --version && clang++ --version && make --version}
           - { name: Windows with gcc,   os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja,       version: gcc --version && g++ --version && ninja --version}
           - { name: Windows with clang, os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja, version: clang --version && clang++ --version && ninja --version}
+          - { name: Windows with MSVC2019, os: windows-latest, flags: -GNinja,                                                      version: msbuild --version && cl}
         buildType: ["Debug", "Release"]
 
     name: Analyze on ${{ matrix.platform.name }} - ${{ matrix.buildType }}
@@ -94,7 +96,7 @@ jobs:
         sudo mv /usr/bin/clang++-16     /usr/bin/clang++  
 
     - name: Install MinGW (Windows)
-      if: matrix.platform.os == 'windows-latest'
+      if: matrix.platform.os == 'windows-latest' && !contains(matrix.platform.name, 'MSVC')
       run: |
         curl -Lo mingw64.zip https://github.com/brechtsanders/winlibs_mingw/releases/download/12.2.0-16.0.0-10.0.0-msvcrt-r5/winlibs-x86_64-posix-seh-gcc-12.2.0-llvm-16.0.0-mingw-w64msvcrt-10.0.0-r5.zip
         unzip -qq -d "C:\Program Files" mingw64.zip
