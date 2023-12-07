@@ -17,7 +17,7 @@ jobs:
           - { name: Ubuntu with clang, os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang,          version: clang --version && clang++ --version && make --version }
           - { name: Windows with gcc,  os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja,        version: gcc --version && g++ --version && ninja --version}
           - { name: Windows with clang, os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja, version: clang --version && clang++ --version && ninja --version}
-          - { name: Windows with MSVC2019, os: windows-latest, flags: -GNinja,                                                      version: msbuild --version && cl}
+          - { name: Windows with MSVC2019, os: windows-latest, flags: -GNinja,                                                      version: ninja --version && cl}
         buildType: ["Debug", "Release"]
 
     name: Build on ${{ matrix.platform.name }} - ${{ matrix.buildType }}
@@ -70,7 +70,7 @@ jobs:
           - { name: Ubuntu with clang,  os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang,         version: clang --version && clang++ --version && make --version}
           - { name: Windows with gcc,   os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja,       version: gcc --version && g++ --version && ninja --version}
           - { name: Windows with clang, os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja, version: clang --version && clang++ --version && ninja --version}
-          - { name: Windows with MSVC2019, os: windows-latest, flags: -GNinja,                                                      version: msbuild --version && cl}
+          - { name: Windows with MSVC2019, os: windows-latest, flags: -GNinja,                                                      version: ninja --version && cl}
         buildType: ["Debug", "Release"]
 
     name: Analyze on ${{ matrix.platform.name }} - ${{ matrix.buildType }}
