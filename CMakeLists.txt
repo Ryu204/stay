@@ -31,12 +31,6 @@ IF (MINGW)
     ADD_COMPILE_OPTIONS(-Wa,-mbig-obj -Os)
 ENDIF()
 
-# Problem with MSVC exception
-IF (MSVC)
-    MESSAGE("-- Adjusting compiler flags for MinGW")
-    ADD_COMPILE_OPTIONS(-fexceptions)
-ENDIF()
-
 # Add target and link libraries
 ADD_EXECUTABLE(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCE_CODE})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC nlohmann_json::nlohmann_json sfml-graphics sfml-audio jsoncpp_lib glm::glm EnTT::EnTT box2d)
