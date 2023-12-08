@@ -74,6 +74,6 @@
 #define stay_FE_n22(...)           ERROR: FOR_EACH only supports up to 21 arguments
 
 #define stay_FE_GET_MACRO(_0,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,_21,_22,NAME,...) NAME
-#define stay_FOR_EACH(what, ...) stay_FE_CALLITn01(stay_FE_GET_MACRO(_0, ##__VA_ARGS__,stay_FE_n22,stay_FE_n21,stay_FE_n20,stay_FE_n19, \
+#define stay_FOR_EACH(what, ...) stay_FE_CALLITn01(stay_FE_GET_MACRO(_0, ##__VA_ARGS__,stay_FE_n22,stay_FE_n21,stay_FE_n20,stay_FE_n19,\
                             stay_FE_n18,stay_FE_n17,stay_FE_n16,stay_FE_n15,stay_FE_n14,stay_FE_n13,stay_FE_n12,stay_FE_n11,stay_FE_n10,stay_FE_n09,\
                             stay_FE_n08,stay_FE_n07,stay_FE_n06,stay_FE_n05,stay_FE_n04,stay_FE_n03,stay_FE_n02,stay_FE_n01,stay_FE_n00), (what, ##__VA_ARGS__))
