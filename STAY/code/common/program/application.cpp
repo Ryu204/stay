@@ -19,7 +19,7 @@ namespace
             using asset::Asset::Asset;
             bool loadFromPath() override
             {
-                return mTexture.loadFromFile(absolutePath());
+                return mTexture.loadFromFile(absolutePath().string());
             }
         private:
             sf::Texture mTexture;

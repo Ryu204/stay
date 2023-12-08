@@ -30,15 +30,15 @@ namespace stay
             {
                 const auto oldName = Path(dir)/(action == efsw::Action::Moved ? oldFilename : filename);
                 const auto relativePath = std::filesystem::relative(oldName, mBaseFolder);
-                const bool untracked = mAssets.find(relativePath) == mAssets.end();
+                const bool untracked = mAssets.find(relativePath.string()) == mAssets.end();
                 if (untracked)
                     return;
-                auto* asset = mAssets.at(relativePath);
+                auto* asset = mAssets.at(relativePath.string());
                 if (action == efsw::Action::Delete)
                 {
                     std::lock_guard lock{mDeleteMutex};
                     mDeleteQueue.emplace_back(asset);
-                    mAssets.erase(relativePath);
+                    mAssets.erase(relativePath.string());
                 }
                 else if (action == efsw::Action::Modified)
                 {
