@@ -7,6 +7,25 @@
 #include "../type/vector.hpp"
 #include "../utility/invoke.hpp"
 
+using namespace stay;
+
+#include "asset/folderWatcher.hpp"
+#include "asset/asset.hpp"
+namespace
+{
+    class Image : public asset::Asset
+    {
+        public:
+            using asset::Asset::Asset;
+            bool loadFromPath() override
+            {
+                return mTexture.loadFromFile(absolutePath());
+            }
+        private:
+            sf::Texture mTexture;
+    };
+}
+
 namespace stay
 {
     
@@ -151,6 +170,36 @@ namespace stay
         {
             mScene->update(dt);
             Invoke::progress(dt);
+
+            /*debug*/
+            static Image im{"asset", "texture/cat.png"};
+            static bool added = false;
+            if (!added)
+            {
+                im.addHandler([](const asset::Action& action) {
+                    switch (action.index())
+                    {
+                        case asset::RENAMED:
+                            std::cout  << "new location: " << im.absolutePath() << std::endl;
+                            break;
+                        case asset::MODIFIED:
+                            std::cout << "Modified" << std::endl;
+                            break;
+                        case asset::DELETED:
+                            std::cout << "Deleted!" << std::endl;
+                            break;
+                        default:
+                            break;
+                    }
+                });
+            }
+            static asset::FolderWatcher fold{"asset"};
+            if (!added)
+            {
+                added = true;
+                fold.add(im);
+            }
+            fold.update(dt);
         }
 
         void Application::render()

@@ -1,6 +1,8 @@
 #pragma once
 
+#include "asset/folderWatcher.hpp"
 #include "type.hpp"
+#include "event/event.hpp"
 
 namespace stay
 {
@@ -9,19 +11,29 @@ namespace stay
         class Asset
         {
             public:
+                using Handler = std::function<void(const Action&)>;
                 Asset(Path baseDirectory, Path relativePath);
                 virtual ~Asset() = default;
-                virtual void load() = 0;
-                void fileChangedHanler(const Action& change);
                 Path absolutePath() const;
                 Path relativePath() const;
                 Path baseFolder() const;
+                void load();
+                bool loaded() const;
+
+                template <typename Func>
+                std::size_t addHandler(Func&& handler)
+                {
+                    return mOnChange.addEventListener<Func>(std::forward<Func>(handler));
+                }
+                void removeHandler(std::size_t id);
             protected:
-                virtual void onModify() {};
-                virtual void onMove(const Path& newRelative) {};
+                virtual bool loadFromPath() = 0;
             private:
+                friend class detail::Listener;
+                event::Event<const Action&> mOnChange;
                 Path mBaseDirectory;
                 Path mRelativePath;
+                bool mLoaded;
         };
     } // namespace asset
 } // namespace stay

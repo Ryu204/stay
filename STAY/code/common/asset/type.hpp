@@ -10,9 +10,13 @@ namespace stay
         using Path = std::filesystem::path;
         
         struct Modify   { int foo; };
-        struct Move     { std::filesystem::path newRelativePath{"HelloWorld.txt"}; };
+        struct Rename     { std::filesystem::path newRelativePath{"HelloWorld.txt"}; };
         struct Delete   { int foo; };
-        struct Create   { int foo;};
-        using Action = std::variant<Modify, Move, Delete, Create>;
+        using Action = std::variant<Modify, Rename, Delete>;
+
+        enum ActionIndex
+        {
+            MODIFIED, RENAMED, DELETED
+        };
     } // namespace asset
 } // namespace stay

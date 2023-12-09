@@ -13,21 +13,6 @@ namespace stay
             assert(std::filesystem::is_directory(mBaseDirectory) && "invalid directory");
             assert(std::filesystem::is_regular_file(absolutePath()) && "not a regular file");
         }
-            
-        void Asset::fileChangedHanler(const Action& change)
-        {
-            std::visit(utils::VariantVisitor{
-                [this](const Modify&) {
-                    onModify();
-                },
-                [this](const Move& move) {
-                    mRelativePath = move.newRelativePath.string();
-                    onMove(absolutePath());
-                },
-                [](const Delete&) { /*Add code here*/},
-                [](const Create&) { /*Add code here*/}
-            }, change);
-        }
         
         Path Asset::absolutePath() const
         {
@@ -42,6 +27,21 @@ namespace stay
         Path Asset::baseFolder() const
         {
             return mBaseDirectory;
+        }
+
+        void Asset::load()
+        {
+            mLoaded = loadFromPath();
+        }
+
+        bool Asset::loaded() const
+        {
+            return mLoaded;
+        }
+
+        void Asset::removeHandler(std::size_t id)
+        {
+            mOnChange.removeListener(id);
         }
     } // namespace asset
 } // namespace stay
