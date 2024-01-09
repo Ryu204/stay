@@ -1,7 +1,11 @@
 #include "listener.hpp"
 #include "asset.hpp"
+#include <SFML/System/Clock.hpp>
 #include <cassert>
-#include <mutex>
+#include <chrono>
+#include <memory>
+#include <cmath>
+#include <iostream> /*debug*/
 
 namespace stay
 {
@@ -9,61 +13,80 @@ namespace stay
     {
         namespace detail
         {
-            Listener::Listener(Path assetFolder, float minCallbackIntervalSeconds)
-                : mBaseFolder(std::move(assetFolder))
+            Listener::Listener(Path baseDirectory, float minCallbackIntervalSeconds)
+                : mBaseDirectory{std::move(baseDirectory)}
                 , mUpdateInterval{minCallbackIntervalSeconds}
+                , mDestructorCalled{false}
             {
-                assert(std::filesystem::is_directory(mBaseFolder) && "invalid directory");
+                assert(std::filesystem::is_directory(mBaseDirectory) && "not a valid directory");
+                mWorkerThread = std::make_unique<std::thread>(&Listener::launch, this);
+            }
+
+            Listener::~Listener()
+            {
+                mDestructorCalled.store(true);
+                mWorkerThread->join();
             }
 
             void Listener::add(Asset& asset)
             {
-                assert(asset.baseFolder() == mBaseFolder && "asset is from other base folder");
-                // This line is important. We do this instead of directly using the relative path method to ensure uniformity.
-                auto relativePath = std::filesystem::relative(asset.absolutePath(), mBaseFolder);
-                mAssets.emplace(relativePath.string(), &asset);
+                assert(asset.baseFolder() == mBaseDirectory && "asset doesn't have same base dir");
+                mAssets[asset.relativePath()] = &asset;
             }
 
-            void Listener::handleFileAction(efsw::WatchID /*watchid*/, const std::string& dir,
-                const std::string& filename, efsw::Action action,
-                std::string oldFilename)
+            void Listener::remove(Asset& asset)
             {
-                const auto oldName = Path(dir)/(action == efsw::Action::Moved ? oldFilename : filename);
-                const auto relativePath = std::filesystem::relative(oldName, mBaseFolder);
-                const bool untracked = mAssets.find(relativePath.string()) == mAssets.end();
+                const auto relativePath = asset.relativePath();
+                assert(mAssets.find(relativePath) != mAssets.end() && "asset not added");
+                mAssets.erase(relativePath);
+                {
+                    std::lock_guard lock{mDeleteMutex};
+                    mDeleteQueue.erase(&asset);
+                }
+                {
+                    std::lock_guard lock{mModifyMutex};
+                    mModifyQueue.erase(&asset);
+                }
+            }
+
+            void Listener::handleFileAction(efsw::WatchID /* id */, const std::string& dir,
+                const std::string& filename, efsw::Action action,
+                std::string /* oldFilename */)
+            {
+                const auto filePath = Path(dir)/filename;
+                const auto relativePath = std::filesystem::relative(filePath, mBaseDirectory);
+                const bool untracked = mAssets.find(relativePath) == mAssets.end();
                 if (untracked)
                     return;
-                auto* asset = mAssets.at(relativePath.string());
+                auto* asset = mAssets.at(relativePath);
                 if (action == efsw::Action::Delete)
                 {
                     std::lock_guard lock{mDeleteMutex};
-                    mDeleteQueue.emplace_back(asset);
-                    mAssets.erase(relativePath.string());
+                    mDeleteQueue.insert(asset);
+                    mAssets.erase(relativePath);
                 }
                 else if (action == efsw::Action::Modified)
                 {
                     std::lock_guard lock{mModifyMutex};
                     mModifyQueue.insert(asset);
                 }
-                else if (action == efsw::Action::Moved)
-                {
-                    const auto newName = Path(dir)/filename;
-                    {
-                        std::lock_guard lock{mMoveMutex};
-                        mMoveQueue[asset] = Rename{std::filesystem::relative(newName, mBaseFolder)};
-                    }
-                    mAssets.emplace(std::filesystem::relative(newName, mBaseFolder).string(), asset);
-                    mAssets.erase(relativePath.string());
-                }
             }
 
-            void Listener::update(float dt)
+            void Listener::launch() 
             {
-                mCurrentTime += dt;
-                if (mCurrentTime > mUpdateInterval)
+                sf::Clock clock;
+                float elapsed = clock.restart().asSeconds();
+                while (!mDestructorCalled.load())
                 {
-                    mCurrentTime -= mUpdateInterval;
-                    notify();
+                    elapsed += clock.restart().asSeconds();
+                    if (elapsed > mUpdateInterval)
+                    {
+                        /*debug*/ std::cout << "Checking from another thread..." << std::endl;
+                        elapsed = std::fmod(elapsed, mUpdateInterval);
+                        notify();
+                    }
+                    const auto halfInterval = std::chrono::milliseconds((int)(mUpdateInterval * 1000.F / 2.F));
+                    std::this_thread::sleep_for(halfInterval);
                 }
             }
 
@@ -80,15 +103,6 @@ namespace stay
                     for (const auto* i : mDeleteQueue)
                         i->mOnChange.invoke(Delete{});
                     mDeleteQueue.clear();
-                }
-                {
-                    std::lock_guard lock{mMoveMutex};
-                    for (const auto& [asset, move] : mMoveQueue)
-                    {
-                        asset->mRelativePath = move.newRelativePath;
-                        asset->mOnChange.invoke(move);
-                    }
-                    mMoveQueue.clear();
                 }
             }
         } // namespace detail

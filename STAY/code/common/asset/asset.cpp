@@ -6,14 +6,18 @@ namespace stay
 {
     namespace asset
     {
-        Asset::Asset(Path baseDirectory, Path relativePath)
-            : mBaseDirectory{std::move(baseDirectory)}
-            , mRelativePath{std::move(relativePath)}
+        Asset::Asset()
         {
             assert(std::filesystem::is_directory(mBaseDirectory) && "invalid directory");
             assert(std::filesystem::is_regular_file(absolutePath()) && "not a regular file");
         }
         
+        void Asset::initPaths(Path baseDir, Path relative)
+        {
+            mBaseDirectory = std::move(baseDir);
+            mRelativePath = std::move(relative);
+        }
+
         Path Asset::absolutePath() const
         {
             return mBaseDirectory/mRelativePath;

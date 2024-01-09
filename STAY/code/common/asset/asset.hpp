@@ -8,11 +8,12 @@ namespace stay
 {
     namespace asset
     {
+        class Manager;
         class Asset
         {
             public:
                 using Handler = std::function<void(const Action&)>;
-                Asset(Path baseDirectory, Path relativePath);
+                Asset();
                 virtual ~Asset() = default;
                 Path absolutePath() const;
                 Path relativePath() const;
@@ -29,8 +30,12 @@ namespace stay
             protected:
                 virtual bool loadFromPath() = 0;
             private:
-                friend class detail::Listener;
+                friend class Manager;
+                void initPaths(Path baseDir, Path relative); 
+
+                friend detail::Listener;
                 event::Event<const Action&> mOnChange;
+
                 Path mBaseDirectory;
                 Path mRelativePath;
                 bool mLoaded;

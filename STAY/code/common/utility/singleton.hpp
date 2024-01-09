@@ -12,6 +12,7 @@ namespace stay
         {
             public:
                 using Type = typename Trait::Type;
+                Singleton() = delete;
                 virtual ~Singleton() = default;
                 static void init()
                 {
@@ -33,7 +34,6 @@ namespace stay
                     return mInstance().get() != nullptr;
                 }
             private:
-                Singleton();
                 static std::unique_ptr<Type>& mInstance()
                 {
                     static std::unique_ptr<Type> res;

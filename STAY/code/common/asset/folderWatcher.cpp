@@ -1,20 +1,19 @@
 #include "folderWatcher.hpp"
 #include "asset.hpp"
 #include "asset/type.hpp"
+#include <SFML/System/Clock.hpp>
 #include <filesystem>
 #include <cassert>
-#include <iostream> /*debug*/
-#include <mutex>
 
 namespace stay
 {
     namespace asset
     {
-        FolderWatcher::FolderWatcher(Path folder, float minCallbackIntervalSeconds)
-            : mFolderPath{std::move(folder)}
-            , mListener{mFolderPath, minCallbackIntervalSeconds}
+        FolderWatcher::FolderWatcher(const Path& folder, float watchInterval)
+            : mFolderPath{folder}
+            , mListener{folder, watchInterval}
         {
-            assert(std::filesystem::is_directory(mFolderPath) && "invalid folder address");
+            assert(std::filesystem::is_directory(mFolderPath) && "invalid directory");
             mWatcher.addWatch(mFolderPath.string(), &mListener, true);
             mWatcher.watch();
         }
@@ -24,9 +23,9 @@ namespace stay
             mListener.add(asset);
         }
 
-        void FolderWatcher::update(float dt)
+        void FolderWatcher::remove(Asset& asset)
         {
-            mListener.update(dt);
+            mListener.remove(asset);
         }
     } // namespace asset
 } // namespace stay
