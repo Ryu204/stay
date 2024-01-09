@@ -22,6 +22,9 @@ FILE(GLOB_RECURSE
 # Initialize clang-tidy if used
 IF(USER_DEFINED_CLANG_TIDY)
     MESSAGE("-- clang-tidy will be used")
+    IF (MSVC)
+        SET(USER_DEFINED_CLANG_TIDY "${USER_DEFINED_CLANG_TIDY};--extra-arg=/EHsc")
+    ENDIF() 
     SET(CMAKE_CXX_CLANG_TIDY "${USER_DEFINED_CLANG_TIDY}")
 ENDIF()
 
