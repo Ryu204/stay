@@ -33,7 +33,20 @@ ENDIF()
 
 # Add target and link libraries
 ADD_EXECUTABLE(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCE_CODE})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC nlohmann_json::nlohmann_json sfml-graphics sfml-audio jsoncpp_lib glm::glm EnTT::EnTT box2d)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC 
+    nlohmann_json::nlohmann_json 
+    sfml-graphics 
+    sfml-audio 
+    jsoncpp_lib 
+    glm::glm 
+    EnTT::EnTT 
+    box2d
+    efsw
+)
+# Add thread support
+SET(THREADS_PREFER_PTHREAD_FLAG TRUE)
+FIND_PACKAGE(Threads REQUIRED)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} PRIVATE Threads::Threads)
 
 # Add common header to include directory
 TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/STAY/code/common)
