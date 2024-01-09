@@ -13,11 +13,14 @@ namespace stay
 {
     namespace asset 
     {
-        class Manager 
+        template <typename Type, whereIs(Type, Asset)>
+        class ManagerTyped
         {
             public:
-                Manager(Path rootDirectory);
-                template <typename Type, whereIs(Type, Asset)>
+                ManagerTyped(Path rootDirectory)
+                    : mRootDirectory{std::move(rootDirectory)}
+                    , mWatcher(mRootDirectory)
+                { }
                 void add(std::size_t id, const Path& relativePath)
                 {
                     assert(mAssetsList.find(id) == mAssetsList.end() && "id added before");
@@ -25,25 +28,27 @@ namespace stay
                     mAssetsList[id]->initPaths(mRootDirectory, relativePath);
                     mWatcher.add(*mAssetsList[id]);
                 }
-                template <typename Type, whereIs(Type, Asset)>
                 Type& get(std::size_t id)
                 {
                     assert(mAssetsList.find(id) != mAssetsList.end());
-                    auto* derived = dynamic_cast<Type*>(mAssetsList.at(id).get());
-                    assert(derived != nullptr && "get wrong type");
-                    return *derived;
+                    return *mAssetsList.at(id);
                 }
-                template <typename Type, whereIs(Type, Asset)>
                 Type& addGet(Path relativePath, std::size_t& id)
                 {
-                    id = add<Type>(relativePath);
-                    return get<Type>(id);
+                    id = add(relativePath);
+                    return get(id);
                 }
-                void remove(std::size_t id);
+                void remove(std::size_t id)
+                {
+                    assert(mAssetsList.find(id) != mAssetsList.end() && "invalid asset id");
+                    mGenerator.erase(id);
+                    mWatcher.remove(*mAssetsList[id]);
+                    mAssetsList.erase(id);
+                }
             private:
                 const Path mRootDirectory;
                 utils::IDGenerator mGenerator;
-                std::unordered_map<std::size_t, Uptr<Asset>> mAssetsList;
+                std::unordered_map<std::size_t, Uptr<Type>> mAssetsList;
                 FolderWatcher mWatcher;
         };
     } // namespace asset
