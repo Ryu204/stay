@@ -21,9 +21,7 @@ namespace stay
                 std::size_t add(const Path& relativePath)
                 {
                     const auto newId = mGenerator.generate();
-                    mAssetsList.emplace(newId, std::make_unique<Type>(
-                        mRootDirectory/relativePath
-                    ));
+                    mAssetsList.emplace(newId, std::make_unique<Type>());
                     mAssetsList[newId]->initPaths(mRootDirectory, relativePath);
                     mWatcher.add(*mAssetsList[newId]);
                     return newId;

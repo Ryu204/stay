@@ -5,7 +5,6 @@
 #include <chrono>
 #include <memory>
 #include <cmath>
-#include <iostream> /*debug*/
 
 namespace stay
 {
@@ -81,7 +80,6 @@ namespace stay
                     elapsed += clock.restart().asSeconds();
                     if (elapsed > mUpdateInterval)
                     {
-                        /*debug*/ std::cout << "Checking from another thread..." << std::endl;
                         elapsed = std::fmod(elapsed, mUpdateInterval);
                         notify();
                     }

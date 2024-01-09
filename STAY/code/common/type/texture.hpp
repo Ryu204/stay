@@ -9,8 +9,11 @@ namespace stay
     class Texture : public asset::Asset
     {
         public:
-            Texture(std::filesystem::path path);
-            sf::Texture& getSfmlTexture();
+            Texture() = default;
+            const sf::Texture& getSfmlTexture()
+            {
+                return mInternalTexture;
+            }
         protected:
             bool loadFromPath() override
             {

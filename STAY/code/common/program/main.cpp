@@ -1,7 +1,5 @@
 #include <iostream>
 
-#include <json/json.h>
-
 #include "application.hpp"
 
 int main()

@@ -13,12 +13,12 @@ namespace stay
         {
             public:
                 using Handler = std::function<void(const Action&)>;
-                Asset();
+                Asset() = default;
                 virtual ~Asset() = default;
                 Path absolutePath() const;
                 Path relativePath() const;
                 Path baseFolder() const;
-                void load();
+                bool load();
                 bool loaded() const;
 
                 template <typename Func>
