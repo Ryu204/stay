@@ -78,13 +78,13 @@ namespace stay
                 {
                     std::lock_guard lock{mModifyMutex};
                     for (const auto* i : mModifyQueue)
-                        i->mOnChange.invoke(Modify{});
+                        i->mOnChange.invoke(Action::MODIFIED);
                     mModifyQueue.clear();
                 }
                 {
                     std::lock_guard lock{mDeleteMutex};
                     for (const auto* i : mDeleteQueue)
-                        i->mOnChange.invoke(Delete{});
+                        i->mOnChange.invoke(Action::DELETED);
                     mDeleteQueue.clear();
                 }
             }
