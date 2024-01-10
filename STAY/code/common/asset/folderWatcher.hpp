@@ -1,10 +1,6 @@
 #pragma once
 
-#include <memory>
-#include <mutex>
-
 #include <efsw/efsw.hpp>
-#include <thread>
 
 #include "type.hpp"
 #include "listener.hpp"

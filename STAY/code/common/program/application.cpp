@@ -46,13 +46,13 @@ namespace stay
         Application::Application()
             : mSprite(sf::TrianglesStrip, 4)
         {
+            Invoke::reset();
             initialize();
         }
 
         Application::~Application()
         {
             saveProperties();
-            Invoke::terminate();
         }
 
         void Application::initialize()

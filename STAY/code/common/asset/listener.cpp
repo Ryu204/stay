@@ -1,5 +1,6 @@
 #include "listener.hpp"
 #include "asset.hpp"
+#include "utility/invoke.hpp"
 #include <SFML/System/Clock.hpp>
 #include <cassert>
 #include <chrono>
@@ -14,17 +15,18 @@ namespace stay
         {
             Listener::Listener(Path baseDirectory, float minCallbackIntervalSeconds)
                 : mBaseDirectory{std::move(baseDirectory)}
-                , mUpdateInterval{minCallbackIntervalSeconds}
-                , mDestructorCalled{false}
             {
                 assert(std::filesystem::is_directory(mBaseDirectory) && "not a valid directory");
-                mWorkerThread = std::make_unique<std::thread>(&Listener::launch, this);
+                mInvokeId = Invoke::after(
+                    minCallbackIntervalSeconds, 
+                    [this]{notify();}, 
+                    /* repeated = */ true
+                );
             }
 
             Listener::~Listener()
             {
-                mDestructorCalled.store(true);
-                mWorkerThread->join();
+                Invoke::removeCallback(mInvokeId);
             }
 
             void Listener::add(Asset& asset)
@@ -68,23 +70,6 @@ namespace stay
                 {
                     std::lock_guard lock{mModifyMutex};
                     mModifyQueue.insert(asset);
-                }
-            }
-
-            void Listener::launch() 
-            {
-                sf::Clock clock;
-                float elapsed = clock.restart().asSeconds();
-                while (!mDestructorCalled.load())
-                {
-                    elapsed += clock.restart().asSeconds();
-                    if (elapsed > mUpdateInterval)
-                    {
-                        elapsed = std::fmod(elapsed, mUpdateInterval);
-                        notify();
-                    }
-                    const auto halfInterval = std::chrono::milliseconds((int)(mUpdateInterval * 1000.F / 2.F));
-                    std::this_thread::sleep_for(halfInterval);
                 }
             }
 

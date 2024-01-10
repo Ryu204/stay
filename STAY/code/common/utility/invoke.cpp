@@ -1,8 +1,15 @@
 #include "invoke.hpp"
 #include <queue>
+#include <cassert>
 
 namespace stay 
 {
+    void Invoke::removeCallback(std::size_t id)
+    {
+        assert(data().generator.isActive(id) && "id not added");
+        data().generator.erase(id);
+    }
+
     void Invoke::progress(float dt)
     {
         data().currentTime += dt;
@@ -12,23 +19,27 @@ namespace stay
             const auto& registry = list.top();
             if (registry.timePoint < data().currentTime)
             {
-                registry.callback();
+                auto info = registry;
+                const auto removed = !data().generator.isActive(info.id);
                 list.pop();
+                if (removed)
+                    continue;
+                if (info.repeated)
+                {
+                    info.timePoint += info.interval;
+                    list.push(info);
+                }
+                info.callback();
             }
             else
                 break;
         }
     }
 
-    void Invoke::terminate()
+    void Invoke::reset()
     {
         data().reset();
     }
-
-    Invoke::Registry::Registry(float timePoint, std::function<void()>&& func)
-        : callback{func}
-        , timePoint(timePoint)
-    {}
 
     bool Invoke::Registry::operator < (const Registry& right) const 
     {
@@ -40,6 +51,7 @@ namespace stay
     {
         currentTime = 0.F;
         std::priority_queue<Registry>().swap(callbackData);
+        utils::IDGenerator().swap(generator);
     }
 
     Invoke::Data& Invoke::data()
