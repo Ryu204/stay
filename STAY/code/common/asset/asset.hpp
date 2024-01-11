@@ -34,7 +34,7 @@ namespace stay
                 void initPaths(Path baseDir, Path relative); 
 
                 friend detail::Listener;
-                event::Event<const Action&> mOnChange;
+                event::Event<Action> mOnChange;
 
                 Path mBaseDirectory;
                 Path mRelativePath;

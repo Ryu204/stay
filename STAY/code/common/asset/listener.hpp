@@ -1,11 +1,8 @@
 #pragma once
 
-#include <atomic>
-#include <shared_mutex>
-#include <thread>
-#include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <mutex>
 
 #include <efsw/efsw.hpp>
 
@@ -31,19 +28,16 @@ namespace stay
 						const std::string& filename, efsw::Action action,
 						std::string /* oldFilename */) override;
                 private:
-                    void launch();
                     void notify();
                     Path mBaseDirectory;
                     std::unordered_map<Path, Asset*> mAssets{};
+
                     std::unordered_set<Asset*> mModifyQueue{};
                     std::unordered_set<Asset*> mDeleteQueue{};
+                    std::recursive_mutex mModifyMutex{};
+                    std::recursive_mutex mDeleteMutex{};
 
-                    std::shared_mutex mModifyMutex{};
-                    std::shared_mutex mDeleteMutex{};
-                    std::atomic_bool mDestructorCalled{};
-                    std::unique_ptr<std::thread> mWorkerThread;
-
-                    const float mUpdateInterval{};
+                    std::size_t mInvokeId{};
             };
         } // namespace detail
     } // namespace asset
