@@ -40,7 +40,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
     nlohmann_json::nlohmann_json 
     sfml-graphics 
     sfml-audio
-    glm::glm 
+    glm::glm-header-only
     EnTT::EnTT 
     box2d
     efsw
