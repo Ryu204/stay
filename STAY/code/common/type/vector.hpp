@@ -13,48 +13,20 @@ namespace stay
     {
         public:
             using glm::vec<2, int>::vec;
-            Json::Value toJSONObject() const override
-            {
-                Json::Value res(Json::arrayValue);
-                res.append(x);
-                res.append(y);
-                return res;
-            }
-            bool fetch(const Json::Value& data) override
-            {
-                if (data.isArray() && data.size() >= 2 && data[0u].isNumeric() && data[1u].isNumeric()) 
-                {
-                    x = data[0u].asInt();
-                    y = data[1u].asInt();
-                    return true;
-                }   
-                return false;
-            }
+            Vector2Int(const glm::vec<2, int>& other)
+                : glm::vec<2, int>{other}
+            {}
+            SERIALIZE(x, y)
     };
 
     class Vector3Int : public glm::vec<3, int>, public Serializable
     {
         public:
             using glm::vec<3, int>::vec;
-            Json::Value toJSONObject() const override
-            {
-                Json::Value res(Json::arrayValue);
-                res.append(x);
-                res.append(y);
-                res.append(z);
-                return res;
-            }
-            bool fetch(const Json::Value& data) override
-            {
-                if (data.isArray() && data.size() >= 3 && data[0u].isNumeric() && data[1u].isNumeric() && data[2u].isNumeric()) 
-                {
-                    x = data[0u].asInt();
-                    y = data[1u].asInt();
-                    z = data[2u].asInt();
-                    return true;
-                }
-                return false;
-            }
+            Vector3Int(const glm::vec<3, int>& other)
+                : glm::vec<3, int>{other}
+            {}
+            SERIALIZE(x, y, z)
     };
 
     class Vector2 : public glm::vec2, public Serializable
@@ -64,24 +36,7 @@ namespace stay
             Vector2(const glm::vec2& vec)
                 : glm::vec2(vec)
             {}
-            Json::Value toJSONObject() const override
-            {
-                Json::Value res(Json::arrayValue);
-                res.append(x);
-                res.append(y);
-                return res;
-            }
-
-            bool fetch(const Json::Value& data) override
-            {
-                if (data.isArray() && data.size() >= 2 && data[0u].isNumeric() && data[1u].isNumeric()) 
-                {
-                    x = data[0u].asFloat();
-                    y = data[1u].asFloat();
-                    return true;
-                }   
-                return false;
-            }
+            SERIALIZE(x, y)
     };
 
     class Vector3 : public glm::vec3, public Serializable
@@ -94,25 +49,7 @@ namespace stay
             Vector3(const glm::vec2& vec)
                 : glm::vec3(vec.x, vec.y, 0.F)
             { }
-            Json::Value toJSONObject() const override
-            {
-                Json::Value res(Json::arrayValue);
-                res.append(x);
-                res.append(y);
-                res.append(z);
-                return res;
-            }
-            bool fetch(const Json::Value& data) override
-            {
-                if (data.isArray() && data.size() >= 3 && data[0u].isNumeric() && data[1u].isNumeric() && data[2u].isNumeric()) 
-                {
-                    x = data[0u].asFloat();
-                    y = data[1u].asFloat();
-                    z = data[2u].asFloat();
-                    return true;
-                }
-                return false;
-            }
+            SERIALIZE(x, y, z)
     };
     /*        Y+
               |

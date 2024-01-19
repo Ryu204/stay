@@ -48,8 +48,8 @@ namespace stay
         struct ColliderInfo : public std::variant<Box, Circle, Chain>, public Serializable
         {
             using std::variant<Box, Circle, Chain>::variant;
-            Json::Value toJSONObject() const override;
-            bool fetch(const Json::Value& value) override;
+            Serializable::Data toJSONObject() const override;
+            bool fetch(const Serializable::Data& value) override;
             Uptr<b2Shape> createShape() const;
         };
     } // namespace phys

@@ -2,8 +2,9 @@
 #include <cmath>
 
 #include "player.hpp"
-#include "../../common/physics/collider.hpp"
-#include "../../common/physics/joint.hpp"
+#include "physics/collider.hpp"
+#include "physics/joint.hpp"
+#include "utility/convert.hpp"
 
 namespace 
 {

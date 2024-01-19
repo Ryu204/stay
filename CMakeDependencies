@@ -3,8 +3,11 @@ INCLUDE(FetchContent)
 SET(FETCHCONTENT_TRY_FIND_PACKAGE_MODE NEVER)
 
 SET(SFML_VERSION "2.6.x")
-SET(LDtkLoader_VERSION "1.2")
 SET(EnTT_VERSION "v3.12.x")
+SET(json_VERSION "master")
+SET(glm_VERSION "master")
+SET(b2d_VERSION "main")
+SET(efsw_VERSION "master")
 
 # SFML
 FETCHCONTENT_DECLARE(
@@ -17,21 +20,14 @@ FETCHCONTENT_DECLARE(
 FETCHCONTENT_DECLARE(
   nlohmannJson
   GIT_REPOSITORY        https://github.com/nlohmann/json.git
-  GIT_TAG               bc889afb4c5bf1c0d8ee29ef35eaaf4c8bef8a5d
-  SYSTEM
-)
-# jsoncpp
-FETCHCONTENT_DECLARE(
-  jsoncpp
-  GIT_REPOSITORY        https://github.com/open-source-parsers/jsoncpp.git
-  GIT_TAG               69098a18b9af0c47549d9a271c054d13ca92b006
+  GIT_TAG               ${json_VERSION}
   SYSTEM
 )
 # glm
 FETCHCONTENT_DECLARE(
   glm
   GIT_REPOSITORY        https://github.com/g-truc/glm.git
-  GIT_TAG               47585fde0c49fa77a2bf2fb1d2ead06999fd4b6e
+  GIT_TAG               ${glm_VERSION}
   SYSTEM
 )
 # EnTT
@@ -46,16 +42,16 @@ FETCHCONTENT_DECLARE(
 FETCHCONTENT_DECLARE(
   b2d
   GIT_REPOSITORY        https://github.com/erincatto/box2d.git
-  GIT_TAG               411acc32eb6d4f2e96fc70ddbdf01fe5f9b16230
+  GIT_TAG               ${b2d_VERSION}
   SYSTEM
 )
 # efsw
 FETCHCONTENT_DECLARE(
   efsw
   GIT_REPOSITORY        https://github.com/SpartanJ/efsw.git
-  GIT_TAG               bc85bafae7d7b641e326ed5d01bfffd5eb0352f5
+  GIT_TAG               ${efsw_VERSION}
   SYSTEM
 )
 
 # Build
-FETCHCONTENT_MAKEAVAILABLE(SFML nlohmannJson jsoncpp glm EnTT b2d efsw)
+FETCHCONTENT_MAKEAVAILABLE(SFML nlohmannJson glm EnTT b2d efsw)

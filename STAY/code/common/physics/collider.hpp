@@ -1,19 +1,12 @@
 #pragma once
 
-#include <variant>
-#include <optional>
-
-#include <SFML/System/NonCopyable.hpp>
 #include <box2d/box2d.h>
 
+#include "ecs/component.hpp"
 #include "colliderInfo.hpp"
-#include "../type/vector.hpp"
-#include "../utility/convert.hpp"
-#include "../utility/typedef.hpp"
-#include "../ecs/component.hpp"
-#include "../event/event.hpp"
-#include "layer.hpp"
 #include "collision.hpp"
+#include "material.hpp"
+#include "layer.hpp"
 
 namespace stay
 {
@@ -23,33 +16,16 @@ namespace stay
     } // namespace sys
     namespace phys
     {
-        class Collider;
-        class Rigidbody;
-        class Material : public Serializable
-        {
-            public:
-                Material(float density = 1.F, float friction = 0.F, float restituition = 0.F);
-                void setDensity(float density);
-                void setFriction(float friction);
-                void setRestituition(float restituition);
-                b2FixtureDef& getFixtureDef();
-                const b2FixtureDef& getFixtureDef() const;
-                int layerID() const;
-                
-                Json::Value toJSONObject() const override;
-                bool fetch(const Json::Value& value) override;
-            private:
-                b2FixtureDef mDef;
-                int mLayerID{0};
-        };
         class RigidBody;
         // @note Remember to call `start` after initialization to connect to `RigidBody`
         class Collider : public ecs::Component
         {
             public:
                 // @param entity The entity this collider attaches to
-                Collider(const ColliderInfo& info = Box{}, const Material& mat = Material());
-                void start();
+                Collider(const ColliderInfo& info = Box{}, const Material& mat = Material{});
+                // @brief connect to the rigidbody
+                // This method must be called to make the collider work
+                void connect();
                 ~Collider() override;
                 void setMaterial(const Material& mat);
                 void setTrigger(bool isTrigger);
@@ -69,7 +45,7 @@ namespace stay
 
                 SERIALIZE(mMaterial, mShapeInfo)
             private:
-                void attachToRigidBody(RigidBody& rgbody);
+                void attachToRigidBody();
 
                 Material mMaterial;
                 ColliderInfo mShapeInfo;

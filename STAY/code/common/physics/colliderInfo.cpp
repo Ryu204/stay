@@ -55,9 +55,9 @@ namespace stay
             return std::move(res);
         }
 
-        Json::Value ColliderInfo::toJSONObject() const
+        Serializable::Data ColliderInfo::toJSONObject() const
         {
-            Json::Value res;
+            Serializable::Data res;
             std::visit(utils::VariantVisitor{
                 [&res](const Circle& cir)
                 {
@@ -78,11 +78,11 @@ namespace stay
             return res;
         }
 
-        bool ColliderInfo::fetch(const Json::Value& value)
+        bool ColliderInfo::fetch(const Serializable::Data& value)
         {
-            if (!value["type"].isString())
+            if (!value["type"].is_string())
                 return false;
-            auto type = value["type"].asString();
+            auto type = value["type"].get<std::string>();
             if (type == "circle")
                 operator=(Circle{});
             else if (type == "box")

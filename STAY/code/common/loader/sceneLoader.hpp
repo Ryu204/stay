@@ -22,10 +22,10 @@ namespace stay
             Uptr<Node> load();
             void save(Node* root, bool overrideIn = false) const;
         private:
-            Node* tryLoad(std::string& log);
-            Json::Value openFile();
-            void loadEntity(Node* currentRoot, const Json::Value& data);
-            Json::Value createSaveObject(Node* root) const;
+            Uptr<Node> tryLoad(std::string& log);
+            Serializable::Data openFile();
+            void loadEntity(Node& parent, const Serializable::Data& data);
+            Serializable::Data createSaveObject(Node* topNode) const;
             Path mFile;
             ComponentsLoader mLoader;
             std::unordered_map<ecs::Entity, ecs::Entity> mParentOf;

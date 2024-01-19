@@ -43,29 +43,11 @@ namespace stay
             void setScale(const Vector2& scale);
             Vector3 getScale() const;
 
-            Json::Value toJSONObject() const override
+            SERIALIZE_POSTPROCESSING(mPosition, mRotation, mScale)
+            void postSerialization()
             {
-                Json::Value res;
-                res["position"] = mPosition.toJSONObject();
-                res["rotation"] = mRotation;
-                res["scale"] = mScale.toJSONObject();
-                return res;
-            }
-
-            bool fetch(const Json::Value& data) override
-            {
-                if (data.type() == Json::objectValue 
-                    && mPosition.fetch(data["position"]) 
-                    && data["rotation"].isNumeric()
-                    && mScale.fetch(data["scale"]))
-                {
-                    mRotation = data["rotation"].asFloat();
-                    mMatrixNeedRebuild = true;
-                    mInverseNeedRebuild = true;
-                    return true;
-                }
-                setMatrix(glm::mat4(1.F));
-                return false;
+                mMatrixNeedRebuild = true;
+                mInverseNeedRebuild = true;
             }
         private:
             // Update other components by decomposing the transform matrix

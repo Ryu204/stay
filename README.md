@@ -23,10 +23,9 @@ cd build/default
 A bunch of them, actually :octocat:
 * **SFML** with [zlib](https://github.com/SFML/SFML/blob/2.6.x/license.md) license
 * **json** with [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT) license
-* **jsoncpp** with [MIT](https://github.com/open-source-parsers/jsoncpp/blob/master/LICENSE) license
-* **glm** with [modified MIT](https://github.com/g-truc/glm/blob/b06b775c1c80af51a1183c0e167f9de3b2351a79/manual.md#-licenses) license
-* **EnTT** with [MIT](https://github.com/skypjack/entt/blob/v3.12.x/LICENSE) license
-* **Box2D** with [MIT](https://github.com/erincatto/box2d/blob/main/LICENSE) license
+* **glm** with [modified MIT](https://github.com/g-truc/glm/blob/master/manual.md#-licenses) license
+* **entt** with [MIT](https://github.com/skypjack/entt/blob/v3.12.x/LICENSE) license
+* **box2d** with [MIT](https://github.com/erincatto/box2d/blob/main/LICENSE) license
 * **efsw** with [MIT](https://github.com/SpartanJ/efsw/blob/master/LICENSE) license
 
 # Trivial info

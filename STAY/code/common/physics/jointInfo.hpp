@@ -2,10 +2,11 @@
 
 #include <variant>
 
-#include <box2d/b2_joint.h>
+#include <box2d/box2d.h>
 
 #include "../type/serializable.hpp"
 #include "../type/vector.hpp"
+#include "ecs/type.hpp"
 
 namespace stay
 {
@@ -27,17 +28,26 @@ namespace stay
             SERIALIZE(anchor);
         };
 
-        namespace detail 
-        {
-            using JointInfoBase = std::variant<Prismatic, Revolute>;
-        } // namespace detail
+        using JointData = std::variant<Prismatic, Revolute>;
 
-        struct JointInfo : public detail::JointInfoBase, public Serializable
+        struct JointInfo : public Serializable
         {
-            using detail::JointInfoBase::variant;
-            Json::Value toJSONObject() const override;
-            bool fetch(const Json::Value& value) override;
+            JointInfo(ecs::Entity other = ecs::Entity{0}, bool shouldCollide = false, JointData data = JointData{});
+            Serializable::Data toJSONObject() const override;
+            bool fetch(const Serializable::Data& value) override;
             Uptr<b2JointDef> createDef(RigidBody& a, RigidBody& b) const;
+
+            struct Connect : Serializable 
+            {
+                Connect(bool shouldCollide, ecs::Entity other) 
+                    : shouldCollide(shouldCollide)
+                    , other(other)
+                {}
+                bool shouldCollide{false};
+                ecs::Entity other{0};
+                SERIALIZE(shouldCollide, other);
+            } connectStatus;
+            JointData data;
         };
     } // namespace phys
 } // namespace stay

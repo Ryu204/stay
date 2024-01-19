@@ -82,7 +82,7 @@ namespace stay
         phys::Material playerMat{1.F, friction, 0.F};
         auto& skinCollider = skin->addComponent<phys::Collider>(skinShape, playerMat);
         skinCollider.setLayer("Player");
-        skin->addComponent<phys::Joint>().start(node->entity(), phys::Revolute{pos}, false);
+        skin->addComponent<phys::Joint>().start(phys::JointInfo{node->entity(), false, phys::Revolute{pos}});
         // Hook collider
         phys::Material light{0.1F};
         auto& hookCollider = node->addComponent<phys::Collider>(phys::Circle{Vector2{}, radius}, light);

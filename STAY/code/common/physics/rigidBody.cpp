@@ -6,6 +6,31 @@ namespace stay
 {
     namespace phys
     {
+        namespace detail
+        {
+            BodyDef::BodyDef(const b2BodyDef& other)
+                : b2BodyDef{other}
+            {}
+                
+            void BodyDef::postSerialization() {
+                type = static_cast<b2BodyType>(mBodyType);
+                position = utils::convertVec2<b2Vec2>(mPosition);
+            }
+            void BodyDef::preSerialization() const {
+                mPosition = utils::convertVec2<Vector2>(position);
+                mBodyType = static_cast<int>(type);
+            }
+
+            void BodyDef::fromBody(b2Body& body) {
+                type = body.GetType();
+                position = body.GetPosition();
+                angle = body.GetAngle() * RAD2DEG;
+                gravityScale = body.GetGravityScale();
+                linearDamping = body.GetLinearDamping();
+                fixedRotation = body.IsFixedRotation();
+            }
+        } // namespace detail
+
         RigidBody::RigidBody(const Vector2& position, float angle, BodyType type)
             : mWorld(nullptr)
             , mBody(nullptr)
@@ -144,31 +169,19 @@ namespace stay
             return mBody;
         }
 
-        Json::Value RigidBody::toJSONObject() const
+        void RigidBody::preSerialization() const 
         {
-            Json::Value res;
-            res["position"] = utils::convertVec2<Vector2>(getPosition()).toJSONObject();
-            res["angle"] = getAngle();
-            res["type"] = static_cast<int>(type());
-            res["hdamping"] = mHorizontalDamping;
-            res["damping"] = mBody->GetLinearDamping();
-            return res;
+            mBodyDefCache.fromBody(*mBody);
         }
-        bool RigidBody::fetch(const Json::Value& value)
+
+        void RigidBody::postSerialization() 
         {
-            Vector2 position;
-            if (!( value["angle"].isNumeric() 
-                && value["type"].isInt() 
-                && position.fetch(value["position"])
-                && value["hdamping"].isNumeric()
-                && value["damping"].isNumeric()))
-                return false;
-            setAngle(value["angle"].asFloat());
-            setPosition(position);
-            setType(static_cast<BodyType>(value["type"].asInt()));
-            mHorizontalDamping = value["hdamping"].asFloat();
-            mBody->SetLinearDamping(value["damping"].asFloat());
-            return true;
+            setType(static_cast<BodyType>(mBodyDefCache.type));
+            setPosition(utils::convertVec2<Vector2>(mBodyDefCache.position));
+            setAngle(mBodyDefCache.angle);
+            setGravityScale(mBodyDefCache.gravityScale);
+            setLinearDamping(mBodyDefCache.linearDamping);
+            setFixedRotation(mBodyDefCache.fixedRotation);
         }
     } // namespace phys
 } // namespace stay

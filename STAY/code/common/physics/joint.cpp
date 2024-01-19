@@ -4,7 +4,7 @@
 #include "rigidBody.hpp"
 #include "world.hpp"
 #include <cstddef>
-#include <stdexcept>
+#include <cassert>
 
 namespace stay
 {
@@ -15,15 +15,28 @@ namespace stay
             if (mJoint != nullptr)
                 World::get().DestroyJoint(mJoint);
         }
-        void Joint::start(ecs::Entity other, const JointInfo& info, bool collide)
+        void Joint::start(const JointInfo& info)
         {
             mBody = &getNode()->getComponent<RigidBody>();
-            mOther = &Node::getNode(other)->getComponent<RigidBody>();
+            mOther = &Node::getNode(info.connectStatus.other)->getComponent<RigidBody>();
             auto def = info.createDef(*mBody, *mOther);
-            def->collideConnected = collide;
+            def->collideConnected = info.connectStatus.shouldCollide;
             def->userData.pointer = reinterpret_cast<uintptr_t>(this);
 
             mJoint = World::get().CreateJoint(def.get());
+            if (!mHasJointInfo) {
+                mInfoCache = info;
+                mHasJointInfo = true;
+            }
+        }
+
+        void Joint::postSerialization() {
+            mHasJointInfo = true;
+        }
+
+        void Joint::start() {
+            assert(mHasJointInfo && "this joint did not receive data (via fetch or direct start)");
+            start(mInfoCache);
         }
 
         RigidBody& Joint::body()
@@ -41,7 +54,7 @@ namespace stay
         void Joint::check() const
         {
             if (mJoint == nullptr)  
-                throw std::runtime_error("acess a joint with null data (probably has not started)");
+                throw std::runtime_error("access a joint with null data (probably has not started)");
         }
     } // namespace phys
 } // namespace stay

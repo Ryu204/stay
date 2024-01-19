@@ -39,9 +39,8 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCE_CODE})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC 
     nlohmann_json::nlohmann_json 
     sfml-graphics 
-    sfml-audio 
-    jsoncpp_lib 
-    glm::glm 
+    sfml-audio
+    glm::glm-header-only
     EnTT::EnTT 
     box2d
     efsw

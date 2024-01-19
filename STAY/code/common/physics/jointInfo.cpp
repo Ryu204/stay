@@ -1,13 +1,7 @@
 #include "jointInfo.hpp"
 #include "../utility/variantHelper.hpp"
-#include "../utility/convert.hpp"
 #include "rigidBody.hpp"
-
-#include <box2d/b2_math.h>
-#include <box2d/b2_revolute_joint.h>
-#include <box2d/box2d.h>
-#include <json/value.h>
-#include <memory>
+#include "utility/convert.hpp"
 
 namespace stay
 {
@@ -22,10 +16,16 @@ namespace stay
         Revolute::Revolute(Vector2 anchor)
             : anchor(std::move(anchor))
         {}
+
+        JointInfo::JointInfo(ecs::Entity other, bool shouldCollide, JointData data)
+            : connectStatus{shouldCollide, other}
+            , data{std::move(data)}
+        {}
         
-        Json::Value JointInfo::toJSONObject() const
+        Serializable::Data JointInfo::toJSONObject() const
         {
-            Json::Value res;
+            Serializable::Data res;
+            res["status"] = connectStatus.toJSONObject();
             std::visit(utils::VariantVisitor{
                 [&res](const Prismatic& pris) {
                     res["type"] = "prismatic";
@@ -35,15 +35,19 @@ namespace stay
                     res["type"] = "revolute";
                     rev.toJSONObject().swap(res["data"]);
                 }
-            }, *this);
+            }, data);
             return res;
         }
             
-        bool JointInfo::fetch(const Json::Value& value)
+        bool JointInfo::fetch(const Serializable::Data& value)
         {
-            auto string = value["type"].isString() ? value["type"].asString() : std::string();
+            if (!value.contains("status") || !connectStatus.fetch(value["status"])) 
+                return false;
+            auto string = value["type"].is_string() ? value["type"].get<std::string>() : std::string();
             if (string == "prismatic")
-                operator=(Prismatic{});
+                data = Prismatic{};
+            else if (string == "revolute")
+                data = Revolute{Vector2{}};
             else
                 return false;
             return std::visit(utils::VariantVisitor{
@@ -53,7 +57,7 @@ namespace stay
                 [&](Revolute& rev) {
                     return rev.fetch(value["data"]);
                 }
-            }, *this);
+            }, data);
         }
         
         Uptr<b2JointDef> JointInfo::createDef(RigidBody& a, RigidBody& b) const
@@ -74,7 +78,7 @@ namespace stay
                     r1->Initialize(a.body(), b.body(), utils::convertVec2<b2Vec2>(rev.anchor));
                     return std::move(r1);
                 }
-            }, *this);
+            }, data);
         }
     } // namespace phys
 } // namespace stay

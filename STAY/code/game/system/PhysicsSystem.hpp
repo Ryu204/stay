@@ -5,10 +5,8 @@
 
 #include <box2d/box2d.h>
 
-#include "../../common/physics/rigidBody.hpp"
-#include "../../common/physics/collider.hpp"
-#include "../../common/physics/destructRegister.hpp"
-#include "../../common/ecs/manager.hpp"
+#include "physics/destructRegister.hpp"
+#include "ecs/manager.hpp"
 
 namespace stay
 {

@@ -13,30 +13,29 @@ namespace stay
         mManager->getRegistryRef().destroy(mUtilizeEntity);
     }
 
-    void ComponentsLoader::loadAllComponents(ecs::Entity entity, const Json::Value& componentsArray)
+    void ComponentsLoader::loadAllComponents(ecs::Entity entity, const Serializable::Data& componentsArray)
     {
-        const bool isArray = componentsArray.type() == Json::ValueType::arrayValue;
+        const bool isArray = componentsArray.type() == nlohmann::json::value_t::array;
         utils::throwIfFalse(isArray, "not an array");
-        for (Json::ArrayIndex i = 0; i < componentsArray.size(); ++i) // NOLINT
+        for (const auto& obj : componentsArray)
         {
-            const auto& obj = componentsArray[i];
-            const std::string name = obj["name"].asString();
+            const std::string name = obj["name"].get<std::string>();
             const bool nameFound = mLoaderList.find(name) != mLoaderList.end();
             utils::throwIfFalse(nameFound, "name \"" + name + "\" not recognized");
             loadComponent(entity, name, obj["data"]);
         }
     }
 
-    void ComponentsLoader::loadComponent(ecs::Entity entity, const std::string& name, const Json::Value& componentData)
+    void ComponentsLoader::loadComponent(ecs::Entity entity, const std::string& name, const Serializable::Data& componentData)
     {
         const auto& loader = *mLoaderList.at(name);
         auto loadSucceeded = loader.deserializeInto(mManager, entity, componentData);
         utils::throwIfFalse(loadSucceeded, "cannot load data of \"" + name + "\"");
     }
 
-    Json::Value ComponentsLoader::saveAllComponents(ecs::Entity entity) const
+    Serializable::Data ComponentsLoader::saveAllComponents(ecs::Entity entity) const
     {
-        Json::Value arr(Json::ValueType::arrayValue);
+        Serializable::Data arr(nlohmann::json::value_t::array);
         const auto& reg = mManager->getRegistryRef();
         for (const auto [id, storage] : reg.storage())
         {
@@ -44,14 +43,14 @@ namespace stay
             const bool hasComponent = storage.contains(entity);
             if (!hasComponent)
                 continue;
-            arr.append(saveComponent(entity, type.name()));   
+            arr.emplace_back(saveComponent(entity, type.name()));   
         }
         return arr;
     }
 
-    Json::Value ComponentsLoader::saveComponent(ecs::Entity entity, const std::string_view& name) const
+    Serializable::Data ComponentsLoader::saveComponent(ecs::Entity entity, const std::string_view& name) const
     {
-        Json::Value res;
+        Serializable::Data res;
         const std::string nameStr(name);
         res["name"] = mTypenameToLoader.at(nameStr);
         const auto& loader = *mLoaderList.at(mTypenameToLoader.at(std::string(name)));

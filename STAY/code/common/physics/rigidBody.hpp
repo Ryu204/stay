@@ -15,6 +15,22 @@ namespace stay
             KINEMATIC = b2_kinematicBody,   // Move under`setVelocity(...)`, only collides DYNAMIC
             DYNAMIC = b2_dynamicBody        // Move by internal solver and (sometimes) explicit user controls
         };
+        namespace detail
+        {
+            class BodyDef : public Serializable, public b2BodyDef
+            {
+                public: 
+                    using b2BodyDef::b2BodyDef;
+                    BodyDef(const b2BodyDef& other);
+                    SERIALIZE_PROCESSING(mBodyType, mPosition, angle, gravityScale, linearDamping, fixedRotation);
+                    void postSerialization();
+                    void preSerialization() const;
+                    void fromBody(b2Body& body);
+                private:
+                    mutable int mBodyType;
+                    mutable Vector2 mPosition;
+            };
+        } // namespace detail
         class Collider;
         // @brief An abstract component, only functions if a collider is presented. Manipulate velocity and force.
         class RigidBody : public ecs::Component
@@ -48,13 +64,17 @@ namespace stay
                 void setHorizontalDamping(float damp);
                 b2Fixture* attachFixture(const b2FixtureDef& properties);
                 b2Body* body();
-
-                Json::Value toJSONObject() const override;
-                bool fetch(const Json::Value& value) override;
+                
+                SERIALIZE_PROCESSING(mBodyDefCache, mHorizontalDamping);
+                void postSerialization();
+                void preSerialization() const;
+                // Serializable::Data toJSONObject() const override;
+                // bool fetch(const Serializable::Data& value) override;
             private:
                 
                 b2World* mWorld;
                 b2Body* mBody;
+                mutable detail::BodyDef mBodyDefCache;
                 float mHorizontalDamping;
         };
 

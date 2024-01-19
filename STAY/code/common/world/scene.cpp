@@ -16,7 +16,6 @@ namespace stay
     }
     Scene::~Scene()
     {
-        mSceneLoader.save(mSceneRoot.get());
         mSceneRoot.reset();
         phys::World::shutdown();
         Node::shutdown();
@@ -28,6 +27,10 @@ namespace stay
     void Scene::start()
     {
         mManager.start();
+    }
+    void Scene::saveToFile()
+    {
+        mSceneLoader.save(mSceneRoot.get());
     }
     void Scene::input(const sf::Event& event)
     {
