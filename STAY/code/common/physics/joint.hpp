@@ -1,14 +1,9 @@
 #pragma once
 
-#include <box2d/b2_joint.h>
-#include <box2d/b2_prismatic_joint.h>
-#include <cassert>
-#include <cstddef>
-#include <json/value.h>
-#include <vector>
+#include <optional>
 
-#include "../ecs/component.hpp"
-#include "../ecs/type.hpp"
+#include "ecs/component.hpp"
+#include "ecs/type.hpp"
 #include "jointInfo.hpp"
 
 namespace stay
@@ -22,7 +17,9 @@ namespace stay
             public:
                 Joint() = default;
                 ~Joint() override;
-                void start(ecs::Entity other, const JointInfo& info, bool collide = true);
+                void start(const JointInfo& info);
+                // Use joint information serialized from save file
+                void start();
                 RigidBody& body();
                 RigidBody& other();
                 template<typename T>
@@ -33,15 +30,16 @@ namespace stay
                     assert(res != nullptr && "Get wrong internal joint type");
                     return res;
                 }
-
-                Json::Value toJSONObject() const override {return Json::Value(); };
-                bool fetch(const Json::Value& data) override {return true; };
+                SERIALIZE_POSTPROCESSING(mInfoCache);
+                void postSerialization();
             private:
                 void check() const;
 
                 b2Joint* mJoint{nullptr};
                 RigidBody* mBody{nullptr};
                 RigidBody* mOther{nullptr};
+                JointInfo mInfoCache{};
+                bool mHasJointInfo{false};
 
                 friend class DestructRegister;
         };

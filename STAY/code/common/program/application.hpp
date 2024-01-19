@@ -8,29 +8,25 @@
 namespace stay
 {
     namespace program
-    {
-        namespace detail
-        {
-            struct AppInfo : Serializable
-            {
-                std::size_t width;
-                std::size_t height;
-                std::string name;
-                float updatesPerSec;
-                Json::Value toJSONObject() const override;
-                bool fetch(const Json::Value& data) override;
-            };
-        } // namespace detail
-        
+    {        
         class Application
         {
             public:
-                static constexpr const char* INIT_FILE = "asset/init/init.json";
+                static constexpr const char* INIT_FILE = "asset/init.json";
 
                 Application();
                 ~Application();
                 void run();
             private:
+                struct Info : Serializable
+                {
+                    std::size_t width{500};
+                    std::size_t height{500};
+                    std::string name{"Unknown"};
+                    float updatesPerSec{60.F};
+                    SERIALIZE(width, height, name, updatesPerSec);
+                };
+
                 void input();
                 void update(float dt);
                 void render();
@@ -38,7 +34,7 @@ namespace stay
                 void setUpRendering();  
                 void saveProperties();
 
-                detail::AppInfo mAppInfo;
+                Info mAppInfo;
                 Uptr<RWin> mWindow;
                 Uptr<Scene> mScene;
 

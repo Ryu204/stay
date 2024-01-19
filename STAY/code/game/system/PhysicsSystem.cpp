@@ -1,6 +1,9 @@
 #include "PhysicsSystem.hpp"
-#include "../../common/physics/world.hpp"
-#include "../../common/utility/math.hpp"
+#include "physics/rigidBody.hpp"
+#include "physics/collider.hpp"
+#include "physics/joint.hpp"
+#include "physics/world.hpp"
+#include "utility/math.hpp"
 
 namespace stay
 {
@@ -82,10 +85,15 @@ namespace stay
 
         void PhysicsSystem::start()
         {
-            auto view2 = mManager->getRegistryRef().view<phys::Collider>();
-            for (auto entity : view2)
+            auto colView = mManager->getRegistryRef().view<phys::Collider>();
+            for (auto entity : colView)
             {
-                view2.get<phys::Collider>(entity).start();
+                colView.get<phys::Collider>(entity).connect();
+            }
+            auto jointView = mManager->getRegistryRef().view<phys::Joint>();
+            for (auto [entity, joint] : jointView.each())
+            {
+                joint.start();
             }
         }
 

@@ -1,9 +1,8 @@
 #include "collider.hpp"
+#include "world/node.hpp"
 #include "rigidBody.hpp"
-#include "../utility/typedef.hpp"
-#include "../world/node.hpp"
-#include "../utility/math.hpp"
-#include <stdexcept>
+#include "utility/math.hpp"
+#include "utility/convert.hpp"
 
 namespace stay
 {
@@ -13,8 +12,7 @@ namespace stay
             : mMaterial(mat)
             , mShapeInfo(info)
             , mFixture(nullptr)
-        { 
-        }     
+        { }     
 
         Collider::~Collider()
         {
@@ -25,21 +23,19 @@ namespace stay
             }
         }
 
-        void Collider::start()
+        void Collider::connect()
         {
             assert(getNode()->hasComponent<RigidBody>() && "Collider created without a rigidbody");
-            attachToRigidBody(getNode()->getComponent<RigidBody>());
+            attachToRigidBody();
         }
 
         void Collider::setMaterial(const Material& mat)
         {
             check();
-            const auto& def = mat.getFixtureDef();
-            mFixture->SetDensity(def.density);
+            mFixture->SetDensity(mat.density);
             mFixture->GetBody()->ResetMassData();
-            mFixture->SetFriction(def.friction);
-            mFixture->SetRestitution(def.restitution);
-            setLayer(mat.layerID());
+            mFixture->SetFriction(mat.friction);
+            mFixture->SetRestitution(mat.restitution);
         }   
 
         void Collider::setTrigger(bool isTrigger)
@@ -66,7 +62,7 @@ namespace stay
         {
             check();
             const std::uint16_t mask = (mFixture == nullptr) ? 
-                mMaterial.getFixtureDef().filter.categoryBits :
+                mMaterial.filter.categoryBits :
                 mFixture->GetFilterData().categoryBits;
             assert(mask != 0 && "zero collision mask");
             return mCollisionLayer().name(utils::mostSignificantBit(mask));
@@ -78,8 +74,8 @@ namespace stay
             auto colMask = mCollisionLayer().getCollisionMask(layer);
             if (mFixture == nullptr)
             {
-                mMaterial.getFixtureDef().filter.categoryBits = mask;
-                mMaterial.getFixtureDef().filter.maskBits = colMask;
+                mMaterial.filter.categoryBits = mask;
+                mMaterial.filter.maskBits = colMask;
             }                
             else
             {
@@ -102,12 +98,12 @@ namespace stay
             return utils::convertVec2<Vector2>(b.upperBound - b.lowerBound);
         }
 
-        void Collider::attachToRigidBody(RigidBody& rgbody)
+        void Collider::attachToRigidBody()
         {
-            b2FixtureDef def = mMaterial.getFixtureDef();
+            auto& rgbody = getNode()->getComponent<RigidBody>();
             auto shape = mShapeInfo.createShape();
-            def.shape = shape.get();
-            mFixture = rgbody.attachFixture(def);
+            mMaterial.shape = shape.get();
+            mFixture = rgbody.attachFixture(mMaterial);
             mFixture->GetUserData().pointer = reinterpret_cast<uintptr_t>(this);
         }
 
@@ -121,66 +117,6 @@ namespace stay
         {   
             static Layer res; 
             return res;
-        }
-
-        Material::Material(float density, float friction, float restituition)
-        {
-            mDef.density = density;
-            mDef.friction = friction;
-            mDef.restitution = restituition;
-        }
-
-        void Material::setDensity(float density)
-        {
-            assert(density > 0.1F && "must have positive density");
-            mDef.density = density;
-        }
-
-        void Material::setFriction(float friction)
-        {
-            mDef.friction = friction;
-        }
-
-        void Material::setRestituition(float restituition)
-        {
-            mDef.restitution = restituition;
-        }
-        
-        const b2FixtureDef& Material::getFixtureDef() const
-        {
-            return mDef;
-        }
-
-        b2FixtureDef& Material::getFixtureDef() 
-        {
-            return mDef;
-        }
-
-        int Material::layerID() const
-        {
-            return mLayerID;
-        }
-
-        Json::Value Material::toJSONObject() const
-        {
-            Json::Value res;
-            res["density"] = mDef.density;
-            res["friction"] = mDef.friction;
-            res["restituition"] = mDef.restitution;
-            res["layerID"] = utils::mostSignificantBit(mDef.filter.categoryBits);
-            return res;
-        }
-
-        bool Material::fetch(const Json::Value& value)
-        {
-            if (!(value["density"].isNumeric() && value["friction"].isNumeric() 
-                && value["restituition"].isNumeric() && value["layerID"].isNumeric()))
-                return false;
-            mDef.density = value["density"].asFloat();
-            mDef.friction = value["friction"].asFloat();
-            mDef.restitution = value["restituition"].asFloat();
-            mLayerID = value["layerID"].asInt();
-            return true;
         }
     } // namespace phys 
 } // namespace stay

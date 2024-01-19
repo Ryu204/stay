@@ -2,10 +2,9 @@
 
 #include <unordered_map>
 
-#include <json/json.h>
 #include <entt/meta/resolve.hpp>
 
-#include "../ecs/manager.hpp"
+#include "ecs/manager.hpp"
 
 namespace stay
 {
@@ -15,9 +14,9 @@ namespace stay
             virtual ~IComponentSerializer() = default;
             // @brief load a component of `val` into `entity` of `manager`
             // @return `true` if the load is successful, `false` otherwise
-            virtual bool deserializeInto(ecs::Manager* /*manager*/, ecs::Entity /*entity*/, const Json::Value& /*val*/) const = 0;
+            virtual bool deserializeInto(ecs::Manager* /*manager*/, ecs::Entity /*entity*/, const Serializable::Data& /*val*/) const = 0;
             // @brief create a json object from `entity`'s corresponding component
-            virtual Json::Value serialize(ecs::Manager* /*manager*/, ecs::Entity /*entity*/) const = 0;
+            virtual Serializable::Data serialize(ecs::Manager* /*manager*/, ecs::Entity /*entity*/) const = 0;
             // @brief create a dummy default component
             // @note to initialize the registry
             virtual void createDefault(ecs::Registry* /*registry*/, ecs::Entity /*entity*/) const = 0;
@@ -27,12 +26,12 @@ namespace stay
     class ComponentSerializer : public IComponentSerializer
     {
         public:
-            bool deserializeInto(ecs::Manager* manager, ecs::Entity entity, const Json::Value& val) const override
+            bool deserializeInto(ecs::Manager* manager, ecs::Entity entity, const Serializable::Data& val) const override
             {
                 auto& comp = manager->addComponent<T>(entity);
                 return comp.fetch(val);
             }
-            Json::Value serialize(ecs::Manager* manager, ecs::Entity entity) const override
+            Serializable::Data serialize(ecs::Manager* manager, ecs::Entity entity) const override
             {
                 return manager->getComponent<T>(entity).toJSONObject();
             }
@@ -79,10 +78,10 @@ namespace stay
                 mManager->getRegistryRef().remove<T>(mUtilizeEntity);
             }
 
-            void loadAllComponents(ecs::Entity entity, const Json::Value& componentsArray);
-            void loadComponent(ecs::Entity entity, const std::string& name, const Json::Value& componentData);
-            Json::Value saveAllComponents(ecs::Entity entity) const;
-            Json::Value saveComponent(ecs::Entity entity, const std::string_view& name) const;
+            void loadAllComponents(ecs::Entity entity, const Serializable::Data& componentsArray);
+            void loadComponent(ecs::Entity entity, const std::string& name, const Serializable::Data& componentData);
+            Serializable::Data saveAllComponents(ecs::Entity entity) const;
+            Serializable::Data saveComponent(ecs::Entity entity, const std::string_view& name) const;
         private:
             static const std::string& error();
             // Used to get internal name of component type in `mManager->getRegistry()`

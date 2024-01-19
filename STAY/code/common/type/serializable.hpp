@@ -3,50 +3,60 @@
 #include <cassert>
 #include <vector>
 
-#include <json/json.h>
+#include <nlohmann/json.hpp>
 
-#include "../utility/foreach.hpp"
-#include "../utility/typedef.hpp"
+#include "utility/foreach.hpp"
+#include "utility/typedef.hpp"
+#include "ecs/type.hpp"
 
 namespace stay
 {
     class Serializable 
     {
         public:
-            virtual Json::Value toJSONObject() const = 0;
-            virtual bool fetch(const Json::Value& /*data*/) = 0;
+            using Data = nlohmann::json;
+            virtual Data toJSONObject() const = 0;
+            virtual bool fetch(const Data& /*data*/) = 0;
     };
 
     template <typename T, whereIs(T, Serializable)>
-    Json::Value toJSON(const T& t)
+    Serializable::Data toJSON(const T& t)
     {
         return t.toJSONObject();
     }
     template <typename T, whereIs(T, Serializable)>
-    bool fromJSON(T& t, const Json::Value& data)
+    bool fromJSON(T& t, const Serializable::Data& data)
     {
         return t.fetch(data);
     }
-    Json::Value toJSON(const int& t);
-    bool fromJSON(int& t, const Json::Value& data);
-    Json::Value toJSON(const float& t);
-    bool fromJSON(float& t, const Json::Value& data);
-    Json::Value toJSON(const bool& t);
-    bool fromJSON(bool& t, const Json::Value& data);
-    Json::Value toJSON(const std::string& t);
-    bool fromJSON(std::string& t, const Json::Value& data);
+    Serializable::Data toJSON(const ecs::Entity& t);
+    bool fromJSON(ecs::Entity& t, const Serializable::Data& data);
+    Serializable::Data toJSON(const int& t);
+    bool fromJSON(int& t, const Serializable::Data& data);
+    Serializable::Data toJSON(const unsigned short& t);
+    bool fromJSON(unsigned short& t, const Serializable::Data& data);
+    Serializable::Data toJSON(const unsigned char& t);
+    bool fromJSON(unsigned char& t, const Serializable::Data& data);
+    Serializable::Data toJSON(const std::size_t& t);
+    bool fromJSON(std::size_t& t, const Serializable::Data& data);
+    Serializable::Data toJSON(const float& t);
+    bool fromJSON(float& t, const Serializable::Data& data);
+    Serializable::Data toJSON(const bool& t);
+    bool fromJSON(bool& t, const Serializable::Data& data);
+    Serializable::Data toJSON(const std::string& t);
+    bool fromJSON(std::string& t, const Serializable::Data& data);
     template <typename T>
-    inline Json::Value toJSON(const std::vector<T>& t)
+    inline Serializable::Data toJSON(const std::vector<T>& t)
     {
-        Json::Value res(Json::arrayValue);
+        Serializable::Data res;
         for (const auto& i : t)
-            res.append(toJSON(i));
+            res.emplace_back(toJSON(i));
         return res;
     }
     template <typename T>
-    inline bool fromJSON(std::vector<T>& t, const Json::Value& data)
+    inline bool fromJSON(std::vector<T>& t, const Serializable::Data& data)
     {
-        if (!data.isArray())
+        if (!data.is_array())
             return false;
         t.clear();
         for (const auto& val : data)
@@ -71,12 +81,12 @@ namespace stay
 // }
 // ```
 #define SERIALIZE(...) \
-    Json::Value toJSONObject() const override {\
-        Json::Value res;\
+    Serializable::Data toJSONObject() const override {\
+        Serializable::Data res;\
         stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
         return res;\
     }\
-    bool fetch(const Json::Value& val) override {\
+    bool fetch(const Serializable::Data& val) override {\
         stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
         return true;\
     }
@@ -96,12 +106,37 @@ namespace stay
 // }
 // ```
 #define SERIALIZE_POSTPROCESSING(...) \
-    Json::Value toJSONObject() const override {\
-        Json::Value res;\
+    Serializable::Data toJSONObject() const override {\
+        Serializable::Data res;\
         stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
         return res;\
     }\
-    bool fetch(const Json::Value& val) override {\
+    bool fetch(const Serializable::Data& val) override {\
+        stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
+        postSerialization();\
+        return true;\
+    }
+
+#define SERIALIZE_PREPROCESSING(...) \
+    Serializable::Data toJSONObject() const override {\
+        Serializable::Data res;\
+        preSerialization();\
+        stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
+        return res;\
+    }\
+    bool fetch(const Serializable::Data& val) override {\
+        stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
+        return true;\
+    }
+
+#define SERIALIZE_PROCESSING(...) \
+    Serializable::Data toJSONObject() const override {\
+        Serializable::Data res;\
+        preSerialization();\
+        stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
+        return res;\
+    }\
+    bool fetch(const Serializable::Data& val) override {\
         stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
         postSerialization();\
         return true;\

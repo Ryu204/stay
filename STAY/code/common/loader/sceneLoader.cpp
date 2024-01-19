@@ -4,6 +4,7 @@
 
 #include "sceneLoader.hpp"
 #include "LDtk/rawSceneLoader.hpp"
+#include "utility/error.hpp"
 
 namespace stay
 {
@@ -18,9 +19,9 @@ namespace stay
         try 
         {
             std::string log;
-            auto* maybeRes = tryLoad(log);
+            auto maybeRes = tryLoad(log);
             if (maybeRes != nullptr)
-                return Uptr<Node>(maybeRes);
+                return std::move(maybeRes);
             
             throw std::runtime_error(log);
         }
@@ -28,50 +29,44 @@ namespace stay
         {
             RawSceneLoader altLoader;
             auto res = altLoader.load(mFile/"in.ldtk", e.what());
-            save(res.get(), false);
             return std::move(res);
         }
     }
 
-    Node* SceneLoader::tryLoad(std::string& log)
+    Uptr<Node> SceneLoader::tryLoad(std::string& log)
     {
         log = "";
         auto data = openFile();
-        if (!data["root"].isInt())
-            throw std::runtime_error("no \"root\" id");
-        if (!data["maxEntity"].isInt())
-            throw std::runtime_error("no \"maxEntity\"");
-        auto rootID = static_cast<ecs::Entity>(data["root"].asInt());
-        auto sceneMaxEntity = data["maxEntity"].asInt();
+        if (!data["topId"].is_number_integer())
+            throw std::runtime_error("no top id");
+        const auto topId = static_cast<ecs::Entity>(data["topId"].get<int>());
+        auto topNode = std::make_unique<Node>(topId);
+        if (!topNode->localTransform().fetch(data["topNode"]["transform"]))
+            throw std::runtime_error("no top node transform");
+        try 
         {
-            const bool exceededThreshold = sceneMaxEntity > (1 << 20);
-            if (exceededThreshold)
-                throw std::runtime_error("internal error");
+            mLoader.loadAllComponents(topId, data["topNode"]["components"]);
         }
-        Uptr<Node> reserver = std::make_unique<Node>(rootID);
-        Node fakeRoot(static_cast<ecs::Entity>(sceneMaxEntity + 1));
-        Node* underRoot = fakeRoot.createChild(static_cast<ecs::Entity>(sceneMaxEntity + 2));
-        data = data["entities"];
+        catch (std::exception& e)
+        {
+            throw std::runtime_error(std::string("top node components list is broken: ") + e.what());
+        }
         mParentOf.clear();
-        for (const auto& entity : data)
-            loadEntity(underRoot, entity);
-        
-        reserver.reset();
-        Node* rootPtr = new Node(rootID);
-        underRoot->setParent(rootPtr);
-        mParentOf.clear();
+        utils::throwIfFalse(data["entities"].is_array(), "entities object must be an array");
+        for (const auto& entity : data["entities"])
+            loadEntity(*topNode, entity);
         for (const auto [child, parent] : mParentOf)
             Node::getNode(child)->setParent(parent);
-        return rootPtr;
+        return std::move(topNode);
     }
 
-    Json::Value SceneLoader::openFile()
+    Serializable::Data SceneLoader::openFile()
     {
         auto file = mFile/"in";
         try
         {
             std::ifstream reader(file);
-            Json::Value res;
+            Serializable::Data res;
             reader >> res;
             return res;
         }
@@ -81,17 +76,17 @@ namespace stay
         }
     }
 
-    void SceneLoader::loadEntity(Node* currentRoot, const Json::Value& data)
+    void SceneLoader::loadEntity(Node& parent, const Serializable::Data& data)
     {
-        const bool hasValidIDs = data["id"].isInt() && data["parent"].isInt();
+        const bool hasValidIDs = data["id"].is_number_integer() && data["parent"].is_number_integer();
         if (!hasValidIDs)
             throw std::runtime_error("entity or parent id not found");
-        auto id = static_cast<ecs::Entity>(data["id"].asInt());
-        auto* created = currentRoot->createChild(id);
+        const auto id = static_cast<ecs::Entity>(data["id"].get<int>());
+        auto* created = parent.createChild(id);
         const bool hasTransform = created->localTransform().fetch(data["transform"]);
         if (!hasTransform)
             throw std::runtime_error("transform data not found");
-        mParentOf[id] = static_cast<ecs::Entity>(data["parent"].asInt());
+        mParentOf[id] = static_cast<ecs::Entity>(data["parent"].get<int>());
         try
         {
             mLoader.loadAllComponents(id, data["components"]);
@@ -105,33 +100,29 @@ namespace stay
     void SceneLoader::save(Node* root, bool overrideIn) const
     {
         auto output = overrideIn ? mFile/"in" : mFile/"out";
-        Json::StreamWriterBuilder builder;
-        builder["indentation"] = "";
-        builder["commentStyle"] = "None";
-        std::ofstream(output) << Json::writeString(builder, createSaveObject(root)) << '\n';
+        std::ofstream(output) << createSaveObject(root).dump(1, '\t', true) << '\n';
     }
 
-    Json::Value SceneLoader::createSaveObject(Node* root) const
+    Serializable::Data SceneLoader::createSaveObject(Node* topNode) const
     {
-        Json::Value res;
-        res["root"] = static_cast<int>(root->entity());
-        res["entities"] = Json::Value(Json::arrayValue);
-        int maxEntity = res["root"].asInt();
-
-        const auto saveToEntities = [&](Node* node) -> void {
-            if (node == root)
-                return;
-            Json::Value entity;
-            entity["id"] = static_cast<int>(node->entity());
-            entity["parent"] = static_cast<int>(node->parent()->entity());
-            entity["transform"] = node->localTransform().toJSONObject();
-            entity["components"] = mLoader.saveAllComponents(node->entity());
-            res["entities"].append(entity);
-            maxEntity = std::max(maxEntity, static_cast<int>(node->entity()));
+        Serializable::Data res;
+        res["topId"] = static_cast<int>(topNode->entity());
+        res["topNode"] = {
+            {"transform", topNode->localTransform().toJSONObject()},
+            {"components", mLoader.saveAllComponents(topNode->entity())}
         };
-
-        root->visit(saveToEntities);
-        res["maxEntity"] = maxEntity;
+        res["entities"] = Serializable::Data(nlohmann::json::value_t::array);
+        const auto saveToEntities = [this, topNode, &res](Node* node) -> void {
+            if (node == topNode) 
+                return;
+            res["entities"].emplace_back(Serializable::Data{
+                {"id", static_cast<int>(node->entity())},
+                {"parent", static_cast<int>(node->parent()->entity())},
+                {"transform", node->localTransform().toJSONObject()},
+                {"components", mLoader.saveAllComponents(node->entity())}
+            });
+        };
+        topNode->visit(saveToEntities);
         return res;
     }
 } // namespace stay

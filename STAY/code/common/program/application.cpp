@@ -1,8 +1,6 @@
 #include <fstream>
 #include <iostream>
 
-#include "json/json.h"
-
 #include "application.hpp"
 #include "../type/vector.hpp"
 #include "../utility/invoke.hpp"
@@ -12,37 +10,6 @@ namespace stay
     
     namespace program
     {
-        namespace detail
-        {
-            Json::Value AppInfo::toJSONObject() const
-            {
-                Json::Value res;
-                res["width"] = width;
-                res["height"] = height;
-                res["name"] = name;
-                res["updatesPerSec"] = updatesPerSec;
-                return res;
-            }
-
-            bool AppInfo::fetch(const Json::Value& data)
-            {
-                if (data.type() == Json::objectValue && data["width"].isInt() && data["height"].isInt() && data["name"].isString() && data["updatesPerSec"].isNumeric())
-                {
-                    width = data["width"].asInt();
-                    height = data["height"].asInt();
-                    name = data["name"].asString();
-                    updatesPerSec = data["updatesPerSec"].asFloat();
-                    return true;
-                }
-
-                width = 500;
-                height = 500;
-                name = "Unknown";
-                updatesPerSec = 60;
-                return false;
-            }
-        } // namespace detail
-
         Application::Application()
             : mSprite(sf::TrianglesStrip, 4)
         {
@@ -61,7 +28,7 @@ namespace stay
             std::ifstream dataReader(INIT_FILE); 
             if (!dataReader.good())       
                 throw std::runtime_error("Cannot open init file");
-            Json::Value data;
+            Serializable::Data data;
             dataReader >> data;
             dataReader.close();
             mAppInfo.fetch(data["window"]);
@@ -70,7 +37,7 @@ namespace stay
             mWindow->setKeyRepeatEnabled(false);
             setUpRendering();
 
-            mScene = std::make_unique<Scene>(data["scene"].asString(), mWindow.get());
+            mScene = std::make_unique<Scene>(data["scene"].get<std::string>(), mWindow.get());
         }
 
         void Application::setUpRendering()
@@ -98,7 +65,7 @@ namespace stay
             mAppInfo.width = winSize.x;
             mAppInfo.height = winSize.y;
             // Read file (to keep existing data)
-            Json::Value root;
+            Serializable::Data root;
             std::ifstream(INIT_FILE) >> root;
             // Write
             root["window"] = mAppInfo.toJSONObject();
@@ -113,6 +80,7 @@ namespace stay
             const float timePerUpdate = 1.F / mAppInfo.updatesPerSec;
 
             mScene->start();
+            mScene->saveToFile();
 
             while (mWindow->isOpen())
             {

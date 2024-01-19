@@ -2,54 +2,106 @@
 
 namespace stay
 {
-    Json::Value toJSON(const int& t)
+    Serializable::Data toJSON(const ecs::Entity& t)
     {
-        return Json::Value(t);
+        return Serializable::Data(static_cast<int>(t));
     }
-    bool fromJSON(int& t, const Json::Value& data)
+    bool fromJSON(ecs::Entity& t, const Serializable::Data& data)
     {
-        if (data.isInt())
+        if (data.is_number_integer())
         {
-            t = data.asInt();
+            t = static_cast<ecs::Entity>(data);
             return true;
         }
         return false;
     }
-    Json::Value toJSON(const float& t)
+    Serializable::Data toJSON(const int& t)
     {
-        return Json::Value(t);
+        return Serializable::Data(t);
     }
-    bool fromJSON(float& t, const Json::Value& data)
+    bool fromJSON(int& t, const Serializable::Data& data)
     {
-        if (data.isNumeric())
+        if (data.is_number_integer())
         {
-            t = data.asFloat();
+            t = data;
             return true;
         }
         return false;
     }
-    Json::Value toJSON(const bool& t)
+    Serializable::Data toJSON(const std::size_t& t)
     {
-        return Json::Value(t);
+        return Serializable::Data(t);
     }
-    bool fromJSON(bool& t, const Json::Value& data)
+    bool fromJSON(unsigned short& t, const Serializable::Data& data)
     {
-        if (data.isBool())
+        if (data.is_number_integer())
         {
-            t = data.asBool();
+            t = data;
             return true;
         }
         return false;
     }
-    Json::Value toJSON(const std::string& t)
+    Serializable::Data toJSON(const unsigned short& t)
     {
-        return Json::Value(t);
+        return Serializable::Data(t);
     }
-    bool fromJSON(std::string& t, const Json::Value& data)
+    bool fromJSON(unsigned char& t, const Serializable::Data& data)
     {
-        if (data.isString())
+        if (data.is_number_integer())
         {
-            data.asString().swap(t);
+            t = data;
+            return true;
+        }
+        return false;
+    }
+    Serializable::Data toJSON(const unsigned char& t)
+    {
+        return Serializable::Data(t);
+    }
+    bool fromJSON(std::size_t& t, const Serializable::Data& data)
+    {
+        if (data.is_number_integer())
+        {
+            t = data;
+            return true;
+        }
+        return false;
+    }
+    Serializable::Data toJSON(const float& t)
+    {
+        return Serializable::Data(t);
+    }
+    bool fromJSON(float& t, const Serializable::Data& data)
+    {
+        if (data.is_number_float())
+        {
+            t = data;
+            return true;
+        }
+        return false;
+    }
+    Serializable::Data toJSON(const bool& t)
+    {
+        return Serializable::Data(t);
+    }
+    bool fromJSON(bool& t, const Serializable::Data& data)
+    {
+        if (data.is_boolean())
+        {
+            t = data;
+            return true;
+        }
+        return false;
+    }
+    Serializable::Data toJSON(const std::string& t)
+    {
+        return Serializable::Data(t);
+    }
+    bool fromJSON(std::string& t, const Serializable::Data& data)
+    {
+        if (data.is_string())
+        {
+            t = data;
             return true;
         }
         return false;

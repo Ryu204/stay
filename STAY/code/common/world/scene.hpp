@@ -13,6 +13,7 @@ namespace stay
             ~Scene();
             void update(float dt);
             void start();
+            void saveToFile();
             void input(const sf::Event& event);
             void render(RTarget* target);
         private:
