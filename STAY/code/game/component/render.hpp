@@ -2,17 +2,15 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "../../common/ecs/component.hpp"
-#include "../../common/type/color.hpp"
-#include "../../common/loader/componentLoader.hpp"
-#include "../../common/utility/convert.hpp"
-#include "../../common/type/serializable.hpp"
+#include "ecs/component.hpp"
+#include "type/color.hpp"
+#include "type/serializable.hpp"
 
 namespace stay
 {
     namespace comp
     {
-        struct Render : public ecs::Component
+        struct Render : public ecs::Component<Render>
         {
             Render(const Color& color = Color(), const Vector2& size = Vector2())
             {
@@ -21,7 +19,7 @@ namespace stay
             }
             Color color;
             Vector2 size;
-            SERIALIZE(color, size);
+            COMPONENT(render, color, size);
         };
     } // namespace comp
 } // namespace stay

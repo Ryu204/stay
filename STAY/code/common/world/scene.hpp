@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../ecs/manager.hpp"
+#include "ecs/manager.hpp"
 #include "camera.hpp"
-#include "../loader/sceneLoader.hpp"
+#include "loader/sceneLoader.hpp"
 
 namespace stay
 {

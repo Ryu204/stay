@@ -5,6 +5,7 @@
 #include "physics/collider.hpp"
 #include "physics/joint.hpp"
 #include "utility/convert.hpp"
+#include "world/node.hpp"
 
 namespace 
 {

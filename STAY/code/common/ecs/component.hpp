@@ -1,25 +1,28 @@
 #pragma once
 
-#include <SFML/System/NonCopyable.hpp>
-
-#include "system.hpp"
-#include "../utility/assignable.hpp"
-#include "../type/serializable.hpp"
-#include "../event/event.hpp"
+#include "componentFwd.hpp"
+#include "componentLoader.hpp"
+#include "world/nodeFwd.hpp"
 
 namespace stay
 {
     class Node;
     namespace ecs
     {
-        class Manager;
-        // Every component type must inherit this struct
-        struct Component : public Serializable, utils::Assignable<Entity>, sf::NonCopyable
+        template <typename T>
+        Node* Component<T>::getNode() const
         {
-                using utils::Assignable<Entity>::get;
-                Node* getNode() const;
-                virtual ~Component();
-                event::Event<> OnRemoval;
+            return Node::getNode(get());
         };
+        template <typename T>
+        Component<T>::~Component()
+        {
+            OnRemoval.invoke();
+        }
+        template <typename T>
+        // NOLINTNEXTLINE(modernize-use-equals-default)
+        Component<T>::SelfRegister::SelfRegister() {
+            componentsLoader().registerComponent<T>(T::componentName());
+        }
     } // namespace ecs
 } // namespace stay

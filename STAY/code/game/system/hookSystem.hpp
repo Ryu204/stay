@@ -3,6 +3,7 @@
 #include <unordered_map>
 
 #include "../../common/ecs/manager.hpp"
+#include "world/node.hpp"
 
 namespace stay
 {

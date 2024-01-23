@@ -1,15 +1,10 @@
 #include "hookSystem.hpp"
-#include "../component/player.hpp"
 #include "../component/hook.hpp"
 #include "physics/collider.hpp"
-#include "physics/rigidBody.hpp"
+#include "../component/player.hpp"
 #include "physics/joint.hpp"
-#include "utility/math.hpp"
-#include "physics/world.hpp"
 #include "utility/convert.hpp"
-
-#include <SFML/Window.hpp>
-#include <box2d/box2d.h>
+#include "utility/math.hpp"
 
 namespace 
 {
@@ -250,8 +245,7 @@ namespace stay
         mQueuedAttaches.emplace(hook, obstacle);
     }
 
-    void HookSystem::
-    createBoxConnect(Node* player, Node* pin, float length, float margin) 
+    void HookSystem::createBoxConnect(Node* player, Node* pin, float length, float margin) 
     {
         auto& playerBody = player->getComponent<phys::RigidBody>();
         const auto playerPosition = playerBody.getPosition();
@@ -269,17 +263,17 @@ namespace stay
 
         phys::Box box{center, Vector2{ropeWidth, length - 2 * margin}, angle};
         static phys::Material mat{0.005F};
-        auto& collider = pin->addComponent<phys::Collider01>(box, mat);
-        collider.setLayer("Player");
+        //auto& collider = pin->addComponent<phys::Collider01>(box, mat);
+        //collider.setLayer("Player");
         
         auto& hook = player->getComponent<Hook>();
-        collider.OnCollisionDetection.addEventListener([this, &playerBody, &hook, pinPosition](phys::Collision& contact, b2Contact& nativeInfo) {
-            const bool touchAtExtension = utils::lengthVec2(playerBody.getPosition() - pinPosition) < utils::lengthVec2(contact.position - pinPosition);
-            if (!touchAtExtension)
-                mQueuedSplitting.emplace(&hook, std::tuple<Vector2, Node*>(contact.position, contact.other->getNode()));
-            nativeInfo.SetEnabled(false);
-        });
-        collider.connect();
+        // collider.OnCollisionDetection.addEventListener([this, &playerBody, &hook, pinPosition](phys::Collision& contact, b2Contact& nativeInfo) {
+        //     const bool touchAtExtension = utils::lengthVec2(playerBody.getPosition() - pinPosition) < utils::lengthVec2(contact.position - pinPosition);
+        //     if (!touchAtExtension)
+        //         mQueuedSplitting.emplace(&hook, std::tuple<Vector2, Node*>(contact.position, contact.other->getNode()));
+        //     nativeInfo.SetEnabled(false);
+        // });
+        // collider.connect();
     }
 
     void HookSystem::createPinAt(const Vector2& position, Hook* hook, Node* platform)
@@ -301,7 +295,7 @@ namespace stay
             const auto pinsRay = lastPinPosition - position;
             // Create joint to the pin
             hook->getNode()->removeComponents<phys::Joint>();
-            lastPinInfo.node->removeComponents<phys::Collider01>();
+            //lastPinInfo.node->removeComponents<phys::Collider01>();
             hook->status.maxLength -= std::min(hook->status.maxLength, utils::lengthVec2(pinsRay));
              // Determine the orientation
             const auto abNormed = glm::normalize(pinsRay);

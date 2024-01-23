@@ -1,6 +1,7 @@
 #include "rawSceneLoader.hpp"
 #include "../../../game/component/list.hpp"
 #include "quicktype.hpp"
+#include "world/node.hpp"
 
 #include <iostream>
 #include <fstream>

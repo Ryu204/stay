@@ -2,10 +2,10 @@
 
 #include <filesystem>
 
-#include "../../ecs/type.hpp"
-#include "../../type/vector.hpp"
+#include "ecs/type.hpp"
+#include "type/vector.hpp"
 #include "quicktypefwd.hpp"
-
+#include "world/node.hpp"
 /*
     This class is used in case there is no suitable file found for `SceneLoader`
 */

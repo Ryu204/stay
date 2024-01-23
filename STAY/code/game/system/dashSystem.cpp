@@ -6,6 +6,7 @@
 #include "utility/invoke.hpp"
 #include "../component/player.hpp"
 #include "../component/hook.hpp"
+#include "world/node.hpp"
 
 namespace stay 
 {

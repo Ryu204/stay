@@ -1,16 +1,16 @@
-#include <iostream>
-#include <fstream>
-#include <cmath>
-
 #include "sceneLoader.hpp"
 #include "LDtk/rawSceneLoader.hpp"
+#include "ecs/componentLoader.hpp"
 #include "utility/error.hpp"
+#include "world/node.hpp"
+
+#include <fstream>
 
 namespace stay
 {
-    SceneLoader::SceneLoader(ecs::Manager* manager, Path&& filepath)
+    SceneLoader::SceneLoader(ecs::Manager& manager, Path&& filepath)
         : mFile(filepath)
-        , mLoader(manager)
+        , mManager(manager)
     {}
 
     // @return Root node
@@ -45,7 +45,7 @@ namespace stay
             throw std::runtime_error("no top node transform");
         try 
         {
-            mLoader.loadAllComponents(topId, data["topNode"]["components"]);
+            componentsLoader().loadAllComponents(mManager, topId, data["topNode"]["components"]);
         }
         catch (std::exception& e)
         {
@@ -89,7 +89,7 @@ namespace stay
         mParentOf[id] = static_cast<ecs::Entity>(data["parent"].get<int>());
         try
         {
-            mLoader.loadAllComponents(id, data["components"]);
+            componentsLoader().loadAllComponents(mManager, id, data["components"]);
         }
         catch(const std::exception& e)
         {
@@ -105,21 +105,22 @@ namespace stay
 
     Serializable::Data SceneLoader::createSaveObject(Node* topNode) const
     {
+        auto& loader = componentsLoader();
         Serializable::Data res;
         res["topId"] = static_cast<int>(topNode->entity());
         res["topNode"] = {
             {"transform", topNode->localTransform().toJSONObject()},
-            {"components", mLoader.saveAllComponents(topNode->entity())}
+            {"components", loader.saveAllComponents(mManager, topNode->entity())}
         };
         res["entities"] = Serializable::Data(nlohmann::json::value_t::array);
-        const auto saveToEntities = [this, topNode, &res](Node* node) -> void {
+        const auto saveToEntities = [this, topNode, &res, &loader](Node* node) -> void {
             if (node == topNode) 
                 return;
             res["entities"].emplace_back(Serializable::Data{
                 {"id", static_cast<int>(node->entity())},
                 {"parent", static_cast<int>(node->parent()->entity())},
                 {"transform", node->localTransform().toJSONObject()},
-                {"components", mLoader.saveAllComponents(node->entity())}
+                {"components", loader.saveAllComponents(mManager, node->entity())}
             });
         };
         topNode->visit(saveToEntities);

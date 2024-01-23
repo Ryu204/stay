@@ -1,14 +1,15 @@
 #include "../ecs/manager.hpp"
-#include "../../game/system/list.hpp"
 #include "../physics/world.hpp"
+#include "../../game/system/list.hpp"
 #include "camera.hpp"
+#include "node.hpp"
 #include "scene.hpp"
 
 namespace stay
 {
     Scene::Scene(std::filesystem::path&& filepath, RWin* window)
         : PIXELS_PER_METER(100.F)
-        , mSceneLoader(&mManager, std::forward<std::filesystem::path>(filepath))
+        , mSceneLoader(mManager, std::forward<std::filesystem::path>(filepath))
     {
         Node::init(mManager.getRegistry());
         phys::World::init();
@@ -51,20 +52,7 @@ namespace stay
         mManager.registerSystem<HookSystem>();
         mManager.registerSystem<DebugSystem>()->initialize(&mCamera, window);
         mManager.registerSystem<DashSystem>();
-        
-        mSceneLoader
-            .registerComponent<comp::Render>("render")
-            .registerComponent<phys::Collider>("collider")
-            .registerComponent<phys::RigidBody>("rigidbody")
-            .registerComponent<phys::RigidBody01>("rigidbody01")
-            .registerComponent<phys::RigidBody02>("rigidbody02")
-            .registerComponent<Player>("player")
-            .registerComponent<PlayerDebug>("debug")
-            .registerComponent<Hook>("hook")
-            .registerComponent<phys::Joint>("joint")
-            .registerComponent<phys::Collider01>("collider01")
-            .registerComponent<phys::Collider02>("collider02")
-            .registerComponent<Dash>("dash");
+
         mSceneRoot = mSceneLoader.load();
     }
 } // namespace stay

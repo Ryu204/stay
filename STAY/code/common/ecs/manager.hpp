@@ -1,10 +1,8 @@
 #pragma once
 
-#include <vector>
-
 #include "system.hpp"
-#include "../utility/typedef.hpp"
-#include "../world/node.hpp"
+#include "utility/typedef.hpp"
+#include "world/nodeFwd.hpp"
 
 namespace stay
 {
@@ -46,33 +44,33 @@ namespace stay
                 void input(const sf::Event& event);
 
                 // Components related functions
-                template <typename Type, typename... Args, whereIs(Type, Component)>
+                template <typename Type, typename... Args, whereIs(Type, Component<Type>)>
                 Type& addComponent(Node* node, Args&&... args)
                 {
                     return addComponent<Type, Args...>(node->entity(), std::forward<Args>(args)...);
                 }
-                template <typename Type, typename... Args, whereIs(Type, Component)>
+                template <typename Type, typename... Args, whereIs(Type, Component<Type>)>
                 Type& addComponent(Entity entity, Args&&... args);
-                template <typename Type, whereIs(Type, Component)>
+                template <typename Type, whereIs(Type, Component<Type>)>
                 void removeComponents(Node* node)
                 {
                     removeComponents<Type>(node->entity());
                 }
-                template <typename Type, whereIs(Type, Component)>
+                template <typename Type, whereIs(Type, Component<Type>)>
                 void removeComponents(Entity entity);
-                template <typename Type, whereIs(Type, Component)>
+                template <typename Type, whereIs(Type, Component<Type>)>
                 bool hasComponent(const Node* node) const
                 {
                     return hasComponent<Type>(node->entity());
                 }
-                template <typename Type, whereIs(Type, Component)>
+                template <typename Type, whereIs(Type, Component<Type>)>
                 bool hasComponent(Entity entity) const;
-                template <typename Type, whereIs(Type, Component)>
+                template <typename Type, whereIs(Type, Component<Type>)>
                 Type& getComponent(Node* node)
                 {
                     return getComponent<Type>(node->entity());
                 }
-                template <typename Type, whereIs(Type, Component)>
+                template <typename Type, whereIs(Type, Component<Type>)>
                 Type& getComponent(Entity entity);
             private:
                 template <typename T>
@@ -86,7 +84,7 @@ namespace stay
                 std::vector<Pair<InputSystem>> mInputSystems{};
         };
 
-        template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
+        template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<Component<Type>, Type>, bool>>
         Type& Manager::addComponent(Entity entity, Args&&... args)
         {
             auto& res = mRegistry->emplace<Type>(entity, std::forward<Args>(args)...);
@@ -94,17 +92,17 @@ namespace stay
             res.assign(entity);
             return res;
         }
-        template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
+        template <typename Type, std::enable_if_t<std::is_base_of_v<Component<Type>, Type>, bool>>
         void Manager::removeComponents(Entity entity)
         {
             mRegistry->remove<Type>(entity);
         }
-        template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
+        template <typename Type, std::enable_if_t<std::is_base_of_v<Component<Type>, Type>, bool>>
         bool Manager::hasComponent(Entity entity) const
         {
             return mRegistry->try_get<Type>(entity) != nullptr;
         }
-        template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
+        template <typename Type, std::enable_if_t<std::is_base_of_v<Component<Type>, Type>, bool>>
         Type& Manager::getComponent(Entity entity)
         {
             return mRegistry->get<Type>(entity);
