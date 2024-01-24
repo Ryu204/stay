@@ -7,24 +7,23 @@ namespace stay
 {
     namespace utils
     {
-        template <typename Trait>
+        template <typename T>
         class Singleton
         {
             public:
-                using Type = typename Trait::Type;
                 Singleton() = delete;
                 virtual ~Singleton() = default;
-                static void init()
+                template <typename... Args>
+                static void init(Args&&... args)
                 {
-                    Trait::create().swap(mInstance());
+                    std::make_unique<T>(std::forward<Args>(args)...).swap(mInstance());
                 }
                 static void shutdown()
                 {
                     assert(mInstance().get() != nullptr && "Call init first");
-                    Trait::shutdown(mInstance());
                     mInstance().reset();
                 }
-                static Type& get()
+                static T& get()
                 {
                     assert(mInstance().get() != nullptr && "call init first");
                     return *mInstance();
@@ -34,9 +33,9 @@ namespace stay
                     return mInstance().get() != nullptr;
                 }
             private:
-                static std::unique_ptr<Type>& mInstance()
+                static std::unique_ptr<T>& mInstance()
                 {
-                    static std::unique_ptr<Type> res;
+                    static std::unique_ptr<T> res;
                     return res;
                 };
         };

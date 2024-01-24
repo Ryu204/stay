@@ -1,6 +1,7 @@
-#include "../ecs/manager.hpp"
-#include "../physics/world.hpp"
-#include "../../game/system/list.hpp"
+#include "ecs/manager.hpp"
+#include "physics/world.hpp"
+#include "type/vector.hpp"
+#include "../game/system/list.hpp"
 #include "camera.hpp"
 #include "node.hpp"
 #include "scene.hpp"
@@ -12,7 +13,7 @@ namespace stay
         , mSceneLoader(mManager, std::forward<std::filesystem::path>(filepath))
     {
         Node::init(mManager.getRegistry());
-        phys::World::init();
+        phys::World::init(20.F * vectorDown);
         initialize(window);
     }
     Scene::~Scene()
