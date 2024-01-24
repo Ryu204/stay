@@ -11,18 +11,16 @@ namespace stay
         public:
             Scene(std::filesystem::path&& filepath, RWin& window);
             ~Scene();
-            void update(float dt);
-            void start();
+            static void update(float dt);
+            static void start();
             void saveToFile();
-            void input(const sf::Event& event);
+            static void input(const sf::Event& event);
             void render(RTarget& target);
         private:
-            void initialize();
             RWin& mWindow;
             Camera mCamera;
-            ecs::Manager mManager;
             Uptr<Node> mSceneRoot;
-            SceneLoader mSceneLoader;
+            Uptr<SceneLoader> mSceneLoader;
 
             const float PIXELS_PER_METER;
     };

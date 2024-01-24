@@ -6,7 +6,7 @@
 #include <box2d/box2d.h>
 
 #include "physics/destructRegister.hpp"
-#include "ecs/manager.hpp"
+#include "ecs/system.hpp"
 
 namespace stay
 {
@@ -26,7 +26,7 @@ namespace stay
             : public ecs::InitSystem
             , public ecs::StartSystem
             , public ecs::UpdateSystem
-            , public ecs::System
+            , public ecs::System<PhysicsSystem>
         {
                 PhysicsSystem(ecs::Manager* manager);
                 ~PhysicsSystem() override;

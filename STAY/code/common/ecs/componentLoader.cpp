@@ -6,6 +6,10 @@ namespace stay
 {
     namespace ecs
     {
+        detail::ComponentsLoader& componentsLoader() {
+            static detail::ComponentsLoader res;
+            return res;
+        }
         namespace detail
         {
             void ComponentsLoader::loadAllComponents(ecs::Manager& manager, ecs::Entity entity, const Serializable::Data& componentsArray)

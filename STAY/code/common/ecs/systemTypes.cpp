@@ -1,17 +1,9 @@
-#include "system.hpp"
-#include "manager.hpp"
+#include "systemTypes.hpp"
 
 namespace stay
 {
     namespace ecs
     {
-        System::System(Manager* manager)
-            : mManager(manager)
-        {}
-        Registry& System::registry() 
-        {
-            return mManager->getRegistryRef();
-        }
         InitSystem::InitSystem(int order)
             : orderInit(order)
         {}

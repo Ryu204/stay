@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-#include "../../common/ecs/manager.hpp"
+#include "ecs/system.hpp"
 #include "world/node.hpp"
 
 namespace stay
@@ -14,7 +14,7 @@ namespace stay
 
     struct Hook;
 
-    struct HookSystem : public ecs::System, public ecs::UpdateSystem, public ecs::InputSystem
+    struct HookSystem : public ecs::System<HookSystem>, public ecs::UpdateSystem, public ecs::InputSystem
     {
             HookSystem(ecs::Manager* manager);
             void update(float dt) override;

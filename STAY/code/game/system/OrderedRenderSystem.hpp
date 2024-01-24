@@ -1,10 +1,11 @@
 #pragma once
 
-#include "../component/render.hpp"
-#include "../../common/ecs/manager.hpp"
-#include "../../common/utility/convert.hpp"
-#include "../../common/utility/sfutils.hpp"
 #include <SFML/System/Vector2.hpp>
+
+#include "../component/render.hpp"
+#include "ecs/system.hpp"
+#include "utility/convert.hpp"
+#include "utility/sfutils.hpp"
 
 /*
     Render the whole scene by traversing every node using BFS
@@ -14,11 +15,11 @@ namespace stay
 {
     namespace sys
     {
-        struct OrderedRenderSystem : public ecs::RenderSystem, public ecs::System
+        struct OrderedRenderSystem : public ecs::RenderSystem, public ecs::System<OrderedRenderSystem>
         {
                 OrderedRenderSystem(ecs::Manager* manager)
                     : ecs::RenderSystem(0)
-                    , ecs::System(manager)
+                    , ecs::System<OrderedRenderSystem>(manager)
                 {
                     mShape.setOutlineColor(sf::Color::White);
                     mShape.setOutlineThickness(0.1F);

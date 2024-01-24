@@ -11,7 +11,7 @@
 namespace stay 
 {
     DashSystem::DashSystem(ecs::Manager* manager)
-        : ecs::System(manager)
+        : ecs::System<DashSystem>(manager)
         , ecs::UpdateSystem(0)
         , ecs::InputSystem(0)
     {}

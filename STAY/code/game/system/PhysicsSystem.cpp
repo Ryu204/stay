@@ -63,7 +63,7 @@ namespace stay
             : ecs::InitSystem(0)
             , ecs::StartSystem(0)
             , ecs::UpdateSystem(-1)
-            , ecs::System(manager)
+            , ecs::System<PhysicsSystem>(manager)
         { 
             phys::Collider::mCollisionLayer()
                 .set(0, "Default")

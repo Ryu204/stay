@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../common/ecs/manager.hpp"
-#include "../../common/physics/debugDraw.hpp"
-#include "../../common/physics/world.hpp"
+#include "ecs/system.hpp"
+#include "physics/debugDraw.hpp"
+#include "physics/world.hpp"
 
 /*
     Render colliders and other physics components using `b2World::DebugDraw()`
@@ -12,12 +12,15 @@ namespace stay
 {
     namespace sys
     {
-        struct PhysicsDebugSystem : public ecs::RenderSystem, public ecs::InitSystem, public ecs::System
+        struct PhysicsDebugSystem 
+            : public ecs::RenderSystem
+            , public ecs::InitSystem
+            , public ecs::System<PhysicsDebugSystem>
         {
                 PhysicsDebugSystem(ecs::Manager* manager)
                     : ecs::RenderSystem(1)
                     , ecs::InitSystem(0)
-                    , ecs::System(manager)
+                    , ecs::System<PhysicsDebugSystem>(manager)
                 { }
                 ~PhysicsDebugSystem() override
                 {

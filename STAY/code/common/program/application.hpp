@@ -28,7 +28,7 @@ namespace stay
                 };
 
                 void input();
-                void update(float dt);
+                static void update(float dt);
                 void render();
                 void initialize();  
                 void setUpRendering();  

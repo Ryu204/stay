@@ -45,10 +45,7 @@ namespace stay
             };
         } // namespace detail
 
-        inline detail::ComponentsLoader& componentsLoader() {
-            static detail::ComponentsLoader res;
-            return res;
-        }
+        detail::ComponentsLoader& componentsLoader();
     } // namespace ecs
 } // namespace stay
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "RawRenderSystem.hpp" // IWYU pragma: export
 #include "OrderedRenderSystem.hpp" // IWYU pragma: export
 #include "PhysicsDebugSystem.hpp" // IWYU pragma: export
 #include "PhysicsSystem.hpp" // IWYU pragma: export

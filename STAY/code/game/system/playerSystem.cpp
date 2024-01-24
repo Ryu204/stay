@@ -2,7 +2,6 @@
 
 #include "../component/player.hpp"
 #include "physics/collider.hpp"
-#include "utility/convert.hpp"
 
 namespace 
 {
@@ -13,7 +12,7 @@ namespace stay
 {
    
     PlayerSystem::PlayerSystem(ecs::Manager* manager)
-        : ecs::System(manager)
+        : ecs::System<PlayerSystem>(manager)
         , ecs::StartSystem(0)
         , ecs::InputSystem(0)
         , ecs::UpdateSystem(0)

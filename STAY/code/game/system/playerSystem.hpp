@@ -5,7 +5,7 @@
 namespace stay 
 {
     struct PlayerSystem 
-        : public ecs::System
+        : public ecs::System<PlayerSystem>
         , public ecs::StartSystem
         , public ecs::UpdateSystem
         , public ecs::InputSystem

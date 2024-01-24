@@ -77,7 +77,7 @@ namespace stay
             float queuedTime = 0.F;
             const float timePerUpdate = 1.F / mAppInfo.updatesPerSec;
 
-            mScene->start();
+            Scene::start();
             mScene->saveToFile();
 
             while (mWindow->isOpen())
@@ -109,13 +109,13 @@ namespace stay
                 default:
                     break;
                 }
-                mScene->input(event);
+                Scene::input(event);
             }
         }
 
         void Application::update(float dt)
         {
-            mScene->update(dt);
+            Scene::update(dt);
             Invoke::progress(dt);
         }
 

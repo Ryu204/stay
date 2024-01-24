@@ -4,6 +4,12 @@ namespace stay
 {
     namespace ecs
     {       
+        Manager& manager()
+        {
+            static Manager manager;
+            return manager;
+        }
+
         Registry& Manager::getRegistryRef()
         {
             return *mRegistry;
@@ -14,9 +20,9 @@ namespace stay
             return mRegistry;
         }
 
-        // Meant to be called only once, before any update
-        void Manager::start(SystemContext context)
+        void Manager::reset(SystemContext context)
         {
+            std::make_shared<Registry>().swap(mRegistry);
             // In the same category, system with smallest id gets called first and so on
             std::sort(mInitSystems.begin(), mInitSystems.end(), detail::Cmpr<InitSystem>());
             std::sort(mStartSystems.begin(), mStartSystems.end(), detail::Cmpr<StartSystem>());
@@ -30,7 +36,11 @@ namespace stay
             {
                 pair.val->init(context);
             }
+        }
 
+        // Meant to be called only once, before any update
+        void Manager::start()
+        {
             for (auto& pair : mStartSystems)
             {
                 pair.val->start();
@@ -69,5 +79,5 @@ namespace stay
                 pair.val->input(event);
             }
         }
-    }
+    } // namespace ecs
 } // namespace stay

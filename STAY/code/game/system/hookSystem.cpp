@@ -18,7 +18,7 @@ namespace
 namespace stay
 {
     HookSystem::HookSystem(ecs::Manager* manager)
-        : ecs::System(manager)
+        : ecs::System<HookSystem>(manager)
         , ecs::UpdateSystem(0)
         , ecs::InputSystem(-1)
     {}

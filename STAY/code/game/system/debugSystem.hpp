@@ -1,12 +1,15 @@
 #pragma once 
 
-#include "../../common/ecs/manager.hpp"
-#include "../../common/utility/typedef.hpp"
+#include "ecs/system.hpp"
+#include "utility/typedef.hpp"
 
 namespace stay
 {
     class Camera;
-    struct DebugSystem : public ecs::UpdateSystem, public ecs::InitSystem, public ecs::System
+    struct DebugSystem 
+        : public ecs::UpdateSystem
+        , public ecs::InitSystem
+        , public ecs::System<DebugSystem>
     {
             DebugSystem(ecs::Manager* manager);
             void init(ecs::SystemContext& context) override;
