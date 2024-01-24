@@ -1,10 +1,13 @@
 #pragma once
 
 #include "transform.hpp"
-#include "ecs/componentFwd.hpp"
 
 namespace stay
 {
+    namespace ecs 
+    {
+        class Component;
+    } // namespace ecs
     class Node : sf::NonCopyable
     {
         public:
@@ -41,13 +44,13 @@ namespace stay
             void visitChained(const Func& func, const FuncReturn& initial, Args&&... args);
             
             ecs::Entity entity() const;
-            template <typename Type, typename... Args, whereIs(Type, ecs::Component<Type>)>
+            template <typename Type, typename... Args, whereIs(Type, ecs::Component)>
             Type& addComponent(Args&&... args);
-            template <typename Type, whereIs(Type, ecs::Component<Type>)>
+            template <typename Type, whereIs(Type, ecs::Component)>
             void removeComponents();
-            template <typename Type, whereIs(Type, ecs::Component<Type>)>
+            template <typename Type, whereIs(Type, ecs::Component)>
             bool hasComponent() const;
-            template <typename Type, whereIs(Type, ecs::Component<Type>)>
+            template <typename Type, whereIs(Type, ecs::Component)>
             Type& getComponent();
         private:
             struct Global
@@ -84,24 +87,24 @@ namespace stay
         }
     }
 
-    template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<ecs::Component<Type>, Type>, bool>>
+    template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
     Type& Node::addComponent(Args&&... args)
     {
         auto& res = globalInfo().registry->emplace<Type>(mEntity, std::forward<Args>(args)...);
         res.assign(mEntity);
         return res;
     }
-    template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component<Type>, Type>, bool>>
+    template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
     void Node::removeComponents()
     {
         globalInfo().registry->remove<Type>(mEntity);
     }
-    template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component<Type>, Type>, bool>>
+    template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
     bool Node::hasComponent() const
     {
         return globalInfo().registry->try_get<Type>(mEntity) != nullptr;
     }
-    template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component<Type>, Type>, bool>>
+    template <typename Type, std::enable_if_t<std::is_base_of_v<ecs::Component, Type>, bool>>
     Type& Node::getComponent()
     {
         assert(hasComponent<Type>() && "non-existing component");

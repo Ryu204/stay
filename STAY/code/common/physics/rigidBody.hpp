@@ -33,7 +33,7 @@ namespace stay
         } // namespace detail
         class Collider;
         // @brief An abstract component, only functions if a collider is presented. Manipulate velocity and force.
-        class RigidBody : public ecs::Component<RigidBody>
+        class RigidBody : public ecs::Component
         {
             public:
                 // @param `angle` angle from OY+ to object's local OY+ in degree, positive if the angle is anti-clockwise
@@ -65,7 +65,7 @@ namespace stay
                 b2Fixture* attachFixture(const b2FixtureDef& properties);
                 b2Body* body();
                 
-                COMPONENT_NAME(rigidbody);
+                REGISTER_COMPONENT(RigidBody);
                 SERIALIZE_PROCESSING(mBodyDefCache, mHorizontalDamping);
                 void postDeserialization();
                 void preSerialization() const;

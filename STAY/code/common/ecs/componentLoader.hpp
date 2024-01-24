@@ -1,59 +1,54 @@
 #pragma once
 
 #include "ecs/type.hpp"
-#include "manager.hpp"
+#include "type/serializable.hpp"
 
 namespace stay
 {
-    class IComponentSerializer 
+    namespace ecs
     {
-        public:
-            virtual ~IComponentSerializer() = default;
-            virtual bool deserialize(ecs::Manager& /*manager*/, ecs::Entity /*entity*/, const Serializable::Data& /*val*/) const = 0;
-            virtual Serializable::Data serialize(ecs::Manager& /*manager*/, ecs::Entity /*entity*/) const = 0;
-            virtual bool inEntity(ecs::Manager& /* manager */, ecs::Entity /* entity */) const = 0;
-    };
-
-    template <typename T, whereIs(T, ecs::Component<T>)>
-    class ComponentSerializer : public IComponentSerializer
-    {
-        public:
-            bool deserialize(ecs::Manager& manager, ecs::Entity entity, const Serializable::Data& val) const override
+        class Manager;
+        class Component;
+        namespace detail
+        {
+            class IComponentSerializer 
             {
-                auto& comp = manager.addComponent<T>(entity);
-                return comp.deserialization(val);
-            }
-            Serializable::Data serialize(ecs::Manager& manager, ecs::Entity entity) const override
-            {
-                return manager.getComponent<T>(entity).serialize();
-            }
-            bool inEntity(ecs::Manager& manager, ecs::Entity entity) const override
-            {
-                return manager.hasComponent<T>(entity);
-            }
-    };
+                public:
+                    virtual ~IComponentSerializer() = default;
+                    virtual bool deserialize(ecs::Manager& /*manager*/, ecs::Entity /*entity*/, const Serializable::Data& /*val*/) const = 0;
+                    virtual Serializable::Data serialize(ecs::Manager& /*manager*/, ecs::Entity /*entity*/) const = 0;
+                    virtual bool inEntity(ecs::Manager& /* manager */, ecs::Entity /* entity */) const = 0;
+            };
 
-    // This class throws like a maniac, use with appropriate `try/catch` when loading components
-    class ComponentsLoader
-    {
-        public:
-            template <typename T, whereIs(T, ecs::Component<T>)>
-            void registerComponent(const std::string& name)
+            template <typename T>
+            class ComponentSerializer : public IComponentSerializer
             {
-                assert(mLoaderList.find(name) == mLoaderList.end() && "component name registered twice");
-                mLoaderList.emplace(name, std::make_unique<ComponentSerializer<T>>());                
-            }
+                public:
+                    bool deserialize(ecs::Manager& manager, ecs::Entity entity, const Serializable::Data& val) const override;
+                    Serializable::Data serialize(ecs::Manager& manager, ecs::Entity entity) const override;
+                    bool inEntity(ecs::Manager& manager, ecs::Entity entity) const override;
+            };
 
-            void loadAllComponents(ecs::Manager& manager, ecs::Entity entity, const Serializable::Data& componentsArray);
-            void loadComponent(ecs::Manager& manager, ecs::Entity entity, const std::string& name, const Serializable::Data& componentData);
-            Serializable::Data saveAllComponents(ecs::Manager& manager, ecs::Entity entity) const;
-            Serializable::Data saveComponent(ecs::Manager& manager, ecs::Entity entity, const std::string& name) const;
-        private:
-            std::unordered_map<std::string, Uptr<IComponentSerializer>> mLoaderList;
-    };
+            // This class throws like a maniac, use with appropriate `try/catch` when loading components
+            class ComponentsLoader
+            {
+                public:
+                    template <typename T, whereIs(T, ecs::Component)>
+                    void registerComponent(const std::string& name);
 
-    inline ComponentsLoader& componentsLoader() {
-        static ComponentsLoader res;
-        return res;
-    }
+                    void loadAllComponents(ecs::Manager& manager, ecs::Entity entity, const Serializable::Data& componentsArray);
+                    void loadComponent(ecs::Manager& manager, ecs::Entity entity, const std::string& name, const Serializable::Data& componentData);
+                    Serializable::Data saveAllComponents(ecs::Manager& manager, ecs::Entity entity) const;
+                    Serializable::Data saveComponent(ecs::Manager& manager, ecs::Entity entity, const std::string& name) const;
+                private:
+                    std::unordered_map<std::string, Uptr<IComponentSerializer>> mLoaderList;
+            };
+        } // namespace detail
+
+        inline detail::ComponentsLoader& componentsLoader() {
+            static detail::ComponentsLoader res;
+            return res;
+        }
+    } // namespace ecs
 } // namespace stay
+

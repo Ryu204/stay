@@ -5,7 +5,7 @@
 
 namespace stay
 {
-    struct Hook : public ecs::Component<Hook>
+    struct Hook : public ecs::Component
     {
             enum State
             {
@@ -43,6 +43,6 @@ namespace stay
             Properties props{};
             Status status{};        
             
-            COMPONENT(hook, props);
+            COMPONENT(Hook, props);
     };
 } // namespace stay

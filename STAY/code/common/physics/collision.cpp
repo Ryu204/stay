@@ -1,5 +1,4 @@
 #include "collision.hpp"
-#include "utility/convert.hpp"
 
 namespace stay
 {

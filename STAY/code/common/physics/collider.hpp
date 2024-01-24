@@ -18,7 +18,7 @@ namespace stay
     {
         class RigidBody;
         // @note Remember to call `start` after initialization to connect to `RigidBody`
-        class Collider : public ecs::Component<Collider>
+        class Collider : public ecs::Component
         {
             public:
                 // @param entity The entity this collider attaches to
@@ -43,7 +43,7 @@ namespace stay
                 event::Event<Collision& /*info*/> OnTriggerExit;
                 event::Event<Collision& /*info*/, b2Contact& /*native info*/> OnCollisionDetection;
 
-                COMPONENT(collider, mMaterial, mShapeInfo)
+                COMPONENT(Collider, mMaterial, mShapeInfo)
             private:
                 void attachToRigidBody();
 
@@ -57,6 +57,12 @@ namespace stay
 
                 void check() const;
                 friend class DestructRegister;
+        };
+
+        class Collider01 : public Collider
+        {
+            public:
+                REGISTER_COMPONENT(Collider01);
         };
     } // namespace phys
 } // namespace stay

@@ -4,10 +4,10 @@
 
 namespace stay
 {
-    struct PlayerDebug : public ecs::Component<PlayerDebug>
+    struct PlayerDebug : public ecs::Component
     {
             PlayerDebug() = default;
-            COMPONENT(playerDebug, foo);
+            COMPONENT(PlayerDebug, foo);
         private:
             int foo;
     };

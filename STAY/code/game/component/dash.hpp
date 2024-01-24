@@ -4,7 +4,7 @@
 
 namespace stay
 {
-    struct Dash : public ecs::Component<Dash>
+    struct Dash : public ecs::Component
     {
             float velocity{10.F};
             float length{4.F};
@@ -15,6 +15,6 @@ namespace stay
             bool canDash{true};
             bool left{false};
             
-            COMPONENT(dash, velocity, length, cooldown, postBrake);
+            COMPONENT(Dash, velocity, length, cooldown, postBrake);
     };
 } // namespace stay

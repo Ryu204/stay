@@ -4,7 +4,7 @@
 
 namespace stay
 {
-    struct Player : public ecs::Component<Player>
+    struct Player : public ecs::Component
     {
         // Base force to move with controls
         float moveStrength{15.F};
@@ -21,6 +21,6 @@ namespace stay
         phys::RigidBody* movementBody;
         phys::RigidBody* hookBody;
 
-        COMPONENT(player, moveStrength, jumpHeight, oppositeScale, airScale);
+        COMPONENT(Player, moveStrength, jumpHeight, oppositeScale, airScale);
     };
 } // namespace stay

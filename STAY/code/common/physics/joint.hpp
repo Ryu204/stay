@@ -9,7 +9,7 @@ namespace stay
     {
         class RigidBody;
 
-        class Joint : public ecs::Component<Joint>
+        class Joint : public ecs::Component
         {
             public:
                 Joint() = default;
@@ -27,7 +27,7 @@ namespace stay
                     assert(res != nullptr && "Get wrong internal joint type");
                     return res;
                 }
-                COMPONENT_NAME(joint);
+                REGISTER_COMPONENT(Joint);
                 SERIALIZE_POSTPROCESSING(mInfoCache);
                 void postDeserialization();
             private:

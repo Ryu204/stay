@@ -1,6 +1,6 @@
 #include "sceneLoader.hpp"
 #include "LDtk/rawSceneLoader.hpp"
-#include "ecs/componentLoader.hpp"
+#include "ecs/component.hpp"
 #include "utility/error.hpp"
 #include "world/node.hpp"
 
@@ -45,7 +45,7 @@ namespace stay
             throw std::runtime_error("no top node transform");
         try 
         {
-            componentsLoader().loadAllComponents(mManager, topId, data["topNode"]["components"]);
+            ecs::componentsLoader().loadAllComponents(mManager, topId, data["topNode"]["components"]);
         }
         catch (std::exception& e)
         {
@@ -89,7 +89,7 @@ namespace stay
         mParentOf[id] = static_cast<ecs::Entity>(data["parent"].get<int>());
         try
         {
-            componentsLoader().loadAllComponents(mManager, id, data["components"]);
+            ecs::componentsLoader().loadAllComponents(mManager, id, data["components"]);
         }
         catch(const std::exception& e)
         {
@@ -105,7 +105,7 @@ namespace stay
 
     Serializable::Data SceneLoader::createSaveObject(Node* topNode) const
     {
-        auto& loader = componentsLoader();
+        auto& loader = ecs::componentsLoader();
         Serializable::Data res;
         res["topId"] = static_cast<int>(topNode->entity());
         res["topNode"] = {

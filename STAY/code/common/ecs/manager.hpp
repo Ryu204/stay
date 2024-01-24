@@ -44,33 +44,33 @@ namespace stay
                 void input(const sf::Event& event);
 
                 // Components related functions
-                template <typename Type, typename... Args, whereIs(Type, Component<Type>)>
+                template <typename Type, typename... Args, whereIs(Type, Component)>
                 Type& addComponent(Node* node, Args&&... args)
                 {
                     return addComponent<Type, Args...>(node->entity(), std::forward<Args>(args)...);
                 }
-                template <typename Type, typename... Args, whereIs(Type, Component<Type>)>
+                template <typename Type, typename... Args, whereIs(Type, Component)>
                 Type& addComponent(Entity entity, Args&&... args);
-                template <typename Type, whereIs(Type, Component<Type>)>
+                template <typename Type, whereIs(Type, Component)>
                 void removeComponents(Node* node)
                 {
                     removeComponents<Type>(node->entity());
                 }
-                template <typename Type, whereIs(Type, Component<Type>)>
+                template <typename Type, whereIs(Type, Component)>
                 void removeComponents(Entity entity);
-                template <typename Type, whereIs(Type, Component<Type>)>
+                template <typename Type, whereIs(Type, Component)>
                 bool hasComponent(const Node* node) const
                 {
                     return hasComponent<Type>(node->entity());
                 }
-                template <typename Type, whereIs(Type, Component<Type>)>
+                template <typename Type, whereIs(Type, Component)>
                 bool hasComponent(Entity entity) const;
-                template <typename Type, whereIs(Type, Component<Type>)>
+                template <typename Type, whereIs(Type, Component)>
                 Type& getComponent(Node* node)
                 {
                     return getComponent<Type>(node->entity());
                 }
-                template <typename Type, whereIs(Type, Component<Type>)>
+                template <typename Type, whereIs(Type, Component)>
                 Type& getComponent(Entity entity);
             private:
                 template <typename T>
@@ -84,7 +84,7 @@ namespace stay
                 std::vector<Pair<InputSystem>> mInputSystems{};
         };
 
-        template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<Component<Type>, Type>, bool>>
+        template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
         Type& Manager::addComponent(Entity entity, Args&&... args)
         {
             auto& res = mRegistry->emplace<Type>(entity, std::forward<Args>(args)...);
@@ -92,17 +92,17 @@ namespace stay
             res.assign(entity);
             return res;
         }
-        template <typename Type, std::enable_if_t<std::is_base_of_v<Component<Type>, Type>, bool>>
+        template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
         void Manager::removeComponents(Entity entity)
         {
             mRegistry->remove<Type>(entity);
         }
-        template <typename Type, std::enable_if_t<std::is_base_of_v<Component<Type>, Type>, bool>>
+        template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
         bool Manager::hasComponent(Entity entity) const
         {
             return mRegistry->try_get<Type>(entity) != nullptr;
         }
-        template <typename Type, std::enable_if_t<std::is_base_of_v<Component<Type>, Type>, bool>>
+        template <typename Type, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
         Type& Manager::getComponent(Entity entity)
         {
             return mRegistry->get<Type>(entity);
