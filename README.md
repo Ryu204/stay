@@ -29,9 +29,27 @@ A bunch of them, actually :octocat:
 * **efsw** with [MIT](https://github.com/SpartanJ/efsw/blob/master/LICENSE) license
 
 # Trivial info
+
 * The scene is structured as a graph, with each node corresponding to an entity in ECS
 * Root node handles save and load
 * Entity behaviours are defined via systems
 * There is currently 2 builtin systems: render and physics
 * Each entity along with components is able to be serialized to and deserialized from json
 * Currently the loading process uses generated quicktype file from [LDtk's website](https://ldtk.io/docs/game-dev/json-overview/json-schema/)'s schema, so it's very ugly.
+
+# Usage
+
+> for future reference
+
+This section lists what user must do to make a game from core codebase (a.k.a `STAY/code/common`):
+
+* Create `class Loader : public ILoader` and implement `load` method. Note that this method can throw without catching.
+* Create more components by:
+    * inheriting from `ecs::Component`
+    * insert a `COMPONENT` macro to register and (de)serialize inside the class's implementation
+* Create more systems by:
+    * insert a `REGISTER_SYSTEM` macro to register inside the class's implementation
+    * inherits from a set of possible base systems to perform corresponding jobs
+    * inherits from `ecs::System` to have access to entities and components
+
+Headers of system classes are not supposed to be included anywhere, as systems work independently. However their code needs to be compiled somehow. That means if a system's definition is so short that it can be contained in a single file, the file must be a source file (`*.cpp`).
