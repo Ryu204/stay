@@ -62,6 +62,7 @@ namespace stay
         class Collider01 : public Collider
         {
             public:
+                using Collider::Collider;
                 REGISTER_COMPONENT(Collider01);
         };
     } // namespace phys

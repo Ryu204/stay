@@ -27,9 +27,9 @@ namespace stay
             void attachQueuedBullets();
             void splitQueuedPins();
             
-            static void createPinAt(const Vector2& position, Hook* hook, Node* platform);
+            void createPinAt(const Vector2& position, Hook* hook, Node* platform);
             static void connectToPin(Hook* hook, Node* pin, const Vector2& pinPosition, const Vector2& playerPosition);
-            static void createBoxConnect(Node* player, Node* pin, float length, float margin);
+            void createBoxConnect(Node* player, Node* pin, float length, float margin);
 
             void updateCooldown(float dt);
             void updateDirection();
