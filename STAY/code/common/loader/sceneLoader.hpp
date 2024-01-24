@@ -24,4 +24,9 @@ namespace stay
             std::unordered_map<ecs::Entity, ecs::Entity> mParentOf;
             ecs::Manager& mManager;
     };
+
+    struct ILoader 
+    {
+        virtual Uptr<Node> load(std::filesystem::path&& path) = 0;
+    };
 } // namespace stay

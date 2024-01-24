@@ -1,5 +1,5 @@
 #include "sceneLoader.hpp"
-#include "LDtk/rawSceneLoader.hpp"
+#include "../game/loader/loader.hpp"
 #include "ecs/component.hpp"
 #include "utility/error.hpp"
 #include "world/node.hpp"
@@ -27,9 +27,19 @@ namespace stay
         }
         catch (std::exception& e)
         {
-            RawSceneLoader altLoader;
-            auto res = altLoader.load(mFile/"in.ldtk", e.what());
-            return std::move(res);
+            std::unique_ptr<ILoader> altLoader = std::make_unique<Loader>();
+            try
+            {
+                auto res = altLoader->load(mFile/"in.ldtk");
+                return std::move(res);
+            }
+            catch (std::exception& e2)
+            {
+                throw std::runtime_error(
+                    std::string("Load failed: ") + e.what() 
+                    +  "\nOpened alternate but failed: " + e2.what()
+                );
+            }
         }
     }
 

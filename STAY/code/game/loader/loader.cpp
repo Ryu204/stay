@@ -1,5 +1,5 @@
-#include "rawSceneLoader.hpp"
-#include "../../../game/component/list.hpp"
+#include "loader.hpp"
+#include "../component/list.hpp"
 #include "quicktype.hpp"
 #include "world/node.hpp"
 
@@ -8,13 +8,7 @@
 
 namespace stay
 {
-    std::string &RawSceneLoader::error()
-    {
-        static std::string res("Attempted to open alt file but failed");
-        return res;
-    }
-
-    void RawSceneLoader::init(const ldtk::Level& level, const ldtk::LayerInstance& layer)
+    void Loader::init(const ldtk::Level& level, const ldtk::LayerInstance& layer)
     {
         mPxPerMeter = level.getFieldInstances().at(0).getValue().get<float>();
         mLayerOffset = Vector2(layer.getPxTotalOffsetX() + level.getWorldX(), layer.getPxTotalOffsetY() + level.getWorldY());
@@ -22,12 +16,12 @@ namespace stay
         mLayerSize = Vector2(layer.getCWid(), layer.getCHei()) * mTileSize;
     }
 
-    Vector2 RawSceneLoader::fileToWorld(const Vector2& pos) const
+    Vector2 Loader::fileToWorld(const Vector2& pos) const
     {
         return Vector2(pos.x, -pos.y) / mPxPerMeter;
     }
 
-    void RawSceneLoader::loadTiles(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
+    void Loader::loadTiles(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
     {
         init(level, layer);
         for (const auto& tile : layer.getAutoLayerTiles())
@@ -39,7 +33,7 @@ namespace stay
         }
     }
 
-    void RawSceneLoader::loadColliders(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
+    void Loader::loadColliders(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
     {
         init(level, layer);
         for (const auto& entity : layer.getEntityInstances())
@@ -59,7 +53,7 @@ namespace stay
         }
     }
 
-    void RawSceneLoader::loadPlayer(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
+    void Loader::loadPlayer(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
     {
         init(level, layer);
         // node
@@ -109,33 +103,26 @@ namespace stay
         dash.postBrake = player.getFieldInstances().at(15).getValue().get<float>();
     }
 
-    Uptr<Node> RawSceneLoader::load(Path &&filename, const std::string& switchReason)
+    Uptr<Node> Loader::load(Path &&filename)
     {
-        try
-        {
-            std::ifstream reader;
-            reader.open(filename);
-            std::stringstream buffer;
-            buffer << reader.rdbuf();
-            const ldtk::Coordinate coord = nlohmann::json::parse(buffer.str());
-            reader.close();
+        std::ifstream reader;
+        reader.open(filename);
+        std::stringstream buffer;
+        buffer << reader.rdbuf();
+        const ldtk::Coordinate coord = nlohmann::json::parse(buffer.str());
+        reader.close();
 
-            Uptr<Node> root = std::make_unique<Node>();
-            const auto& level = coord.getLevels()[0];
-            const auto layers = level.getLayerInstances();
-            const auto& platform = layers->at(1);
-            const auto& collider = layers->at(0);
-            const auto& player = layers->at(2);
+        Uptr<Node> root = std::make_unique<Node>();
+        const auto& level = coord.getLevels()[0];
+        const auto layers = level.getLayerInstances();
+        const auto& platform = layers->at(1);
+        const auto& collider = layers->at(0);
+        const auto& player = layers->at(2);
 
-            loadTiles(root.get(), level, platform);
-            loadColliders(root.get(), level, collider);
-            loadPlayer(root.get(), level, player);
+        loadTiles(root.get(), level, platform);
+        loadColliders(root.get(), level, collider);
+        loadPlayer(root.get(), level, player);
 
-            return std::move(root);
-        }
-        catch (std::exception& e)
-        {
-            throw std::runtime_error(switchReason + "\n" + error() + ":\n" + e.what());
-        }
+        return std::move(root);
     }
 } // namespace stay
