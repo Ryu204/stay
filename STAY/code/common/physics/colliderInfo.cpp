@@ -22,7 +22,7 @@ namespace stay
             return mData;
         }
 
-        void Chain::postSerialization()
+        void Chain::postDeserialization()
         {
             mCached = false;
         }

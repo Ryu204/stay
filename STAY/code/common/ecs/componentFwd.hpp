@@ -33,11 +33,11 @@ namespace stay
 
 // `name` will be used in save file
 #define COMPONENT_NAME(name) \
-static const char* componentName() { return #name;}\
-static void triggerNameRegistration() { registerHelper; }
+    static const char* componentName() { return #name;}\
+    static void triggerNameRegistration() { registerHelper; }
 
 // Only a syntatic sugar
 #define COMPONENT(name, ...) \
-COMPONENT_NAME(name)\
-SERIALIZE(__VA_ARGS__)
+    COMPONENT_NAME(name)\
+    SERIALIZE(__VA_ARGS__)
 

@@ -29,7 +29,7 @@ namespace stay
                 }
                 COMPONENT_NAME(joint);
                 SERIALIZE_POSTPROCESSING(mInfoCache);
-                void postSerialization();
+                void postDeserialization();
             private:
                 void check() const;
 

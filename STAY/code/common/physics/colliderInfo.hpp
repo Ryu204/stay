@@ -38,7 +38,7 @@ namespace stay
             Chain() = default;
             Chain(std::vector<Vector2>& points);
             SERIALIZE_POSTPROCESSING(mPoints);
-            void postSerialization();
+            void postDeserialization();
             const std::vector<b2Vec2>& data() const;
             private:
                 mutable bool mCached{false};

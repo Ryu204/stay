@@ -23,7 +23,7 @@ namespace stay
                     using b2BodyDef::b2BodyDef;
                     BodyDef(const b2BodyDef& other);
                     SERIALIZE_PROCESSING(mBodyType, mPosition, angle, gravityScale, linearDamping, fixedRotation);
-                    void postSerialization();
+                    void postDeserialization();
                     void preSerialization() const;
                     void fromBody(b2Body& body);
                 private:
@@ -67,7 +67,7 @@ namespace stay
                 
                 COMPONENT_NAME(rigidbody);
                 SERIALIZE_PROCESSING(mBodyDefCache, mHorizontalDamping);
-                void postSerialization();
+                void postDeserialization();
                 void preSerialization() const;
                 // Serializable::Data serialize() const override;
                 // bool deserialization(const Serializable::Data& value) override;

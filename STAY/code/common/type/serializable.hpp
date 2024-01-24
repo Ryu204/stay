@@ -98,7 +98,7 @@ namespace stay
 //     Color color;
 //     bool cacheChanged;
 //     SERIALIZE_POSTPROCESSING(vec, color)
-//     void postSerialization()
+//     void postDeserialization()
 //     {
 //          cacheChanged = true;
 //     }
@@ -112,7 +112,7 @@ namespace stay
     }\
     bool deserialization(const Serializable::Data& val) override {\
         stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
-        postSerialization();\
+        postDeserialization();\
         return true;\
     }
 
@@ -137,6 +137,6 @@ namespace stay
     }\
     bool deserialization(const Serializable::Data& val) override {\
         stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
-        postSerialization();\
+        postDeserialization();\
         return true;\
     }

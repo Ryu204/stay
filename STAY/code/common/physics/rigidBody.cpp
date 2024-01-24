@@ -12,7 +12,7 @@ namespace stay
                 : b2BodyDef{other}
             {}
                 
-            void BodyDef::postSerialization() {
+            void BodyDef::postDeserialization() {
                 type = static_cast<b2BodyType>(mBodyType);
                 position = mPosition.toVec2<b2Vec2>();
             }
@@ -174,7 +174,7 @@ namespace stay
             mBodyDefCache.fromBody(*mBody);
         }
 
-        void RigidBody::postSerialization() 
+        void RigidBody::postDeserialization() 
         {
             setType(static_cast<BodyType>(mBodyDefCache.type));
             setPosition(Vector2::from(mBodyDefCache.position));

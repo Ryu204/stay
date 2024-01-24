@@ -29,7 +29,7 @@ namespace stay
             }
         }
 
-        void Joint::postSerialization() {
+        void Joint::postDeserialization() {
             mHasJointInfo = true;
         }
 

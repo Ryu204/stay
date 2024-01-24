@@ -44,7 +44,7 @@ namespace stay
             Vector3 getScale() const;
 
             SERIALIZE_POSTPROCESSING(mPosition, mRotation, mScale)
-            void postSerialization()
+            void postDeserialization()
             {
                 mMatrixNeedRebuild = true;
                 mInverseNeedRebuild = true;
