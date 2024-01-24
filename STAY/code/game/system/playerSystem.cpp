@@ -93,7 +93,7 @@ namespace stay
         {
             if (player.onDash)
                 continue;
-            auto force = utils::convertVec2<Vector2>(dir * player.moveStrength);
+            auto force = Vector2::from(dir * player.moveStrength);
             const auto vel = player.movementBody->getVelocity();
             const auto isLeft = vel.x < 5.F;
             const auto isRight = vel.x > -5.F;

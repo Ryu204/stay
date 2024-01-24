@@ -1,6 +1,6 @@
 #include "colliderInfo.hpp"
-#include "utility/convert.hpp"
 #include "utility/variantHelper.hpp"
+#include <box2d/b2_math.h>
 
 namespace stay
 {
@@ -17,7 +17,7 @@ namespace stay
                 mCached = true;
                 mData.clear();
                 for (const auto& i : mPoints)
-                    mData.emplace_back(utils::convertVec2<b2Vec2>(i));
+                    mData.emplace_back(i.toVec2<b2Vec2>());
             }
             return mData;
         }
@@ -41,7 +41,7 @@ namespace stay
                 {
                     Uptr<b2PolygonShape> res = std::make_unique<b2PolygonShape>();
                     res->SetAsBox(box.size.x / 2.F, box.size.y / 2.F, 
-                        utils::convertVec2<b2Vec2>(box.position), 
+                        box.position.toVec2<b2Vec2>(), 
                         box.angle * DEG2RAD);
                     return std::move(res);
                 },

@@ -2,6 +2,7 @@
 #include "utility/variantHelper.hpp"
 #include "rigidBody.hpp"
 #include "utility/convert.hpp"
+#include <box2d/b2_math.h>
 
 namespace stay
 {
@@ -67,15 +68,15 @@ namespace stay
                     auto r1 = std::make_unique<b2PrismaticJointDef>();
                     r1->bodyA = a.body();
                     r1->bodyB = b.body();
-                    r1->localAnchorA = a.body()->GetLocalPoint(utils::convertVec2<b2Vec2>(pris.anchorA));
-                    r1->localAnchorB = b.body()->GetLocalPoint(utils::convertVec2<b2Vec2>(pris.anchorB));
+                    r1->localAnchorA = a.body()->GetLocalPoint(pris.anchorA.toVec2<b2Vec2>());
+                    r1->localAnchorB = b.body()->GetLocalPoint(pris.anchorB.toVec2<b2Vec2>());
                     r1->referenceAngle = r1->bodyB->GetAngle() - r1->bodyA->GetAngle();
-                    r1->localAxisA = r1->bodyA->GetLocalVector(utils::convertVec2<b2Vec2>(pris.axis));
+                    r1->localAxisA = r1->bodyA->GetLocalVector(pris.axis.toVec2<b2Vec2>());
                     return std::move(r1);
                 },
                 [&](const Revolute& rev) -> Uptr<b2JointDef> {
                     auto r1 = std::make_unique<b2RevoluteJointDef>();
-                    r1->Initialize(a.body(), b.body(), utils::convertVec2<b2Vec2>(rev.anchor));
+                    r1->Initialize(a.body(), b.body(), rev.anchor.toVec2<b2Vec2>());
                     return std::move(r1);
                 }
             }, data);

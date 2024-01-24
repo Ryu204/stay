@@ -4,6 +4,7 @@
 #include "../../common/ecs/manager.hpp"
 #include "../../common/utility/convert.hpp"
 #include "../../common/utility/sfutils.hpp"
+#include <SFML/System/Vector2.hpp>
 
 /*
     Render the whole scene by traversing every node using BFS
@@ -41,7 +42,7 @@ namespace stay
                         if (current->hasComponent<comp::Render>())
                         {
                             const auto& drawable = current->getComponent<comp::Render>();
-                            mShape.setSize(utils::convertVec2<sf::Vector2f>(drawable.size));
+                            mShape.setSize(drawable.size.toVec2<sf::Vector2f>());
                             utils::centerSf(mShape);
                             mShape.setFillColor(drawable.color);
                             target->draw(mShape, states);

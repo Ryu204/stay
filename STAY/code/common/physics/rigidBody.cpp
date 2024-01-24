@@ -14,10 +14,10 @@ namespace stay
                 
             void BodyDef::postSerialization() {
                 type = static_cast<b2BodyType>(mBodyType);
-                position = utils::convertVec2<b2Vec2>(mPosition);
+                position = mPosition.toVec2<b2Vec2>();
             }
             void BodyDef::preSerialization() const {
-                mPosition = utils::convertVec2<Vector2>(position);
+                mPosition = Vector2::from(position);
                 mBodyType = static_cast<int>(type);
             }
 
@@ -37,7 +37,7 @@ namespace stay
             , mHorizontalDamping(0.05F)
         {
             b2BodyDef bodyDef;
-            bodyDef.position = utils::convertVec2<b2Vec2>(position);
+            bodyDef.position = position.toVec2<b2Vec2>();
             bodyDef.angle = angle * DEG2RAD;
             bodyDef.type = static_cast<b2BodyType>(type);
             bodyDef.angularDamping = 0.01F;
@@ -66,12 +66,12 @@ namespace stay
         
         void RigidBody::setPosition(const Vector2& position)
         {
-            mBody->SetTransform(utils::convertVec2<b2Vec2>(position), mBody->GetAngle());
+            mBody->SetTransform(position.toVec2<b2Vec2>(), mBody->GetAngle());
         }
 
         Vector2 RigidBody::getPosition() const
         {
-            return utils::convertVec2<Vector2>(mBody->GetPosition());
+            return Vector2::from(mBody->GetPosition());
         }
 
         void RigidBody::setAngle(float angle)
@@ -86,17 +86,17 @@ namespace stay
 
         void RigidBody::applyForce(const Vector2& force)
         {
-            mBody->ApplyForceToCenter(utils::convertVec2<b2Vec2>(force), true);
+            mBody->ApplyForceToCenter(force.toVec2<b2Vec2>(), true);
         }
 
         void RigidBody::setVelocity(const Vector2& velocity) 
         {
-            mBody->SetLinearVelocity(utils::convertVec2<b2Vec2>(velocity));
+            mBody->SetLinearVelocity(velocity.toVec2<b2Vec2>());
         }
 
         Vector2 RigidBody::getVelocity() const
         {
-            return utils::convertVec2<Vector2>(mBody->GetLinearVelocity());
+            return Vector2::from(mBody->GetLinearVelocity());
         }
 
         void RigidBody::setAngularVelocity(float velocity)
@@ -121,7 +121,7 @@ namespace stay
 
         Vector2 RigidBody::gravity() const
         {
-            return utils::convertVec2<Vector2>(mWorld->GetGravity());
+            return Vector2::from(mWorld->GetGravity());
         }
 
         float RigidBody::gravityScale() const
@@ -177,7 +177,7 @@ namespace stay
         void RigidBody::postSerialization() 
         {
             setType(static_cast<BodyType>(mBodyDefCache.type));
-            setPosition(utils::convertVec2<Vector2>(mBodyDefCache.position));
+            setPosition(Vector2::from(mBodyDefCache.position));
             setAngle(mBodyDefCache.angle);
             setGravityScale(mBodyDefCache.gravityScale);
             setLinearDamping(mBodyDefCache.linearDamping);

@@ -18,7 +18,7 @@ namespace stay
             struct WorldWrapper : b2World
             {
                 WorldWrapper(const Vector2& gravity)
-                    : b2World(utils::convertVec2<b2Vec2>(gravity))
+                    : b2World(gravity.toVec2<b2Vec2>())
                 {}
             };
         } // namespace details

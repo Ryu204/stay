@@ -37,7 +37,7 @@ namespace stay
     Vector2 DebugSystem::mousePosition() const
     {
         assert(mCamera != nullptr && mWindow != nullptr && "uninitialized debug system");
-        auto res = utils::convertVec2<Vector2>(mWindow->mapPixelToCoords(sf::Mouse::getPosition(*mWindow), mCamera->getView()));
+        auto res = Vector2::from(mWindow->mapPixelToCoords(sf::Mouse::getPosition(*mWindow), mCamera->getView()));
         res.y *= -1.F;
         return res;
     }

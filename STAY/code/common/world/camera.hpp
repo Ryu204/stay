@@ -35,7 +35,7 @@ namespace stay
             // @brief Change camera's aspect ratio to fit into `target` while keeping internal height
             void adaptTo(const RTarget* target)
             {
-                adaptTo(utils::convertVec2<Vector2>(target->getSize()));
+                adaptTo(Vector2::from(target->getSize()));
             }
             // @brief Adjust aspect ratio to match `size` and the height is retanined
             void adaptTo(const Vector2& size)

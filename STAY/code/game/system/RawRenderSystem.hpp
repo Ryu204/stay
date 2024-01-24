@@ -4,6 +4,7 @@
 #include "../component/render.hpp"
 #include "utility/convert.hpp"
 #include "utility/sfutils.hpp"
+#include <SFML/System/Vector2.hpp>
 
 /*
     This system renders by iterating through all object with `render` component and use it global transform
@@ -31,8 +32,8 @@ namespace stay
                         auto& render = mManager->getRegistryRef().get<comp::Render>(entity);
                         auto* node = Node::getNode(entity);
                         const auto tf = node->globalTransform();
-                        mShape.setSize(utils::convertVec2<sf::Vector2f>(render.size));
-                        mShape.setPosition(utils::convertVec2<sf::Vector2f>(tf.getPosition()));
+                        mShape.setSize(render.size.toVec2<sf::Vector2f>());
+                        mShape.setPosition(tf.getPosition().toVec2<sf::Vector2f>());
                         utils::centerSf(mShape);
                         mShape.setFillColor(render.color);
                         target->draw(mShape);
