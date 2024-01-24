@@ -1,5 +1,5 @@
 #include "jointInfo.hpp"
-#include "../utility/variantHelper.hpp"
+#include "utility/variantHelper.hpp"
 #include "rigidBody.hpp"
 #include "utility/convert.hpp"
 

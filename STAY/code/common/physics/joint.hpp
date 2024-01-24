@@ -1,9 +1,6 @@
 #pragma once
 
-#include <optional>
-
 #include "ecs/component.hpp"
-#include "ecs/type.hpp"
 #include "jointInfo.hpp"
 
 namespace stay

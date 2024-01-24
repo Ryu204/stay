@@ -1,6 +1,6 @@
 #include "colliderInfo.hpp"
-#include "../utility/convert.hpp"
-#include "../utility/variantHelper.hpp"
+#include "utility/convert.hpp"
+#include "utility/variantHelper.hpp"
 
 namespace stay
 {

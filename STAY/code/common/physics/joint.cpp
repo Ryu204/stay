@@ -1,9 +1,8 @@
 #include "joint.hpp"
 #include "jointInfo.hpp"
-#include "../world/node.hpp"
 #include "rigidBody.hpp"
 #include "world.hpp"
-#include <cstddef>
+
 #include <cassert>
 
 namespace stay

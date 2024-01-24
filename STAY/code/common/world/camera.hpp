@@ -2,10 +2,9 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "../type/vector.hpp"
-#include "../ecs/manager.hpp"
-#include "../utility/convert.hpp"
-#include "../utility/typedef.hpp"
+#include "type/vector.hpp"
+#include "utility/convert.hpp"
+#include "utility/typedef.hpp"
 
 namespace stay
 {
@@ -39,7 +38,7 @@ namespace stay
                 adaptTo(utils::convertVec2<Vector2>(target->getSize()));
             }
             // @brief Adjust aspect ratio to match `size` and the height is retanined
-            void adaptTo(Vector2 size)
+            void adaptTo(const Vector2& size)
             {
                 mView.setSize(sf::Vector2f(mHeight * size.x / size.y, mHeight));
             }

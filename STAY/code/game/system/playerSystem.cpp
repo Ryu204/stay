@@ -1,11 +1,8 @@
-#include <optional>
-#include <cmath>
+#include "playerSystem.hpp"
 
-#include "player.hpp"
+#include "../component/player.hpp"
 #include "physics/collider.hpp"
-#include "physics/joint.hpp"
 #include "utility/convert.hpp"
-#include "world/node.hpp"
 
 namespace 
 {

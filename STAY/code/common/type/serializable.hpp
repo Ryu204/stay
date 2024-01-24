@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <vector>
 
 #include <nlohmann/json.hpp>

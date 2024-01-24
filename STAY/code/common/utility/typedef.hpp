@@ -1,11 +1,10 @@
 #pragma once
 
 #include <memory>
-#include <type_traits>
 
 #include <SFML/Graphics.hpp>
 
-#include "define.hpp"
+#include "define.hpp" // IWYU pragma: export
 
 namespace stay
 {

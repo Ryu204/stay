@@ -1,6 +1,5 @@
 #include "world.hpp"
 
-#include <box2d/box2d.h>
 
 namespace stay
 {

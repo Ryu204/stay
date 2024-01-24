@@ -2,8 +2,8 @@
 
 #include <box2d/box2d.h>
 
-#include "../utility/singleton.hpp"
-#include "../utility/typedef.hpp"
+#include "utility/singleton.hpp"
+#include "utility/typedef.hpp"
 
 namespace stay
 {

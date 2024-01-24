@@ -4,8 +4,8 @@
 
 #include <box2d/box2d.h>
 
-#include "../type/vector.hpp"
-#include "../type/serializable.hpp"
+#include "type/vector.hpp"
+#include "type/serializable.hpp"
 
 namespace stay
 {

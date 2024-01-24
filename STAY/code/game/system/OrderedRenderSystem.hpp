@@ -21,7 +21,7 @@ namespace stay
                 {
                     mShape.setOutlineColor(sf::Color::White);
                     mShape.setOutlineThickness(0.1F);
-                    utils::centersf(mShape);
+                    utils::centerSf(mShape);
                 }
 
                 void render(RTarget* target, Node* root) override
@@ -42,7 +42,7 @@ namespace stay
                         {
                             const auto& drawable = current->getComponent<comp::Render>();
                             mShape.setSize(utils::convertVec2<sf::Vector2f>(drawable.size));
-                            utils::centersf(mShape);
+                            utils::centerSf(mShape);
                             mShape.setFillColor(drawable.color);
                             target->draw(mShape, states);
                         }

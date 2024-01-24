@@ -1,5 +1,3 @@
-#include <type_traits>
-
 #include "manager.hpp"
 
 namespace stay

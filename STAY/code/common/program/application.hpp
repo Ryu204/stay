@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
-#include "../utility/typedef.hpp"
-#include "../type/serializable.hpp"
-#include "../world/scene.hpp"
+#include "utility/typedef.hpp"
+#include "type/serializable.hpp"
+#include "world/scene.hpp"
 
 namespace stay
 {

@@ -1,9 +1,7 @@
 #include <fstream>
-#include <iostream>
 
 #include "application.hpp"
-#include "../type/vector.hpp"
-#include "../utility/invoke.hpp"
+#include "utility/invoke.hpp"
 
 namespace stay
 {

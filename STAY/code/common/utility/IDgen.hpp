@@ -7,7 +7,7 @@ namespace stay
 {
 	namespace utils
 	{
-		class IDGenerator
+		class IdGenerator
 		{
 		public:
 			// Generate a new ID.
@@ -36,7 +36,7 @@ namespace stay
 				return mUsing.count(id) > 0;
 			}
 
-			void swap(IDGenerator& other)
+			void swap(IdGenerator& other) noexcept
 			{
 				mUsing.swap(other.mUsing);
 				mCaching.swap(other.mCaching);

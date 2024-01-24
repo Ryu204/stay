@@ -1,4 +1,5 @@
 #include "manager.hpp"
+
 #include <cassert>
 
 namespace stay 

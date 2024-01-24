@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../common/ecs/manager.hpp"
+#include "ecs/manager.hpp"
 #include "../component/render.hpp"
-#include "../../common/utility/convert.hpp"
-#include "../../common/utility/sfutils.hpp"
+#include "utility/convert.hpp"
+#include "utility/sfutils.hpp"
 
 /*
     This system renders by iterating through all object with `render` component and use it global transform
@@ -33,7 +33,7 @@ namespace stay
                         const auto tf = node->globalTransform();
                         mShape.setSize(utils::convertVec2<sf::Vector2f>(render.size));
                         mShape.setPosition(utils::convertVec2<sf::Vector2f>(tf.getPosition()));
-                        utils::centersf(mShape);
+                        utils::centerSf(mShape);
                         mShape.setFillColor(render.color);
                         target->draw(mShape);
                     }

@@ -1,7 +1,6 @@
 #include "destructRegister.hpp"
 #include "collider.hpp"
 #include "joint.hpp"
-#include "../world/node.hpp"
 
 namespace stay 
 {

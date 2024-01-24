@@ -1,6 +1,4 @@
 #include "invoke.hpp"
-#include <queue>
-#include <cassert>
 
 namespace stay 
 {
@@ -51,7 +49,7 @@ namespace stay
     {
         currentTime = 0.F;
         std::priority_queue<Registry>().swap(callbackData);
-        utils::IDGenerator().swap(generator);
+        utils::IdGenerator().swap(generator);
     }
 
     Invoke::Data& Invoke::data()

@@ -1,5 +1,4 @@
 #include "collider.hpp"
-#include "world/node.hpp"
 #include "rigidBody.hpp"
 #include "utility/math.hpp"
 #include "utility/convert.hpp"

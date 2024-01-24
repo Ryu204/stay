@@ -2,8 +2,8 @@
 
 #include <box2d/box2d.h>
 
-#include "../ecs/component.hpp"
-#include "../type/vector.hpp"
+#include "ecs/component.hpp"
+#include "type/vector.hpp"
 
 namespace stay
 {

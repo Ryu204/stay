@@ -1,5 +1,4 @@
 #include "asset.hpp"
-#include "utility/variantHelper.hpp"
 #include <filesystem>
 #include <cassert>
 

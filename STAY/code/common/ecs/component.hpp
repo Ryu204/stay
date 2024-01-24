@@ -1,6 +1,6 @@
 #pragma once
 
-#include "componentFwd.hpp"
+#include "componentFwd.hpp" // IWYU pragma: export
 #include "componentLoader.hpp"
 #include "world/node.hpp"
 

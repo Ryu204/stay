@@ -3,7 +3,6 @@
 #include "quicktype.hpp"
 #include "world/node.hpp"
 
-#include <iostream>
 #include <fstream>
 #include <sstream>
 
