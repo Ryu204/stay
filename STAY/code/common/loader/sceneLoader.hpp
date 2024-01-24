@@ -28,5 +28,6 @@ namespace stay
     struct ILoader 
     {
         virtual Uptr<Node> load(std::filesystem::path&& path) = 0;
+        virtual ~ILoader() = default;
     };
 } // namespace stay
