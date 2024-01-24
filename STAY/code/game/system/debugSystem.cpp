@@ -9,7 +9,7 @@
 namespace stay
 {
     DebugSystem::DebugSystem(ecs::Manager* manager)
-        : ecs::System<DebugSystem>{manager}
+        : ecs::System{manager}
         , ecs::InitSystem{0}
         , ecs::UpdateSystem{0}
         , mCamera{nullptr}

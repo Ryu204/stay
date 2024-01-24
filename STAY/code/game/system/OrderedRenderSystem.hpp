@@ -15,11 +15,12 @@ namespace stay
 {
     namespace sys
     {
-        struct OrderedRenderSystem : public ecs::RenderSystem, public ecs::System<OrderedRenderSystem>
+        struct OrderedRenderSystem : public ecs::RenderSystem, public ecs::System
         {
+                REGISTER_SYSTEM(OrderedRenderSystem)
                 OrderedRenderSystem(ecs::Manager* manager)
                     : ecs::RenderSystem(0)
-                    , ecs::System<OrderedRenderSystem>(manager)
+                    , ecs::System(manager)
                 {
                     mShape.setOutlineColor(sf::Color::White);
                     mShape.setOutlineThickness(0.1F);

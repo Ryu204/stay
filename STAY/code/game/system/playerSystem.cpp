@@ -12,7 +12,7 @@ namespace stay
 {
    
     PlayerSystem::PlayerSystem(ecs::Manager* manager)
-        : ecs::System<PlayerSystem>(manager)
+        : ecs::System(manager)
         , ecs::StartSystem(0)
         , ecs::InputSystem(0)
         , ecs::UpdateSystem(0)

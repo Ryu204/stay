@@ -7,14 +7,11 @@ namespace stay
     namespace ecs
     {
         // Base class for convinience when reference manager
-        template <typename T>
         struct System
         {
                 System(Manager* manager)
                     : mManager(manager)
-                {
-                    System<T>::selfRegister.dummy();
-                }
+                {}
                 virtual ~System() = default;
                 Registry& registry()
                 {
@@ -22,16 +19,13 @@ namespace stay
                 }            
             protected:
                 Manager* mManager;
-            private:
-                CRTP_UNDERLYING(T)
-                static inline struct SelfRegister final
-                {
-                    SelfRegister()
-                    {
-                        ecs::manager().registerSystem<T>();
-                    }
-                    void dummy() {}
-                } selfRegister;
         };
     } // namespace ecs
 } // namespace stay
+
+#define REGISTER_SYSTEM(className) \
+    static inline struct SelfRegister final {\
+        SelfRegister() {\
+            ecs::manager().registerSystem<className>();\
+        }\
+    } selfRegister;

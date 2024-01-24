@@ -15,12 +15,13 @@ namespace stay
         struct PhysicsDebugSystem 
             : public ecs::RenderSystem
             , public ecs::InitSystem
-            , public ecs::System<PhysicsDebugSystem>
+            , public ecs::System
         {
+                REGISTER_SYSTEM(PhysicsDebugSystem)
                 PhysicsDebugSystem(ecs::Manager* manager)
                     : ecs::RenderSystem(1)
                     , ecs::InitSystem(0)
-                    , ecs::System<PhysicsDebugSystem>(manager)
+                    , ecs::System(manager)
                 { }
                 ~PhysicsDebugSystem() override
                 {

@@ -9,8 +9,9 @@ namespace stay
     struct DebugSystem 
         : public ecs::UpdateSystem
         , public ecs::InitSystem
-        , public ecs::System<DebugSystem>
-    {
+        , public ecs::System
+    {   
+            REGISTER_SYSTEM(DebugSystem)
             DebugSystem(ecs::Manager* manager);
             void init(ecs::SystemContext& context) override;
             void update(float dt) override;

@@ -14,8 +14,9 @@ namespace stay
 
     struct Hook;
 
-    struct HookSystem : public ecs::System<HookSystem>, public ecs::UpdateSystem, public ecs::InputSystem
+    struct HookSystem : public ecs::System, public ecs::UpdateSystem, public ecs::InputSystem
     {
+            REGISTER_SYSTEM(HookSystem)
             HookSystem(ecs::Manager* manager);
             void update(float dt) override;
             void input(const sf::Event& event) override;

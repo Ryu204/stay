@@ -26,8 +26,9 @@ namespace stay
             : public ecs::InitSystem
             , public ecs::StartSystem
             , public ecs::UpdateSystem
-            , public ecs::System<PhysicsSystem>
+            , public ecs::System
         {
+                REGISTER_SYSTEM(PhysicsSystem)
                 PhysicsSystem(ecs::Manager* manager);
                 ~PhysicsSystem() override;
                 void start() override;
