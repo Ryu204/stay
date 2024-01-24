@@ -1,5 +1,3 @@
-#pragma once
-
 #include "ecs/system.hpp"
 #include "physics/debugDraw.hpp"
 #include "physics/world.hpp"
