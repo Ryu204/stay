@@ -1,4 +1,4 @@
-#include "PhysicsSystem.hpp"
+#include "physicsSystem.hpp"
 #include "physics/rigidBody.hpp"
 #include "physics/collider.hpp"
 #include "physics/joint.hpp"

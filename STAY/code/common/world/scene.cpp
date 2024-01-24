@@ -1,7 +1,6 @@
 #include "ecs/manager.hpp"
 #include "physics/world.hpp"
 #include "type/vector.hpp"
-#include "../game/system/list.hpp"
 #include "camera.hpp"
 #include "node.hpp"
 #include "scene.hpp"

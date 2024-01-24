@@ -4,7 +4,6 @@
 
 #include "ecs/component.hpp"
 #include "type/color.hpp"
-#include "type/serializable.hpp"
 
 namespace stay
 {

@@ -2,10 +2,10 @@
 
 #include <SFML/System/Vector2.hpp>
 
-#include "../component/render.hpp"
+#include "render.hpp"
 #include "ecs/system.hpp"
-#include "utility/convert.hpp"
 #include "utility/sfutils.hpp"
+#include "utility/convert.hpp"
 
 /*
     Render the whole scene by traversing every node using BFS
@@ -15,10 +15,10 @@ namespace stay
 {
     namespace sys
     {
-        struct OrderedRenderSystem : public ecs::RenderSystem, public ecs::System
+        struct RenderSystem : public ecs::RenderSystem, public ecs::System
         {
-                REGISTER_SYSTEM(OrderedRenderSystem)
-                OrderedRenderSystem(ecs::Manager* manager)
+                REGISTER_SYSTEM(RenderSystem)
+                RenderSystem(ecs::Manager* manager)
                     : ecs::RenderSystem(0)
                     , ecs::System(manager)
                 {
