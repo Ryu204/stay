@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../utility/typedef.hpp"
 #include "type.hpp"
+#include "systemContext.hpp"
 
 namespace stay
 {
@@ -19,6 +19,13 @@ namespace stay
                 Manager* mManager;
         };
         // Interfaces for specific tasks
+        struct InitSystem
+        {
+            InitSystem(int order);
+            virtual ~InitSystem() = default;
+            int orderInit;
+            virtual void init(SystemContext& context) = 0;
+        };
         struct StartSystem
         {
             StartSystem(int order);

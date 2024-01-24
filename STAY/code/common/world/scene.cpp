@@ -8,13 +8,15 @@
 
 namespace stay
 {
-    Scene::Scene(std::filesystem::path&& filepath, RWin* window)
-        : PIXELS_PER_METER(100.F)
+    Scene::Scene(std::filesystem::path&& filepath, RWin& window)
+        : mWindow(window)
+        , mCamera(40.F)
         , mSceneLoader(mManager, std::forward<std::filesystem::path>(filepath))
+        , PIXELS_PER_METER(100.F)
     {
         Node::init(mManager.getRegistry());
         phys::World::init(20.F * vectorDown);
-        initialize(window);
+        initialize();
     }
     Scene::~Scene()
     {
@@ -28,7 +30,7 @@ namespace stay
     }
     void Scene::start()
     {
-        mManager.start();
+        mManager.start(ecs::SystemContext{ mCamera, mWindow});
     }
     void Scene::saveToFile()
     {
@@ -38,20 +40,20 @@ namespace stay
     {
         mManager.input(event);
     }
-    void Scene::render(RTarget* target)
+    void Scene::render(RTarget& target)
     {
-        mCamera.setOn(target);
-        mManager.render(target, mSceneRoot.get());
+        mCamera.setOn(&target);
+        mManager.render(&target, mSceneRoot.get());
     }
-    void Scene::initialize(RWin* window)
+    void Scene::initialize()
     {
         // mManager.registerSystem<sys::RawRenderSystem>();
         mManager.registerSystem<sys::OrderedRenderSystem>();
-        mManager.registerSystem<sys::PhysicsDebugSystem>()->initialize();
-        mManager.registerSystem<sys::PhysicsSystem>()->initialize();
+        mManager.registerSystem<sys::PhysicsDebugSystem>();
+        mManager.registerSystem<sys::PhysicsSystem>();
         mManager.registerSystem<PlayerSystem>();
         mManager.registerSystem<HookSystem>();
-        mManager.registerSystem<DebugSystem>()->initialize(&mCamera, window);
+        mManager.registerSystem<DebugSystem>();
         mManager.registerSystem<DashSystem>();
 
         mSceneRoot = mSceneLoader.load();

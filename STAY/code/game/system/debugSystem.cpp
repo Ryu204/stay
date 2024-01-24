@@ -11,15 +11,16 @@ namespace stay
 {
     DebugSystem::DebugSystem(ecs::Manager* manager)
         : ecs::System{manager}
+        , ecs::InitSystem{0}
         , ecs::UpdateSystem{0}
         , mCamera{nullptr}
         , mWindow{nullptr}
     {}
 
-    void DebugSystem::initialize(Camera* camera, RWin* window)
+    void DebugSystem::init(ecs::SystemContext& context)
     {
-        mCamera = camera;
-        mWindow = window;
+        mCamera = &context.camera;
+        mWindow = &context.window;
     }
 
     void DebugSystem::update(float /*dt*/)

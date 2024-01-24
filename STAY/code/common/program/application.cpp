@@ -35,7 +35,7 @@ namespace stay
             mWindow->setKeyRepeatEnabled(false);
             setUpRendering();
 
-            mScene = std::make_unique<Scene>(data["scene"].get<std::string>(), mWindow.get());
+            mScene = std::make_unique<Scene>(data["scene"].get<std::string>(), *mWindow.get());
         }
 
         void Application::setUpRendering()
@@ -124,7 +124,7 @@ namespace stay
             mWindow->clear();
             mTexture->clear();
             // Start drawing here
-            mScene->render(mTexture.get());
+            mScene->render(*mTexture);
             // End drawing
             mTexture->display();
             RStates states;

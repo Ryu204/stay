@@ -12,6 +12,9 @@ namespace stay
         {
             return mManager->getRegistryRef();
         }
+        InitSystem::InitSystem(int order)
+            : orderInit(order)
+        {}
         StartSystem::StartSystem(int order)
             : orderStart(order)
         {}

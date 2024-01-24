@@ -6,10 +6,10 @@
 namespace stay
 {
     class Camera;
-    struct DebugSystem : public ecs::UpdateSystem, public ecs::System
+    struct DebugSystem : public ecs::UpdateSystem, public ecs::InitSystem, public ecs::System
     {
             DebugSystem(ecs::Manager* manager);
-            void initialize(Camera* camera, RWin* window);
+            void init(ecs::SystemContext& context) override;
             void update(float dt) override;
         private:
             Vector2 mousePosition() const;

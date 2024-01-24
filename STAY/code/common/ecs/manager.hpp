@@ -15,7 +15,7 @@ namespace stay
             struct Ordered
             {
                 int id {};
-                T val {};
+                SPtr<T> val {};
             };
             template <typename T>
             struct Cmpr
@@ -26,6 +26,7 @@ namespace stay
                 }
             };
         } // namespace detail
+
         class Manager 
         {
             public:     
@@ -37,7 +38,7 @@ namespace stay
                 template <typename DerviedSystem>
                 SPtr<DerviedSystem> registerSystem();
                 // Meant to be called only once, before any update
-                void start();
+                void start(ecs::SystemContext context);
                 // Meant to be call every frame update
                 void update(float dt);
                 void render(RTarget* target, Node* root);
@@ -74,8 +75,9 @@ namespace stay
                 Type& getComponent(Entity entity);
             private:
                 template <typename T>
-                using Pair = detail::Ordered<SPtr<T>>;
+                using Pair = detail::Ordered<T>;
                 SPtr<Registry> mRegistry{std::make_shared<Registry>()};
+                std::vector<Pair<InitSystem>> mInitSystems{};
                 std::vector<Pair<StartSystem>> mStartSystems{};
                 std::vector<Pair<UpdateSystem>> mUpdateSystems{};
                 std::vector<Pair<PostUpdateSystem>> mPostUpdateSystems{};
@@ -112,6 +114,12 @@ namespace stay
         SPtr<DerviedSystem> Manager::registerSystem()
         {
             SPtr<DerviedSystem> ptr = std::make_shared<DerviedSystem>(this);
+            // Init
+            if constexpr (std::is_base_of_v<InitSystem, DerviedSystem>)
+            {
+                auto initPtr = std::dynamic_pointer_cast<InitSystem>(ptr);
+                mInitSystems.push_back(Pair<InitSystem>{ initPtr->orderInit, initPtr });
+            }
             // Start
             if constexpr (std::is_base_of_v<StartSystem, DerviedSystem>)
             {

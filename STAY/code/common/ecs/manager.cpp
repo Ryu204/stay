@@ -15,15 +15,21 @@ namespace stay
         }
 
         // Meant to be called only once, before any update
-        void Manager::start()
+        void Manager::start(SystemContext context)
         {
             // In the same category, system with smallest id gets called first and so on
-            std::sort(mStartSystems.begin(), mStartSystems.end(), detail::Cmpr<SPtr<StartSystem>>());
-            std::sort(mUpdateSystems.begin(), mUpdateSystems.end(), detail::Cmpr<SPtr<UpdateSystem>>());
-            std::sort(mPreUpdateSystems.begin(), mPreUpdateSystems.end(), detail::Cmpr<SPtr<PreUpdateSystem>>());
-            std::sort(mPostUpdateSystems.begin(), mPostUpdateSystems.end(), detail::Cmpr<SPtr<PostUpdateSystem>>());
-            std::sort(mRenderSystems.begin(), mRenderSystems.end(), detail::Cmpr<SPtr<RenderSystem>>());
-            std::sort(mInputSystems.begin(), mInputSystems.end(), detail::Cmpr<SPtr<InputSystem>>());
+            std::sort(mInitSystems.begin(), mInitSystems.end(), detail::Cmpr<InitSystem>());
+            std::sort(mStartSystems.begin(), mStartSystems.end(), detail::Cmpr<StartSystem>());
+            std::sort(mUpdateSystems.begin(), mUpdateSystems.end(), detail::Cmpr<UpdateSystem>());
+            std::sort(mPreUpdateSystems.begin(), mPreUpdateSystems.end(), detail::Cmpr<PreUpdateSystem>());
+            std::sort(mPostUpdateSystems.begin(), mPostUpdateSystems.end(), detail::Cmpr<PostUpdateSystem>());
+            std::sort(mRenderSystems.begin(), mRenderSystems.end(), detail::Cmpr<RenderSystem>());
+            std::sort(mInputSystems.begin(), mInputSystems.end(), detail::Cmpr<InputSystem>());
+
+            for (auto& pair : mInitSystems)
+            {
+                pair.val->init(context);
+            }
 
             for (auto& pair : mStartSystems)
             {
