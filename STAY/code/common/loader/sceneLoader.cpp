@@ -41,7 +41,7 @@ namespace stay
             throw std::runtime_error("no top id");
         const auto topId = static_cast<ecs::Entity>(data["topId"].get<int>());
         auto topNode = std::make_unique<Node>(topId);
-        if (!topNode->localTransform().fetch(data["topNode"]["transform"]))
+        if (!topNode->localTransform().deserialization(data["topNode"]["transform"]))
             throw std::runtime_error("no top node transform");
         try 
         {
@@ -83,7 +83,7 @@ namespace stay
             throw std::runtime_error("entity or parent id not found");
         const auto id = static_cast<ecs::Entity>(data["id"].get<int>());
         auto* created = parent.createChild(id);
-        const bool hasTransform = created->localTransform().fetch(data["transform"]);
+        const bool hasTransform = created->localTransform().deserialization(data["transform"]);
         if (!hasTransform)
             throw std::runtime_error("transform data not found");
         mParentOf[id] = static_cast<ecs::Entity>(data["parent"].get<int>());
@@ -109,7 +109,7 @@ namespace stay
         Serializable::Data res;
         res["topId"] = static_cast<int>(topNode->entity());
         res["topNode"] = {
-            {"transform", topNode->localTransform().toJSONObject()},
+            {"transform", topNode->localTransform().serialize()},
             {"components", loader.saveAllComponents(mManager, topNode->entity())}
         };
         res["entities"] = Serializable::Data(nlohmann::json::value_t::array);
@@ -119,7 +119,7 @@ namespace stay
             res["entities"].emplace_back(Serializable::Data{
                 {"id", static_cast<int>(node->entity())},
                 {"parent", static_cast<int>(node->parent()->entity())},
-                {"transform", node->localTransform().toJSONObject()},
+                {"transform", node->localTransform().serialize()},
                 {"components", loader.saveAllComponents(mManager, node->entity())}
             });
         };

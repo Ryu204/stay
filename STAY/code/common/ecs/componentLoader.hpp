@@ -21,11 +21,11 @@ namespace stay
             bool deserialize(ecs::Manager& manager, ecs::Entity entity, const Serializable::Data& val) const override
             {
                 auto& comp = manager.addComponent<T>(entity);
-                return comp.fetch(val);
+                return comp.deserialization(val);
             }
             Serializable::Data serialize(ecs::Manager& manager, ecs::Entity entity) const override
             {
-                return manager.getComponent<T>(entity).toJSONObject();
+                return manager.getComponent<T>(entity).serialize();
             }
             bool inEntity(ecs::Manager& manager, ecs::Entity entity) const override
             {

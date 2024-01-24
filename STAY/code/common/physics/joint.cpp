@@ -34,7 +34,7 @@ namespace stay
         }
 
         void Joint::start() {
-            assert(mHasJointInfo && "this joint did not receive data (via fetch or direct start)");
+            assert(mHasJointInfo && "this joint did not receive data (via deserialization or direct start)");
             start(mInfoCache);
         }
 

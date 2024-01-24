@@ -29,7 +29,7 @@ namespace stay
             Serializable::Data data;
             dataReader >> data;
             dataReader.close();
-            mAppInfo.fetch(data["window"]);
+            mAppInfo.deserialization(data["window"]);
             
             mWindow = std::make_unique<RWin>(sf::VideoMode(mAppInfo.width, mAppInfo.height), mAppInfo.name);
             mWindow->setKeyRepeatEnabled(false);
@@ -66,7 +66,7 @@ namespace stay
             Serializable::Data root;
             std::ifstream(INIT_FILE) >> root;
             // Write
-            root["window"] = mAppInfo.toJSONObject();
+            root["window"] = mAppInfo.serialize();
             std::ofstream dataWriter(INIT_FILE);
             dataWriter << root;
         }

@@ -22,26 +22,26 @@ namespace stay
             , data{std::move(data)}
         {}
         
-        Serializable::Data JointInfo::toJSONObject() const
+        Serializable::Data JointInfo::serialize() const
         {
             Serializable::Data res;
-            res["status"] = connectStatus.toJSONObject();
+            res["status"] = connectStatus.serialize();
             std::visit(utils::VariantVisitor{
                 [&res](const Prismatic& pris) {
                     res["type"] = "prismatic";
-                    pris.toJSONObject().swap(res["data"]);
+                    pris.serialize().swap(res["data"]);
                 },
                 [&res](const Revolute& rev) {
                     res["type"] = "revolute";
-                    rev.toJSONObject().swap(res["data"]);
+                    rev.serialize().swap(res["data"]);
                 }
             }, data);
             return res;
         }
             
-        bool JointInfo::fetch(const Serializable::Data& value)
+        bool JointInfo::deserialization(const Serializable::Data& value)
         {
-            if (!value.contains("status") || !connectStatus.fetch(value["status"])) 
+            if (!value.contains("status") || !connectStatus.deserialization(value["status"])) 
                 return false;
             auto string = value["type"].is_string() ? value["type"].get<std::string>() : std::string();
             if (string == "prismatic")
@@ -52,10 +52,10 @@ namespace stay
                 return false;
             return std::visit(utils::VariantVisitor{
                 [&](Prismatic& obj) {
-                    return obj.fetch(value["data"]);
+                    return obj.deserialization(value["data"]);
                 },
                 [&](Revolute& rev) {
-                    return rev.fetch(value["data"]);
+                    return rev.deserialization(value["data"]);
                 }
             }, data);
         }

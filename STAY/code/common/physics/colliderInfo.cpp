@@ -55,30 +55,30 @@ namespace stay
             return std::move(res);
         }
 
-        Serializable::Data ColliderInfo::toJSONObject() const
+        Serializable::Data ColliderInfo::serialize() const
         {
             Serializable::Data res;
             std::visit(utils::VariantVisitor{
                 [&res](const Circle& cir)
                 {
                     res["type"] = "circle";
-                    res["data"] = cir.toJSONObject();
+                    res["data"] = cir.serialize();
                 },
                 [&res](const Box& box)
                 {
                     res["type"] = "box";
-                    res["data"] = box.toJSONObject();
+                    res["data"] = box.serialize();
                 },
                 [&res](const Chain& chain)
                 {
                     res["type"] = "chain";
-                    res["data"] = chain.toJSONObject();
+                    res["data"] = chain.serialize();
                 }
             }, *this);
             return res;
         }
 
-        bool ColliderInfo::fetch(const Serializable::Data& value)
+        bool ColliderInfo::deserialization(const Serializable::Data& value)
         {
             if (!value["type"].is_string())
                 return false;
@@ -93,15 +93,15 @@ namespace stay
             return std::visit(utils::VariantVisitor{
                 [&](Circle& obj)
                 {
-                    return obj.fetch(value["data"]);
+                    return obj.deserialization(value["data"]);
                 },
                 [&](Box& obj)
                 {
-                    return obj.fetch(value["data"]);
+                    return obj.deserialization(value["data"]);
                 },
                 [&](Chain& obj)
                 {
-                    return obj.fetch(value["data"]);
+                    return obj.deserialization(value["data"]);
                 }
             }, *this);
         }

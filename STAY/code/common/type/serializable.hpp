@@ -14,19 +14,19 @@ namespace stay
     {
         public:
             using Data = nlohmann::json;
-            virtual Data toJSONObject() const = 0;
-            virtual bool fetch(const Data& /*data*/) = 0;
+            virtual Data serialize() const = 0;
+            virtual bool deserialization(const Data& /*data*/) = 0;
     };
 
     template <typename T, whereIs(T, Serializable)>
     Serializable::Data toJSON(const T& t)
     {
-        return t.toJSONObject();
+        return t.serialize();
     }
     template <typename T, whereIs(T, Serializable)>
     bool fromJSON(T& t, const Serializable::Data& data)
     {
-        return t.fetch(data);
+        return t.deserialization(data);
     }
     Serializable::Data toJSON(const ecs::Entity& t);
     bool fromJSON(ecs::Entity& t, const Serializable::Data& data);
@@ -61,7 +61,7 @@ namespace stay
         for (const auto& val : data)
         {
             t.push_back(T());
-            if (!t.back().fetch(val))
+            if (!t.back().deserialization(val))
                 return false;
         }
         return true;
@@ -80,12 +80,12 @@ namespace stay
 // }
 // ```
 #define SERIALIZE(...) \
-    Serializable::Data toJSONObject() const override {\
+    Serializable::Data serialize() const override {\
         Serializable::Data res;\
         stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
         return res;\
     }\
-    bool fetch(const Serializable::Data& val) override {\
+    bool deserialization(const Serializable::Data& val) override {\
         stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
         return true;\
     }
@@ -105,37 +105,37 @@ namespace stay
 // }
 // ```
 #define SERIALIZE_POSTPROCESSING(...) \
-    Serializable::Data toJSONObject() const override {\
+    Serializable::Data serialize() const override {\
         Serializable::Data res;\
         stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
         return res;\
     }\
-    bool fetch(const Serializable::Data& val) override {\
+    bool deserialization(const Serializable::Data& val) override {\
         stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
         postSerialization();\
         return true;\
     }
 
 #define SERIALIZE_PREPROCESSING(...) \
-    Serializable::Data toJSONObject() const override {\
+    Serializable::Data serialize() const override {\
         Serializable::Data res;\
         preSerialization();\
         stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
         return res;\
     }\
-    bool fetch(const Serializable::Data& val) override {\
+    bool deserialization(const Serializable::Data& val) override {\
         stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
         return true;\
     }
 
 #define SERIALIZE_PROCESSING(...) \
-    Serializable::Data toJSONObject() const override {\
+    Serializable::Data serialize() const override {\
         Serializable::Data res;\
         preSerialization();\
         stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\
         return res;\
     }\
-    bool fetch(const Serializable::Data& val) override {\
+    bool deserialization(const Serializable::Data& val) override {\
         stay_FOR_EACH(stay_FETCH_JSON, __VA_ARGS__)\
         postSerialization();\
         return true;\

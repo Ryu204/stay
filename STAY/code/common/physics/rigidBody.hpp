@@ -69,8 +69,8 @@ namespace stay
                 SERIALIZE_PROCESSING(mBodyDefCache, mHorizontalDamping);
                 void postSerialization();
                 void preSerialization() const;
-                // Serializable::Data toJSONObject() const override;
-                // bool fetch(const Serializable::Data& value) override;
+                // Serializable::Data serialize() const override;
+                // bool deserialization(const Serializable::Data& value) override;
             private:
                 
                 b2World* mWorld;
