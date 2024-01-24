@@ -2,7 +2,7 @@
 
 #include "componentFwd.hpp"
 #include "componentLoader.hpp"
-#include "world/nodeFwd.hpp"
+#include "world/node.hpp"
 
 namespace stay
 {

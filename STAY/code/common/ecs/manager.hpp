@@ -2,7 +2,7 @@
 
 #include "system.hpp"
 #include "utility/typedef.hpp"
-#include "world/nodeFwd.hpp"
+#include "world/node.hpp"
 
 namespace stay
 {
