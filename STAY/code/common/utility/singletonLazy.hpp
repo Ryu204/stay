@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <cassert>
 
 namespace stay
 {
@@ -18,19 +17,13 @@ namespace stay
                 {
                     std::make_unique<T>(std::forward<Args>(args)...).swap(mInstance());
                 }
-                static void shutdown()
-                {
-                    assert(mInstance().get() != nullptr && "Call init first");
-                    mInstance().reset();
-                }
                 static T& get()
                 {
-                    assert(mInstance().get() != nullptr && "call init first");
+                    if (mInstance().get() == nullptr)
+                    {
+                        std::make_unique<T>().swap(mInstance());
+                    }
                     return *mInstance();
-                }
-                static bool avail()
-                {
-                    return mInstance().get() != nullptr;
                 }
             private:
                 static std::unique_ptr<T>& mInstance()

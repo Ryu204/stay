@@ -42,7 +42,7 @@ namespace stay
                 void remove(std::size_t id);
             private:
                 const Path mRootDirectory;
-                utils::IDGenerator mGenerator;
+                utils::IdGenerator mGenerator;
                 std::unordered_map<std::size_t, Uptr<Asset>> mAssetsList;
                 FolderWatcher mWatcher;
         };

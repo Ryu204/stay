@@ -4,8 +4,8 @@
 
 #include <box2d/box2d.h>
 
-#include "../type/vector.hpp"
-#include "../type/serializable.hpp"
+#include "type/vector.hpp"
+#include "type/serializable.hpp"
 
 namespace stay
 {
@@ -37,8 +37,8 @@ namespace stay
         {
             Chain() = default;
             Chain(std::vector<Vector2>& points);
-            SERIALIZE_POSTPROCESSING(mPoints);
-            void postSerialization();
+            DESERIALIZE_POSTPROCESSING(mPoints);
+            void postDeserialization();
             const std::vector<b2Vec2>& data() const;
             private:
                 mutable bool mCached{false};
@@ -48,8 +48,8 @@ namespace stay
         struct ColliderInfo : public std::variant<Box, Circle, Chain>, public Serializable
         {
             using std::variant<Box, Circle, Chain>::variant;
-            Serializable::Data toJSONObject() const override;
-            bool fetch(const Serializable::Data& value) override;
+            Serializable::Data serialize() const override;
+            bool deserialization(const Serializable::Data& value) override;
             Uptr<b2Shape> createShape() const;
         };
     } // namespace phys

@@ -1,9 +1,9 @@
-#pragma once
+#include <SFML/System/Vector2.hpp>
 
-#include "../component/render.hpp"
-#include "../../common/ecs/manager.hpp"
-#include "../../common/utility/convert.hpp"
-#include "../../common/utility/sfutils.hpp"
+#include "render.hpp"
+#include "ecs/system.hpp"
+#include "utility/sfutils.hpp"
+#include "utility/convert.hpp"
 
 /*
     Render the whole scene by traversing every node using BFS
@@ -13,15 +13,16 @@ namespace stay
 {
     namespace sys
     {
-        struct OrderedRenderSystem : public ecs::RenderSystem, public ecs::System
+        struct RenderSystem : public ecs::RenderSystem, public ecs::System
         {
-                OrderedRenderSystem(ecs::Manager* manager)
+                REGISTER_SYSTEM(RenderSystem)
+                RenderSystem(ecs::Manager* manager)
                     : ecs::RenderSystem(0)
                     , ecs::System(manager)
                 {
                     mShape.setOutlineColor(sf::Color::White);
                     mShape.setOutlineThickness(0.1F);
-                    utils::centersf(mShape);
+                    utils::centerSf(mShape);
                 }
 
                 void render(RTarget* target, Node* root) override
@@ -38,11 +39,11 @@ namespace stay
                     {
                         const auto& tf = current->localTransform();
                         states.transform = states.transform * utils::transTosfTrans(tf);
-                        if (current->hasComponent<comp::Render>())
+                        if (current->hasComponent<Render>())
                         {
-                            const auto& drawable = current->getComponent<comp::Render>();
-                            mShape.setSize(utils::convertVec2<sf::Vector2f>(drawable.size));
-                            utils::centersf(mShape);
+                            const auto& drawable = current->getComponent<Render>();
+                            mShape.setSize(drawable.size.toVec2<sf::Vector2f>());
+                            utils::centerSf(mShape);
                             mShape.setFillColor(drawable.color);
                             target->draw(mShape, states);
                         }

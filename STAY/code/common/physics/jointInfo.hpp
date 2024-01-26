@@ -4,8 +4,8 @@
 
 #include <box2d/box2d.h>
 
-#include "../type/serializable.hpp"
-#include "../type/vector.hpp"
+#include "type/serializable.hpp"
+#include "type/vector.hpp"
 #include "ecs/type.hpp"
 
 namespace stay
@@ -33,8 +33,8 @@ namespace stay
         struct JointInfo : public Serializable
         {
             JointInfo(ecs::Entity other = ecs::Entity{0}, bool shouldCollide = false, JointData data = JointData{});
-            Serializable::Data toJSONObject() const override;
-            bool fetch(const Serializable::Data& value) override;
+            Serializable::Data serialize() const override;
+            bool deserialization(const Serializable::Data& value) override;
             Uptr<b2JointDef> createDef(RigidBody& a, RigidBody& b) const;
 
             struct Connect : Serializable 

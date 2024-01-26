@@ -1,4 +1,4 @@
-#include "PhysicsSystem.hpp"
+#include "physicsSystem.hpp"
 #include "physics/rigidBody.hpp"
 #include "physics/collider.hpp"
 #include "physics/joint.hpp"
@@ -60,7 +60,8 @@ namespace stay
         } // namespace detail
 
         PhysicsSystem::PhysicsSystem(ecs::Manager* manager)
-            : ecs::StartSystem(0)
+            : ecs::InitSystem(0)
+            , ecs::StartSystem(0)
             , ecs::UpdateSystem(-1)
             , ecs::System(manager)
         { 
@@ -97,7 +98,7 @@ namespace stay
             }
         }
 
-        void PhysicsSystem::initialize()
+        void PhysicsSystem::init(ecs::SystemContext& /* context */)
         {
             phys::World::get().SetContactListener(&mContactListener);
             phys::World::get().SetDestructionListener(&mDestructListener);

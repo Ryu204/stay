@@ -1,11 +1,10 @@
 #pragma once
 
-#include <SFML/System/NonCopyable.hpp>
-
-#include "system.hpp"
-#include "../utility/assignable.hpp"
-#include "../type/serializable.hpp"
-#include "../event/event.hpp"
+#include "type/serializable.hpp"
+#include "utility/assignable.hpp"
+#include "event/event.hpp"
+#include "componentLoader.hpp"
+#include "componentLoader.impl.hpp" // IWYU pragma: keep
 
 namespace stay
 {
@@ -14,12 +13,27 @@ namespace stay
     {
         class Manager;
         // Every component type must inherit this struct
-        struct Component : public Serializable, utils::Assignable<Entity>, sf::NonCopyable
+        class Component : public Serializable, public utils::Assignable<Entity>, private sf::NonCopyable
         {
-                using utils::Assignable<Entity>::get;
+            public:
                 Node* getNode() const;
-                virtual ~Component();
+                ~Component() override ;
                 event::Event<> OnRemoval;
         };
     } // namespace ecs
 } // namespace stay
+
+
+// `className` will be used in save file
+#define REGISTER_COMPONENT(className) \
+    static inline struct SelfRegister final {\
+        SelfRegister() {\
+            stay::ecs::componentsLoader().registerComponent<className>(#className);\
+        }\
+    } selfRegister;
+
+// Only a syntatic sugar
+// If you want to perform additional operations, use `REGISTER_COMPONENT` with corresponding serde macro
+#define COMPONENT(className, ...) \
+    REGISTER_COMPONENT(className)\
+    SERIALIZE(__VA_ARGS__)

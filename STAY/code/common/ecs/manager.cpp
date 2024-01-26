@@ -1,11 +1,15 @@
-#include <type_traits>
-
 #include "manager.hpp"
 
 namespace stay
 {
     namespace ecs
     {       
+        Manager& manager()
+        {
+            static Manager manager;
+            return manager;
+        }
+
         Registry& Manager::getRegistryRef()
         {
             return *mRegistry;
@@ -16,17 +20,27 @@ namespace stay
             return mRegistry;
         }
 
+        void Manager::reset(SystemContext context)
+        {
+            std::make_shared<Registry>().swap(mRegistry);
+            // In the same category, system with smallest id gets called first and so on
+            std::sort(mInitSystems.begin(), mInitSystems.end(), detail::Cmpr<InitSystem>());
+            std::sort(mStartSystems.begin(), mStartSystems.end(), detail::Cmpr<StartSystem>());
+            std::sort(mUpdateSystems.begin(), mUpdateSystems.end(), detail::Cmpr<UpdateSystem>());
+            std::sort(mPreUpdateSystems.begin(), mPreUpdateSystems.end(), detail::Cmpr<PreUpdateSystem>());
+            std::sort(mPostUpdateSystems.begin(), mPostUpdateSystems.end(), detail::Cmpr<PostUpdateSystem>());
+            std::sort(mRenderSystems.begin(), mRenderSystems.end(), detail::Cmpr<RenderSystem>());
+            std::sort(mInputSystems.begin(), mInputSystems.end(), detail::Cmpr<InputSystem>());
+
+            for (auto& pair : mInitSystems)
+            {
+                pair.val->init(context);
+            }
+        }
+
         // Meant to be called only once, before any update
         void Manager::start()
         {
-            // In the same category, system with smallest id gets called first and so on
-            std::sort(mStartSystems.begin(), mStartSystems.end(), detail::Cmpr<SPtr<StartSystem>>());
-            std::sort(mUpdateSystems.begin(), mUpdateSystems.end(), detail::Cmpr<SPtr<UpdateSystem>>());
-            std::sort(mPreUpdateSystems.begin(), mPreUpdateSystems.end(), detail::Cmpr<SPtr<PreUpdateSystem>>());
-            std::sort(mPostUpdateSystems.begin(), mPostUpdateSystems.end(), detail::Cmpr<SPtr<PostUpdateSystem>>());
-            std::sort(mRenderSystems.begin(), mRenderSystems.end(), detail::Cmpr<SPtr<RenderSystem>>());
-            std::sort(mInputSystems.begin(), mInputSystems.end(), detail::Cmpr<SPtr<InputSystem>>());
-
             for (auto& pair : mStartSystems)
             {
                 pair.val->start();
@@ -65,5 +79,5 @@ namespace stay
                 pair.val->input(event);
             }
         }
-    }
+    } // namespace ecs
 } // namespace stay

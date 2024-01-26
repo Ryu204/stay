@@ -1,18 +1,13 @@
 #pragma once
 
-#include <vector>
-#include <unordered_map>
-
-#include "SFML/System/NonCopyable.hpp"
-
 #include "transform.hpp"
-#include "../utility/typedef.hpp"
-#include "../utility/assignable.hpp"
-#include "../ecs/system.hpp"
-#include "../ecs/component.hpp"
 
 namespace stay
 {
+    namespace ecs 
+    {
+        class Component;
+    } // namespace ecs
     class Node : sf::NonCopyable
     {
         public:
@@ -71,7 +66,7 @@ namespace stay
             std::unordered_map<ecs::Entity, Uptr<Node>> mChildren;
             Transform mLocalTransform;
     };
-
+    
     template <typename Func, typename... Args>
     void Node::visit(const Func& func, Args&&... args)
     {

@@ -48,7 +48,7 @@ namespace stay
             {
                 float currentTime{0.F};
                 std::priority_queue<Registry> callbackData{};
-                utils::IDGenerator generator;
+                utils::IdGenerator generator;
                 void reset();
             };
 

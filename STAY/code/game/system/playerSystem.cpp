@@ -1,10 +1,7 @@
-#include <optional>
-#include <cmath>
+#include "playerSystem.hpp"
 
-#include "player.hpp"
+#include "../component/player.hpp"
 #include "physics/collider.hpp"
-#include "physics/joint.hpp"
-#include "utility/convert.hpp"
 
 namespace 
 {
@@ -95,7 +92,7 @@ namespace stay
         {
             if (player.onDash)
                 continue;
-            auto force = utils::convertVec2<Vector2>(dir * player.moveStrength);
+            auto force = Vector2::from(dir * player.moveStrength);
             const auto vel = player.movementBody->getVelocity();
             const auto isLeft = vel.x < 5.F;
             const auto isRight = vel.x > -5.F;

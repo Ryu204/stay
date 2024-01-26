@@ -2,7 +2,7 @@
 
 #include <box2d/box2d.h>
 
-#include "../type/vector.hpp"
+#include "type/vector.hpp"
 
 namespace stay
 {

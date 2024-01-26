@@ -1,10 +1,7 @@
 #pragma once
 
-#include "render.hpp"
-#include "../../common/physics/collider.hpp"
-#include "player.hpp"
-#include "../../common/physics/rigidBody.hpp"
-#include "hook.hpp"
-#include "../../common/physics/joint.hpp"
-#include "playerDebug.hpp"
-#include "dash.hpp"
+#include "components.hpp" // IWYU pragma: export
+#include "player.hpp" // IWYU pragma: export
+#include "hook.hpp" // IWYU pragma: export
+#include "playerDebug.hpp" // IWYU pragma: export
+#include "dash.hpp" // IWYU pragma: export

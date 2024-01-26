@@ -1,16 +1,16 @@
-#include <iostream>
-#include <fstream>
-#include <cmath>
-
 #include "sceneLoader.hpp"
-#include "LDtk/rawSceneLoader.hpp"
+#include "iLoader.hpp"
+#include "ecs/component.hpp"
 #include "utility/error.hpp"
+#include "world/node.hpp"
+
+#include <fstream>
 
 namespace stay
 {
-    SceneLoader::SceneLoader(ecs::Manager* manager, Path&& filepath)
+    SceneLoader::SceneLoader(ecs::Manager& manager, Path&& filepath)
         : mFile(filepath)
-        , mLoader(manager)
+        , mManager(manager)
     {}
 
     // @return Root node
@@ -27,9 +27,19 @@ namespace stay
         }
         catch (std::exception& e)
         {
-            RawSceneLoader altLoader;
-            auto res = altLoader.load(mFile/"in.ldtk", e.what());
-            return std::move(res);
+            auto& altLoader = detail::loader().getLoader();
+            try
+            {
+                auto res = altLoader.load(mFile/"in.ldtk");
+                return std::move(res);
+            }
+            catch (std::exception& e2)
+            {
+                throw std::runtime_error(
+                    std::string("Load failed: ") + e.what() 
+                    +  "\nOpened alternate but failed: " + e2.what()
+                );
+            }
         }
     }
 
@@ -41,11 +51,11 @@ namespace stay
             throw std::runtime_error("no top id");
         const auto topId = static_cast<ecs::Entity>(data["topId"].get<int>());
         auto topNode = std::make_unique<Node>(topId);
-        if (!topNode->localTransform().fetch(data["topNode"]["transform"]))
+        if (!topNode->localTransform().deserialization(data["topNode"]["transform"]))
             throw std::runtime_error("no top node transform");
         try 
         {
-            mLoader.loadAllComponents(topId, data["topNode"]["components"]);
+            ecs::componentsLoader().loadAllComponents(mManager, topId, data["topNode"]["components"]);
         }
         catch (std::exception& e)
         {
@@ -83,13 +93,13 @@ namespace stay
             throw std::runtime_error("entity or parent id not found");
         const auto id = static_cast<ecs::Entity>(data["id"].get<int>());
         auto* created = parent.createChild(id);
-        const bool hasTransform = created->localTransform().fetch(data["transform"]);
+        const bool hasTransform = created->localTransform().deserialization(data["transform"]);
         if (!hasTransform)
             throw std::runtime_error("transform data not found");
         mParentOf[id] = static_cast<ecs::Entity>(data["parent"].get<int>());
         try
         {
-            mLoader.loadAllComponents(id, data["components"]);
+            ecs::componentsLoader().loadAllComponents(mManager, id, data["components"]);
         }
         catch(const std::exception& e)
         {
@@ -105,21 +115,22 @@ namespace stay
 
     Serializable::Data SceneLoader::createSaveObject(Node* topNode) const
     {
+        auto& loader = ecs::componentsLoader();
         Serializable::Data res;
         res["topId"] = static_cast<int>(topNode->entity());
         res["topNode"] = {
-            {"transform", topNode->localTransform().toJSONObject()},
-            {"components", mLoader.saveAllComponents(topNode->entity())}
+            {"transform", topNode->localTransform().serialize()},
+            {"components", loader.saveAllComponents(mManager, topNode->entity())}
         };
         res["entities"] = Serializable::Data(nlohmann::json::value_t::array);
-        const auto saveToEntities = [this, topNode, &res](Node* node) -> void {
+        const auto saveToEntities = [this, topNode, &res, &loader](Node* node) -> void {
             if (node == topNode) 
                 return;
             res["entities"].emplace_back(Serializable::Data{
                 {"id", static_cast<int>(node->entity())},
                 {"parent", static_cast<int>(node->parent()->entity())},
-                {"transform", node->localTransform().toJSONObject()},
-                {"components", mLoader.saveAllComponents(node->entity())}
+                {"transform", node->localTransform().serialize()},
+                {"components", loader.saveAllComponents(mManager, node->entity())}
             });
         };
         topNode->visit(saveToEntities);

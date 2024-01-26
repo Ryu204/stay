@@ -1,9 +1,6 @@
 #pragma once
 
-#include <optional>
-
 #include "ecs/component.hpp"
-#include "ecs/type.hpp"
 #include "jointInfo.hpp"
 
 namespace stay
@@ -30,8 +27,9 @@ namespace stay
                     assert(res != nullptr && "Get wrong internal joint type");
                     return res;
                 }
-                SERIALIZE_POSTPROCESSING(mInfoCache);
-                void postSerialization();
+                REGISTER_COMPONENT(Joint);
+                DESERIALIZE_POSTPROCESSING(mInfoCache);
+                void postDeserialization();
             private:
                 void check() const;
 

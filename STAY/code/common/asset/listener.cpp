@@ -1,11 +1,10 @@
 #include "listener.hpp"
 #include "asset.hpp"
 #include "utility/invoke.hpp"
+
 #include <SFML/System/Clock.hpp>
+
 #include <cassert>
-#include <chrono>
-#include <memory>
-#include <cmath>
 
 namespace stay
 {

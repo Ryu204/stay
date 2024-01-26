@@ -43,7 +43,7 @@ namespace stay
                 event::Event<Collision& /*info*/> OnTriggerExit;
                 event::Event<Collision& /*info*/, b2Contact& /*native info*/> OnCollisionDetection;
 
-                SERIALIZE(mMaterial, mShapeInfo)
+                COMPONENT(Collider, mMaterial, mShapeInfo)
             private:
                 void attachToRigidBody();
 
@@ -59,14 +59,11 @@ namespace stay
                 friend class DestructRegister;
         };
 
-        // @brief Placeholder to provide a mean for an entity to hold more than 1 collider
-        struct Collider01 : public Collider 
+        class Collider01 : public Collider
         {
-            using Collider::Collider;
-        };
-        struct Collider02 : public Collider 
-        {
-            using Collider::Collider;
+            public:
+                using Collider::Collider;
+                REGISTER_COMPONENT(Collider01);
         };
     } // namespace phys
 } // namespace stay

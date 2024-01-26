@@ -43,6 +43,6 @@ namespace stay
             Properties props{};
             Status status{};        
             
-            SERIALIZE(props);
+            COMPONENT(Hook, props);
     };
 } // namespace stay

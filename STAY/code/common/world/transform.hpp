@@ -43,8 +43,8 @@ namespace stay
             void setScale(const Vector2& scale);
             Vector3 getScale() const;
 
-            SERIALIZE_POSTPROCESSING(mPosition, mRotation, mScale)
-            void postSerialization()
+            DESERIALIZE_POSTPROCESSING(mPosition, mRotation, mScale)
+            void postDeserialization()
             {
                 mMatrixNeedRebuild = true;
                 mInverseNeedRebuild = true;

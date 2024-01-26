@@ -2,8 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "../type/vector.hpp"
-#include "../world/transform.hpp"
+#include "world/transform.hpp"
 
 namespace stay
 {

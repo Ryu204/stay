@@ -12,7 +12,7 @@ namespace stay
     namespace utils
     {
         template <typename sfObject>
-        void centersf(sfObject& object)
+        void centerSf(sfObject& object)
         {
             auto bounds = object.getLocalBounds();
             object.setOrigin(bounds.left + bounds.width / 2.F, bounds.top + bounds.height / 2.F);

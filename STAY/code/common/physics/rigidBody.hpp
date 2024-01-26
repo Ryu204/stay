@@ -2,8 +2,8 @@
 
 #include <box2d/box2d.h>
 
-#include "../ecs/component.hpp"
-#include "../type/vector.hpp"
+#include "ecs/component.hpp"
+#include "type/vector.hpp"
 
 namespace stay
 {
@@ -23,7 +23,7 @@ namespace stay
                     using b2BodyDef::b2BodyDef;
                     BodyDef(const b2BodyDef& other);
                     SERIALIZE_PROCESSING(mBodyType, mPosition, angle, gravityScale, linearDamping, fixedRotation);
-                    void postSerialization();
+                    void postDeserialization();
                     void preSerialization() const;
                     void fromBody(b2Body& body);
                 private:
@@ -65,26 +65,18 @@ namespace stay
                 b2Fixture* attachFixture(const b2FixtureDef& properties);
                 b2Body* body();
                 
+                REGISTER_COMPONENT(RigidBody);
                 SERIALIZE_PROCESSING(mBodyDefCache, mHorizontalDamping);
-                void postSerialization();
+                void postDeserialization();
                 void preSerialization() const;
-                // Serializable::Data toJSONObject() const override;
-                // bool fetch(const Serializable::Data& value) override;
+                // Serializable::Data serialize() const override;
+                // bool deserialization(const Serializable::Data& value) override;
             private:
                 
                 b2World* mWorld;
                 b2Body* mBody;
                 mutable detail::BodyDef mBodyDefCache;
                 float mHorizontalDamping;
-        };
-
-        struct RigidBody01 : public RigidBody 
-        {
-            using RigidBody::RigidBody;
-        };
-        struct RigidBody02 : public RigidBody 
-        {
-            using RigidBody::RigidBody;
         };
     } // namespace phys
 } // namespace stay

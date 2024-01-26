@@ -20,14 +20,6 @@ namespace stay
         {
                 using Handler = std::function<void(EventArgs...)>;
                 
-                ~Event()
-                {
-                    // return all IDs to manager
-                    for (const auto& pair : mSubcribers)
-                    {
-                        mIDGen.erase(pair.first);
-                    }
-                }
                 // @return The index of the listener. This index is used to later remove the listener from invoke list if needed.
                 template <typename Func>
                 std::size_t addEventListener(Func&& action)
@@ -55,7 +47,7 @@ namespace stay
                 }
             private:
                 std::unordered_map<std::size_t, Handler> mSubcribers{};
-                utils::IDGenerator mIDGen;
+                utils::IdGenerator mIDGen;
         };
     } // namespace event
 } // namespace stay

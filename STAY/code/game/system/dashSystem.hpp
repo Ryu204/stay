@@ -1,11 +1,15 @@
 #pragma once 
 
-#include "../../common/ecs/manager.hpp"
+#include "ecs/system.hpp"
 
 namespace stay
 {
-    struct DashSystem : public ecs::InputSystem, public ecs::UpdateSystem, public ecs::System
+    struct DashSystem 
+        : public ecs::InputSystem
+        , public ecs::UpdateSystem
+        , public ecs::System
     {
+            REGISTER_SYSTEM(DashSystem)
             DashSystem(ecs::Manager* manager);
             void update(float dt) override;
             void input(const sf::Event& event) override;

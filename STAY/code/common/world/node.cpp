@@ -1,4 +1,3 @@
-#include <string>
 #include <cassert>
 
 #include "node.hpp"
@@ -17,7 +16,6 @@ namespace stay
     {
         auto& info = globalInfo();
         info.nodeOf.clear();
-        info.registry->destroy(info.root);
         info.registry.reset();
     }
 

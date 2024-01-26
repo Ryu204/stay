@@ -15,6 +15,6 @@ namespace stay
             bool canDash{true};
             bool left{false};
             
-            SERIALIZE(velocity, length, cooldown, postBrake);
+            COMPONENT(Dash, velocity, length, cooldown, postBrake);
     };
 } // namespace stay

@@ -1,9 +1,7 @@
 #include <fstream>
-#include <iostream>
 
 #include "application.hpp"
-#include "../type/vector.hpp"
-#include "../utility/invoke.hpp"
+#include "utility/invoke.hpp"
 
 namespace stay
 {
@@ -31,13 +29,13 @@ namespace stay
             Serializable::Data data;
             dataReader >> data;
             dataReader.close();
-            mAppInfo.fetch(data["window"]);
+            mAppInfo.deserialization(data["window"]);
             
             mWindow = std::make_unique<RWin>(sf::VideoMode(mAppInfo.width, mAppInfo.height), mAppInfo.name);
             mWindow->setKeyRepeatEnabled(false);
             setUpRendering();
 
-            mScene = std::make_unique<Scene>(data["scene"].get<std::string>(), mWindow.get());
+            mScene = std::make_unique<Scene>(data["scene"].get<std::string>(), *mWindow.get());
         }
 
         void Application::setUpRendering()
@@ -68,7 +66,7 @@ namespace stay
             Serializable::Data root;
             std::ifstream(INIT_FILE) >> root;
             // Write
-            root["window"] = mAppInfo.toJSONObject();
+            root["window"] = mAppInfo.serialize();
             std::ofstream dataWriter(INIT_FILE);
             dataWriter << root;
         }
@@ -79,7 +77,7 @@ namespace stay
             float queuedTime = 0.F;
             const float timePerUpdate = 1.F / mAppInfo.updatesPerSec;
 
-            mScene->start();
+            Scene::start();
             mScene->saveToFile();
 
             while (mWindow->isOpen())
@@ -111,13 +109,13 @@ namespace stay
                 default:
                     break;
                 }
-                mScene->input(event);
+                Scene::input(event);
             }
         }
 
         void Application::update(float dt)
         {
-            mScene->update(dt);
+            Scene::update(dt);
             Invoke::progress(dt);
         }
 
@@ -126,7 +124,7 @@ namespace stay
             mWindow->clear();
             mTexture->clear();
             // Start drawing here
-            mScene->render(mTexture.get());
+            mScene->render(*mTexture);
             // End drawing
             mTexture->display();
             RStates states;

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <string>
-#include "../utility/typedef.hpp"
-#include "../type/serializable.hpp"
-#include "../world/scene.hpp"
+#include "utility/typedef.hpp"
+#include "type/serializable.hpp"
+#include "world/scene.hpp"
 
 namespace stay
 {
@@ -28,7 +28,7 @@ namespace stay
                 };
 
                 void input();
-                void update(float dt);
+                static void update(float dt);
                 void render();
                 void initialize();  
                 void setUpRendering();  

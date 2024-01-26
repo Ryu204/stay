@@ -1,9 +1,8 @@
 #include "joint.hpp"
 #include "jointInfo.hpp"
-#include "../world/node.hpp"
 #include "rigidBody.hpp"
 #include "world.hpp"
-#include <cstddef>
+
 #include <cassert>
 
 namespace stay
@@ -30,12 +29,12 @@ namespace stay
             }
         }
 
-        void Joint::postSerialization() {
+        void Joint::postDeserialization() {
             mHasJointInfo = true;
         }
 
         void Joint::start() {
-            assert(mHasJointInfo && "this joint did not receive data (via fetch or direct start)");
+            assert(mHasJointInfo && "this joint did not receive data (via deserialization or direct start)");
             start(mInfoCache);
         }
 

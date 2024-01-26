@@ -1,10 +1,8 @@
 #pragma once
 
-#include <vector>
-
-#include "system.hpp"
-#include "../utility/typedef.hpp"
-#include "../world/node.hpp"
+#include "systemTypes.hpp"
+#include "utility/typedef.hpp"
+#include "world/node.hpp"
 
 namespace stay
 {
@@ -17,7 +15,7 @@ namespace stay
             struct Ordered
             {
                 int id {};
-                T val {};
+                SPtr<T> val {};
             };
             template <typename T>
             struct Cmpr
@@ -28,17 +26,19 @@ namespace stay
                 }
             };
         } // namespace detail
+
         class Manager 
         {
             public:     
+                Manager() = default;
                 Registry& getRegistryRef();
                 SPtr<Registry> getRegistry();
 
                 // @note Its overriding IDs are used to determine its order in the manager action, i.e type with lower ID called earlier
                 // @param DerivedSystem A dervied class of `ecs:*System`(s) defined in `system.hpp`, with the restriction of having a constructor taking an `ecs::Manager*`
                 template <typename DerviedSystem>
-                SPtr<DerviedSystem> registerSystem();
-                // Meant to be called only once, before any update
+                void registerSystem();
+                void reset(ecs::SystemContext context);
                 void start();
                 // Meant to be call every frame update
                 void update(float dt);
@@ -76,8 +76,9 @@ namespace stay
                 Type& getComponent(Entity entity);
             private:
                 template <typename T>
-                using Pair = detail::Ordered<SPtr<T>>;
+                using Pair = detail::Ordered<T>;
                 SPtr<Registry> mRegistry{std::make_shared<Registry>()};
+                std::vector<Pair<InitSystem>> mInitSystems{};
                 std::vector<Pair<StartSystem>> mStartSystems{};
                 std::vector<Pair<UpdateSystem>> mUpdateSystems{};
                 std::vector<Pair<PostUpdateSystem>> mPostUpdateSystems{};
@@ -110,48 +111,54 @@ namespace stay
             return mRegistry->get<Type>(entity);
         }
 
-        template <typename DerviedSystem>
-        SPtr<DerviedSystem> Manager::registerSystem()
+        template <typename DerivedSystem>
+        void Manager::registerSystem()
         {
-            SPtr<DerviedSystem> ptr = std::make_shared<DerviedSystem>(this);
+            SPtr<DerivedSystem> ptr = std::make_shared<DerivedSystem>(this);
+            // Init
+            if constexpr (std::is_base_of_v<InitSystem, DerivedSystem>)
+            {
+                SPtr<InitSystem> initPtr = std::dynamic_pointer_cast<InitSystem>(ptr);
+                mInitSystems.push_back(Pair<InitSystem>{ initPtr->orderInit, initPtr });
+            }
             // Start
-            if constexpr (std::is_base_of_v<StartSystem, DerviedSystem>)
+            if constexpr (std::is_base_of_v<StartSystem, DerivedSystem>)
             {
                 SPtr<StartSystem> startPtr = std::dynamic_pointer_cast<StartSystem>(ptr);
                 mStartSystems.push_back(Pair<StartSystem>{ startPtr->orderStart, startPtr });
             }
             // Update
-            if constexpr (std::is_base_of_v<UpdateSystem, DerviedSystem>)
+            if constexpr (std::is_base_of_v<UpdateSystem, DerivedSystem>)
             {
                 SPtr<UpdateSystem> updatePtr = std::dynamic_pointer_cast<UpdateSystem>(ptr);
                 mUpdateSystems.push_back(Pair<UpdateSystem>{updatePtr->orderUpdate, updatePtr});
             }
             // PostUpdate
-            if constexpr (std::is_base_of_v<PostUpdateSystem, DerviedSystem>)
+            if constexpr (std::is_base_of_v<PostUpdateSystem, DerivedSystem>)
             {
                 SPtr<PostUpdateSystem> lateUpdatePtr = std::dynamic_pointer_cast<PostUpdateSystem>(ptr);
                 mPostUpdateSystems.push_back(Pair<PostUpdateSystem>{lateUpdatePtr->orderLateUpdate, lateUpdatePtr});
             }
             // PreUpdate
-            if constexpr (std::is_base_of_v<PreUpdateSystem, DerviedSystem>)
+            if constexpr (std::is_base_of_v<PreUpdateSystem, DerivedSystem>)
             {
                 SPtr<PreUpdateSystem> preUpdatePtr = std::dynamic_pointer_cast<PreUpdateSystem>(ptr);
                 mPreUpdateSystems.push_back(Pair<PreUpdateSystem>{preUpdatePtr->orderPreUpdate, preUpdatePtr});
             }
             // Render
-            if constexpr (std::is_base_of_v<RenderSystem, DerviedSystem>)
+            if constexpr (std::is_base_of_v<RenderSystem, DerivedSystem>)
             {
                 SPtr<RenderSystem> renderPtr = std::dynamic_pointer_cast<RenderSystem>(ptr);
                 mRenderSystems.push_back(Pair<RenderSystem>{renderPtr->orderRender, renderPtr});
             }
             // Input
-            if constexpr (std::is_base_of_v<InputSystem, DerviedSystem>)
+            if constexpr (std::is_base_of_v<InputSystem, DerivedSystem>)
             {
                 SPtr<InputSystem> inputPtr = std::dynamic_pointer_cast<InputSystem>(ptr);
                 mInputSystems.push_back(Pair<InputSystem>{inputPtr->orderInput, inputPtr});
             }
-
-            return ptr;
         }
+
+        Manager& manager();
     } // namespace ecs
 } // namespace stay

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../common/physics/rigidBody.hpp"
-#include "../../common/ecs/manager.hpp"
 
 namespace stay
 {
@@ -22,20 +21,6 @@ namespace stay
         phys::RigidBody* movementBody;
         phys::RigidBody* hookBody;
 
-        SERIALIZE(moveStrength, jumpHeight, oppositeScale, airScale);
-    };
-
-    struct PlayerSystem 
-        : public ecs::System
-        , public ecs::StartSystem
-        , public ecs::UpdateSystem
-        , public ecs::InputSystem
-    {
-            PlayerSystem(ecs::Manager* manager);
-            void start() override;
-            void input(const sf::Event& event) override;
-            void update(float dt) override;
-        private:
-            bool mEntered;
+        COMPONENT(Player, moveStrength, jumpHeight, oppositeScale, airScale);
     };
 } // namespace stay

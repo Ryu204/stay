@@ -1,15 +1,10 @@
 #include "hookSystem.hpp"
-#include "../component/player.hpp"
 #include "../component/hook.hpp"
 #include "physics/collider.hpp"
-#include "physics/rigidBody.hpp"
+#include "../component/player.hpp"
 #include "physics/joint.hpp"
+#include "type/vector.hpp"
 #include "utility/math.hpp"
-#include "physics/world.hpp"
-#include "utility/convert.hpp"
-
-#include <SFML/Window.hpp>
-#include <box2d/box2d.h>
 
 namespace 
 {
@@ -103,7 +98,7 @@ namespace stay
             mDirection = bestVector;
         }
         else
-            mDirection = glm::normalize(mDirection);
+            mDirection = mDirection.norm();
     }
 
     void HookSystem::updateControl(Hook& hook, float dt)
@@ -213,20 +208,16 @@ namespace stay
             if (unsplitted)
                 continue;
             const auto& pin = hook.status.createdPins.back();
-            // const auto currentSwingSpeed = pin.node->getComponent<phys::Joint>().getNativeHandle<b2RevoluteJoint>()->GetJointSpeed();
-            // const auto sameDirection = pin.clockwise ? currentSwingSpeed < tolerance : currentSwingSpeed > -tolerance;
-            // if (sameDirection)
-            //     continue;
             // A = lastPin, B = pin next to it, c = player position
             const auto b = (hook.status.createdPins.end() - 2)->node->getComponent<phys::RigidBody>().getPosition();
             const auto a = pin.node->getComponent<phys::RigidBody>().getPosition();            
-            const auto ab = glm::normalize(b - a);
-            const auto ac = glm::normalize(hook.getNode()->getComponent<phys::RigidBody>().getPosition() - a);
+            const auto ab = Vector2(b - a).norm();
+            const auto ac = Vector2(hook.getNode()->getComponent<phys::RigidBody>().getPosition() - a).norm();
             const auto crossZ = ab.x * ac.y - ab.y * ac.x;
             const auto sameSide = pin.clockwise ? crossZ < tolerance : crossZ > -tolerance;
             if (sameSide)
                 continue;
-            rejoinList.emplace_back(&hook, glm::length(b - a), &playerBody);
+            rejoinList.emplace_back(&hook, Vector2(b - a).getLength(), &playerBody);
         }
         for (const auto& [hook, length, playerBody] : rejoinList)
         {
@@ -250,19 +241,18 @@ namespace stay
         mQueuedAttaches.emplace(hook, obstacle);
     }
 
-    void HookSystem::
-    createBoxConnect(Node* player, Node* pin, float length, float margin) 
+    void HookSystem::createBoxConnect(Node* player, Node* pin, float length, float margin) 
     {
         auto& playerBody = player->getComponent<phys::RigidBody>();
         const auto playerPosition = playerBody.getPosition();
         auto& pinBody = pin->getComponent<phys::RigidBody>();
         auto pinPosition = pinBody.getPosition();
 
-        auto direction = playerPosition - pinPosition;
-        auto absoluteCenter = pinPosition + length / 2.F * glm::normalize(direction);
-        auto center = utils::convertVec2<Vector2>(
-            pinBody.body()->GetLocalPoint(
-                utils::convertVec2<b2Vec2>(absoluteCenter)));
+        const Vector2 direction = playerPosition - pinPosition;
+        const Vector2 absoluteCenter = pinPosition + length / 2.F * direction.norm();
+        auto center = Vector2::from(
+            pinBody.body()->GetLocalPoint(absoluteCenter.toVec2<b2Vec2>())
+        );
         auto angleToOx = std::abs(direction.x) < 1e-4 ? 90.F : std::atan2(direction.y, direction.x) * RAD2DEG;
         auto absoluteAngle = angleToOx - 90.F;
         auto angle = absoluteAngle - pinBody.getAngle();
@@ -298,14 +288,14 @@ namespace stay
         {
             auto& lastPinInfo = hook->status.createdPins.back();
             const auto lastPinPosition = lastPinInfo.node->getComponent<phys::RigidBody>().getPosition();   
-            const auto pinsRay = lastPinPosition - position;
+            const Vector2 pinsRay = lastPinPosition - position;
             // Create joint to the pin
             hook->getNode()->removeComponents<phys::Joint>();
             lastPinInfo.node->removeComponents<phys::Collider01>();
             hook->status.maxLength -= std::min(hook->status.maxLength, utils::lengthVec2(pinsRay));
              // Determine the orientation
-            const auto abNormed = glm::normalize(pinsRay);
-            const auto acNormed = glm::normalize(lastPinInfo.savedPosition - position);
+            const auto abNormed = pinsRay.norm();
+            const auto acNormed = Vector2(lastPinInfo.savedPosition - position).norm();
             clockwise = abNormed.x * acNormed.y - abNormed.y * acNormed.x > 0.F;
         }
         auto& bulletRevJoint = pin->addComponent<phys::Joint>();
@@ -326,6 +316,6 @@ namespace stay
         playerPrisJoint.start(phys::JointInfo{pin->entity(), false, phys::Prismatic{playerPosition, pinPosition, pinPosition - playerPosition}});
         auto* nativePrisJoint = playerPrisJoint.getNativeHandle<b2PrismaticJoint>();
         nativePrisJoint->EnableLimit(true);
-        nativePrisJoint->SetLimits(0.F, glm::length(pinPosition - playerPosition));
+        nativePrisJoint->SetLimits(0.F, Vector2(pinPosition - playerPosition).getLength());
     }
 } // namespace stay

@@ -1,7 +1,9 @@
 #include "folderWatcher.hpp"
 #include "asset.hpp"
 #include "asset/type.hpp"
+
 #include <SFML/System/Clock.hpp>
+
 #include <filesystem>
 #include <cassert>
 

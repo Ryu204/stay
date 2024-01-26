@@ -1,7 +1,5 @@
 #pragma once
 
-#include <variant>
-
 namespace stay
 {
     namespace utils

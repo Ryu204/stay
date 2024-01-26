@@ -2,7 +2,8 @@
 
 #include <unordered_map>
 
-#include "../../common/ecs/manager.hpp"
+#include "ecs/system.hpp"
+#include "world/node.hpp"
 
 namespace stay
 {
@@ -15,6 +16,7 @@ namespace stay
 
     struct HookSystem : public ecs::System, public ecs::UpdateSystem, public ecs::InputSystem
     {
+            REGISTER_SYSTEM(HookSystem)
             HookSystem(ecs::Manager* manager);
             void update(float dt) override;
             void input(const sf::Event& event) override;

@@ -7,7 +7,7 @@ namespace stay
     struct PlayerDebug : public ecs::Component
     {
             PlayerDebug() = default;
-            SERIALIZE(foo);
+            COMPONENT(PlayerDebug, foo);
         private:
             int foo;
     };

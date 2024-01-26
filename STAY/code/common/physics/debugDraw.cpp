@@ -1,11 +1,7 @@
 #include "debugDraw.hpp"
 
-#include <box2d/box2d.h>
-#include <SFML/Graphics.hpp>
-
-#include "../utility/convert.hpp"
-#include "../utility/b2utils.hpp"
-#include "../utility/sfutils.hpp"
+#include "utility/convert.hpp"
+#include "utility/sfutils.hpp"
 
 namespace stay
 {
