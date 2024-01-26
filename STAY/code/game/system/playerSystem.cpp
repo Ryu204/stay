@@ -30,7 +30,7 @@ namespace stay
             collider.OnCollisionEnter.addEventListener(
                 [&player = player](phys::Collision& contact)
                 {
-                    if (contact.normal.y < 0.5F)
+                    if (contact.normal.y < 0.F)
                     {
                         player.canJump = true;
                         player.onGround = true;
@@ -40,7 +40,7 @@ namespace stay
             collider.OnCollisionExit.addEventListener(
                 [&player = player](phys::Collision& contact) 
                 {
-                    if (contact.normal.y < 0.5F)
+                    if (contact.normal.y < 0.F)
                     {
                         player.onGround = false;
                     }
