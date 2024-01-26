@@ -68,7 +68,7 @@ namespace stay
     }
 } // namespace stay
 #define stay_GET_JSON(x) { res[#x] = stay::toJSON(x); }
-#define stay_FETCH_JSON(x) { if (!stay::fromJSON(x, val[#x])) return false; }
+#define stay_FETCH_JSON(x) { if (!val.contains(#x) || !stay::fromJSON(x, val[#x])) return false; }
 
 // @example 
 // ```cpp
