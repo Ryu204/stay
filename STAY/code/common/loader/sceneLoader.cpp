@@ -18,12 +18,7 @@ namespace stay
     {
         try 
         {
-            std::string log;
-            auto maybeRes = tryLoad(log);
-            if (maybeRes != nullptr)
-                return std::move(maybeRes);
-            
-            throw std::runtime_error(log);
+            return tryLoad();
         }
         catch (std::exception& e)
         {
@@ -37,15 +32,14 @@ namespace stay
             {
                 throw std::runtime_error(
                     std::string("Load failed: ") + e.what() 
-                    +  "\nOpened alternate but failed: " + e2.what()
+                    +  "\nOpened alternate file but failed: " + e2.what()
                 );
             }
         }
     }
 
-    Uptr<Node> SceneLoader::tryLoad(std::string& log)
+    Uptr<Node> SceneLoader::tryLoad()
     {
-        log = "";
         auto data = openFile();
         if (!data["topId"].is_number_integer())
             throw std::runtime_error("no top id");

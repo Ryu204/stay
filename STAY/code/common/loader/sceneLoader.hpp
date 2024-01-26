@@ -15,7 +15,7 @@ namespace stay
             Uptr<Node> load();
             void save(Node* root, bool overrideIn = false) const;
         private:
-            Uptr<Node> tryLoad(std::string& log);
+            Uptr<Node> tryLoad();
             Serializable::Data openFile();
             void loadEntity(Node& parent, const Serializable::Data& data);
             Serializable::Data createSaveObject(Node* topNode) const;
