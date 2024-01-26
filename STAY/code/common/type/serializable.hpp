@@ -97,14 +97,14 @@ namespace stay
 //     Vector2 vec;
 //     Color color;
 //     bool cacheChanged;
-//     SERIALIZE_POSTPROCESSING(vec, color)
+//     DESERIALIZE_POSTPROCESSING(vec, color)
 //     void postDeserialization()
 //     {
 //          cacheChanged = true;
 //     }
 // }
 // ```
-#define SERIALIZE_POSTPROCESSING(...) \
+#define DESERIALIZE_POSTPROCESSING(...) \
     Serializable::Data serialize() const override {\
         Serializable::Data res;\
         stay_FOR_EACH(stay_GET_JSON, __VA_ARGS__)\

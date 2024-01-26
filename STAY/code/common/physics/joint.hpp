@@ -28,7 +28,7 @@ namespace stay
                     return res;
                 }
                 REGISTER_COMPONENT(Joint);
-                SERIALIZE_POSTPROCESSING(mInfoCache);
+                DESERIALIZE_POSTPROCESSING(mInfoCache);
                 void postDeserialization();
             private:
                 void check() const;
