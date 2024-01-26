@@ -39,9 +39,9 @@ namespace stay
                     {
                         const auto& tf = current->localTransform();
                         states.transform = states.transform * utils::transTosfTrans(tf);
-                        if (current->hasComponent<comp::Render>())
+                        if (current->hasComponent<Render>())
                         {
-                            const auto& drawable = current->getComponent<comp::Render>();
+                            const auto& drawable = current->getComponent<Render>();
                             mShape.setSize(drawable.size.toVec2<sf::Vector2f>());
                             utils::centerSf(mShape);
                             mShape.setFillColor(drawable.color);

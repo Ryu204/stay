@@ -7,18 +7,15 @@
 
 namespace stay
 {
-    namespace comp
+    struct Render : public ecs::Component
     {
-        struct Render : public ecs::Component
+        Render(const Color& color = Color(), const Vector2& size = Vector2())
         {
-            Render(const Color& color = Color(), const Vector2& size = Vector2())
-            {
-                this->color = color;
-                this->size = size;
-            }
-            Color color;
-            Vector2 size;
-            COMPONENT(Render, color, size);
-        };
-    } // namespace comp
+            this->color = color;
+            this->size = size;
+        }
+        Color color;
+        Vector2 size;
+        COMPONENT(Render, color, size);
+    };
 } // namespace stay

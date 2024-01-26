@@ -1,5 +1,5 @@
 #include "sceneLoader.hpp"
-#include "../game/loader/loader.hpp"
+#include "iLoader.hpp"
 #include "ecs/component.hpp"
 #include "utility/error.hpp"
 #include "world/node.hpp"
@@ -27,10 +27,10 @@ namespace stay
         }
         catch (std::exception& e)
         {
-            std::unique_ptr<ILoader> altLoader = std::make_unique<Loader>();
+            auto& altLoader = detail::loader().getLoader();
             try
             {
-                auto res = altLoader->load(mFile/"in.ldtk");
+                auto res = altLoader.load(mFile/"in.ldtk");
                 return std::move(res);
             }
             catch (std::exception& e2)

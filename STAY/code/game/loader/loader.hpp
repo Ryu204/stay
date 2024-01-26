@@ -6,7 +6,7 @@
 #include "type/vector.hpp"
 #include "quicktypefwd.hpp"
 #include "world/node.hpp"
-#include "loader/sceneLoader.hpp"
+#include "loader/iLoader.hpp"
 
 /*
     This class is used in case there is no suitable file found for `SceneLoader`

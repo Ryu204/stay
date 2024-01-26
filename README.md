@@ -43,7 +43,6 @@ A bunch of them, actually :octocat:
 
 This section lists what user must do to make a game from core codebase (a.k.a `STAY/code/common`):
 
-* Create `class Loader : public ILoader` and implement `load` method. Note that this method can throw without catching.
 * Create more components by:
     * inheriting from `ecs::Component`
     * insert a `COMPONENT` macro to register and (de)serialize inside the class's implementation
@@ -51,5 +50,6 @@ This section lists what user must do to make a game from core codebase (a.k.a `S
     * insert a `REGISTER_SYSTEM` macro to register inside the class's implementation
     * inherits from a set of possible base systems to perform corresponding jobs
     * inherits from `ecs::System` to have access to entities and components
+* Create an optional loader class to generate the scene by calling `constructLoader` (see example in `game/system/levelSystem.hpp`). Once the scene is run, it will save a loader-independent file for later use without loader.
 
 Headers of system classes are not supposed to be included anywhere, as systems work independently. However their code needs to be compiled somehow. That means if a system's definition is so short that it can be contained in a single file, the file must be a source file (`*.cpp`).

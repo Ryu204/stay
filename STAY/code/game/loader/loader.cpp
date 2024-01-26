@@ -29,7 +29,7 @@ namespace stay
             auto* entity = currentRoot->createChild();
             const auto& tilePos = Vector2(tile.getPx()[0], tile.getPx()[1]) + Vector2(0.5F, 0.5F) * mPxPerMeter + mLayerOffset;
             entity->localTransform().setPosition(fileToWorld(tilePos));
-            entity->addComponent<comp::Render>(Color(0x00FF00FF), Vector2(mTileSize, mTileSize) / mPxPerMeter);
+            entity->addComponent<Render>(Color(0x00FF00FF), Vector2(mTileSize, mTileSize) / mPxPerMeter);
         }
     }
 
