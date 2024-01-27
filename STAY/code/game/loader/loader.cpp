@@ -112,7 +112,8 @@ namespace stay
         const ldtk::Coordinate coord = nlohmann::json::parse(buffer.str());
         reader.close();
 
-        Uptr<Node> root = std::make_unique<Node>();
+        Uptr<Node> root = std::make_unique<Node>(ecs::Entity{1});
+        assert(static_cast<int>(root->entity()) == 1 && "top node must be 1, but node with value 1 exists");
         const auto& level = coord.getLevels()[0];
         const auto layers = level.getLayerInstances();
         const auto& platform = layers->at(1);

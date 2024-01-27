@@ -25,7 +25,6 @@ namespace stay
         LoaderHolder& loader()
         {
             static LoaderHolder res;
-            res.setLoader<ILoader>();
             return res;
         }
     } // namespace detail

@@ -9,7 +9,8 @@ namespace stay
         auto& info = globalInfo();
         info.nodeOf.clear();
         info.registry = registry;
-        info.root = registry->create();
+        info.root = registry->create(ecs::Entity{0});
+        assert(static_cast<int>(info.root) == 0 && "registry already used entity 0");
     }
 
     void Node::shutdown()

@@ -23,7 +23,7 @@ namespace stay
                 }
                 ILoader& getLoader();
             private:
-                Uptr<ILoader> mLoader{};
+                Uptr<ILoader> mLoader{std::make_unique<ILoader>()};
         };
         LoaderHolder& loader();
     } // namespace detail
