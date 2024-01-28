@@ -7,7 +7,7 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Build or search for dependencies
 MESSAGE("-- Fetching dependencies from GitHub")
-INCLUDE(CMakeDependencies)
+INCLUDE(cmake/Dependencies.txt)
 
 # Collect source files
 FILE(GLOB_RECURSE 
@@ -45,6 +45,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
     box2d
     efsw
 )
+
 # Specific libraries macros
 TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC "GLM_ENABLE_EXPERIMENTAL")
 # Add thread support
@@ -58,3 +59,10 @@ TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/STAY/code
 # Copy asset folder
 FILE(COPY "${PROJECT_NAME}/asset" DESTINATION ".")
 MESSAGE("-- Asset folder is copied to ${CMAKE_BINARY_DIR}/asset")
+
+# Create python binding
+IF (USER_DEFINED_PYTHON_BINDING)
+    SET(RETURN_VALUE 0.1)
+    SET(${PROJECT_NAME}_PYTHON_MODULE re_stay)
+    INCLUDE(cmake/PythonBind.txt)
+ENDIF()

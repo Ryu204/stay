@@ -28,6 +28,15 @@
             "binaryDir" : "build/default"
         },
         {
+            "name": "py",
+            "description": "python binding for scene load process",
+            "inherits": "base",
+            "binaryDir": "build/py",
+            "cacheVariables": {
+                "USER_DEFINED_PYTHON_BINDING": "EXISTS"
+            }
+        },
+        {
             "name": "clang-tidy",
             "inherits" : "default",
             "binaryDir" : "build/clang-tidy",
