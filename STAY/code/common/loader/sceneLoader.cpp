@@ -25,7 +25,9 @@ namespace stay
             auto& altLoader = detail::loader().getLoader();
             try
             {
-                auto res = altLoader.load(mFile/"in.ldtk");
+                auto res = std::make_unique<Node>(ecs::Entity{1});
+                assert(static_cast<int>(res->entity()) == 1 && "top node must be 1, but node with value 1 exists");
+                altLoader.load(mFile/"in.ldtk", res.get());
                 return std::move(res);
             }
             catch (std::exception& e2)
@@ -58,7 +60,7 @@ namespace stay
         mParentOf.clear();
         utils::throwIfFalse(data["entities"].is_array(), "entities object must be an array");
         for (const auto& entity : data["entities"])
-            loadEntity(*topNode, entity);
+            loadEntity(topNode.get(), entity);
         for (const auto [child, parent] : mParentOf)
             Node::getNode(child)->setParent(parent);
         return std::move(topNode);
@@ -80,13 +82,13 @@ namespace stay
         }
     }
 
-    void SceneLoader::loadEntity(Node& parent, const Serializable::Data& data)
+    void SceneLoader::loadEntity(Node* parent, const Serializable::Data& data)
     {
         const bool hasValidIDs = data["id"].is_number_integer() && data["parent"].is_number_integer();
         if (!hasValidIDs)
             throw std::runtime_error("entity or parent id not found");
         const auto id = static_cast<ecs::Entity>(data["id"].get<int>());
-        auto* created = parent.createChild(id);
+        auto* created = parent->createChild(id);
         const bool hasTransform = created->localTransform().deserialization(data["transform"]);
         if (!hasTransform)
             throw std::runtime_error("transform data not found");

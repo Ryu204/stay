@@ -1,15 +1,23 @@
-#include "program/application.hpp"
-
 #include <pybind11/pybind11.h>
 
-int run() 
-{
-    stay::program::Application app;
-    app.run();
-    return 0;
-}
+#include "config.hpp"
+#include "program/application.hpp"
+#include "opaques.hpp" // IWYU pragma: keep
 
-PYBIND11_MODULE(re_stay, m) 
+namespace stay
 {
-    m.def("run", &run, "run the program");
-}
+    namespace py
+    {
+        void initEntity(pybind11::module_& m);
+        void initNode(pybind11::module_& m);
+        void initLoader(pybind11::module_& m);
+
+        PYBIND11_MODULE(STAY_MODULE_NAME, m)
+        {
+            initEntity(m);
+            initNode(m);
+            initLoader(m);
+            m.def("run", []() { program::Application().run(); }, "Run the game");
+        }
+    }
+} // namespace stay

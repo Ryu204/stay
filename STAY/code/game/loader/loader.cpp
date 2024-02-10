@@ -103,7 +103,7 @@ namespace stay
         dash.postBrake = player.getFieldInstances().at(15).getValue().get<float>();
     }
 
-    Uptr<Node> Loader::load(Path &&filename)
+    void Loader::load(const std::filesystem::path& filename, Node* node)
     {
         std::ifstream reader;
         reader.open(filename);
@@ -112,18 +112,14 @@ namespace stay
         const ldtk::Coordinate coord = nlohmann::json::parse(buffer.str());
         reader.close();
 
-        Uptr<Node> root = std::make_unique<Node>(ecs::Entity{1});
-        assert(static_cast<int>(root->entity()) == 1 && "top node must be 1, but node with value 1 exists");
         const auto& level = coord.getLevels()[0];
         const auto layers = level.getLayerInstances();
         const auto& platform = layers->at(1);
         const auto& collider = layers->at(0);
         const auto& player = layers->at(2);
 
-        loadTiles(root.get(), level, platform);
-        loadColliders(root.get(), level, collider);
-        loadPlayer(root.get(), level, player);
-
-        return std::move(root);
+        loadTiles(node, level, platform);
+        loadColliders(node, level, collider);
+        loadPlayer(node, level, player);
     }
 } // namespace stay

@@ -17,7 +17,7 @@ namespace stay
         private:
             Uptr<Node> tryLoad();
             Serializable::Data openFile();
-            void loadEntity(Node& parent, const Serializable::Data& data);
+            void loadEntity(Node* parent, const Serializable::Data& data);
             Serializable::Data createSaveObject(Node* topNode) const;
 
             Path mFile;

@@ -20,7 +20,7 @@ namespace stay
         public:
             using Path = typename std::filesystem::path;
             // @return Root node if succeeded, null if failed
-            Uptr<Node> load(Path&& filename) override;
+            void load(const std::filesystem::path& filename, Node* node) override;
         private:
             void init(const ldtk::Level& level, const ldtk::LayerInstance& layer);
             void loadTiles(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer);

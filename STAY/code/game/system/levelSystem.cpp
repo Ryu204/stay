@@ -6,7 +6,7 @@ namespace stay
     class LevelSystem : public ecs::System, public ecs::InitSystem
     {
         public:
-            REGISTER_SYSTEM(LevelSystem)
+            // REGISTER_SYSTEM(LevelSystem)
             LevelSystem(ecs::Manager* manager)
                 : ecs::System(manager)
                 , ecs::InitSystem(0)

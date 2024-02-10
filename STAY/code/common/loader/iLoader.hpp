@@ -5,9 +5,9 @@
 
 namespace stay
 {
-    struct ILoader 
+    struct ILoader : std::enable_shared_from_this<ILoader>
     {
-        virtual Uptr<Node> load(std::filesystem::path&& path);
+        virtual void load(const std::filesystem::path& /* path */, Node* node);
         virtual ~ILoader() = default;
     };
 
@@ -19,11 +19,18 @@ namespace stay
                 template <typename T, typename... Args, typename = std::enable_if_t<std::is_base_of_v<ILoader, T>, bool>>
                 void setLoader(Args&&... args)
                 {
-                    mLoader = std::make_unique<T>(std::forward<Args>(args)...);
+                    mLoader = std::make_shared<T>(std::forward<Args>(args)...);
                 }
-                ILoader& getLoader();
+                void setLoaderPtr(std::shared_ptr<ILoader>&& ptr)
+                {
+                    mLoader = std::move(ptr);
+                }
+                ILoader& getLoader()
+                {
+                    return *mLoader;
+                }
             private:
-                Uptr<ILoader> mLoader{std::make_unique<ILoader>()};
+                SPtr<ILoader> mLoader{std::make_shared<ILoader>()};
         };
         LoaderHolder& loader();
     } // namespace detail
@@ -33,4 +40,6 @@ namespace stay
     {
         detail::loader().setLoader<T>(std::forward<Args>(args)...);
     }
+
+    void setLoader(std::shared_ptr<ILoader>&& ptr);
 } // namespace stay
