@@ -45,12 +45,28 @@
             }
         },
         {
+            "name": "py-lint",
+            "inherits": "clang-tidy",
+            "binaryDir": "build/py-lint",
+            "cacheVariables": {
+                "USER_DEFINED_PYTHON_BINDING": "EXISTS"
+            }
+        },
+        {
             "name": "ci",
             "inherits" : "default"
         },
         {
             "name" : "ci-lint",
             "inherits" : "clang-tidy"
+        },
+        {
+            "name": "ci-py",
+            "inherits": "py"
+        },
+        {
+            "name": "ci-py-lint",
+            "inherits": "py-lint"
         }
     ]
 }
