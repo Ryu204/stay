@@ -106,6 +106,9 @@ namespace stay
             Vector2(const glm::vec2& vec)
                 : glm::vec2(vec)
             {}
+            Vector2(const glm::vec3& vec)
+                : glm::vec2(vec.x, vec.y)
+            {}
             SERIALIZE(x, y)
     };
 

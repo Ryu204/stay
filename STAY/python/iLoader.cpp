@@ -1,7 +1,6 @@
 #include <pybind11/pybind11.h>
 
 #include "loader/iLoader.hpp"
-#include "opaques.hpp" // IWYU pragma: keep
 
 namespace stay 
 {
