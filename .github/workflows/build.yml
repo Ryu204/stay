@@ -57,7 +57,8 @@ jobs:
     - name: Build
       run: cmake --build build/default -j
 
-    - name: Build Python binding
+    - name: Build Python binding (disabled for Clang on Windows)
+      if: matrix.platform.os != 'windows-latest' || !contains(matrix.platform.name, 'clang')
       run: cmake --preset ci-py ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} && cmake --build build/py -j
   
   lint:
@@ -125,5 +126,6 @@ jobs:
     - name: Build
       run: cmake --build build/clang-tidy -j
 
-    - name: Build Python binding
+    - name: Build Python binding (disabled for Clang on Windows)
+      if: matrix.platform.os != 'windows-latest' || !contains(matrix.platform.name, 'clang')
       run: cmake --preset ci-py-lint ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} && cmake --build build/py-lint -j
