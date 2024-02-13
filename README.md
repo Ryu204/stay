@@ -5,11 +5,13 @@ A project for my girlfriend's birthday.
 It's a game but the "engine" part is taking over.
 
 # How to build
-You will need `CMake` with version `>= 3.24` to build the project directly.
+
+You will need `git` and `CMake` (with version `>= 3.24`) to build the project directly.
 
 Inside project directory:
 ```sh
-cmake --preset=default # This will take a while to download sources of dependencies
+git submodule update --init --recursive --remote
+cmake --preset=default
 cmake --build build/default
 ```
 Run the executable:
@@ -27,6 +29,7 @@ A bunch of them, actually :octocat:
 * **entt** with [MIT](https://github.com/skypjack/entt/blob/v3.12.x/LICENSE) license
 * **box2d** with [MIT](https://github.com/erincatto/box2d/blob/main/LICENSE) license
 * **efsw** with [MIT](https://github.com/SpartanJ/efsw/blob/master/LICENSE) license
+* **pybind11** with [BSD-style](https://github.com/pybind/pybind11/blob/master/LICENSE) license
 
 # Trivial info
 
