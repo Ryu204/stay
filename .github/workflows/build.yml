@@ -125,6 +125,5 @@ jobs:
     - name: Build
       run: cmake --build build/clang-tidy -j
 
-    - name: Build Python binding (Windows version only supports MSVC)
-      if: matrix.platform.os != 'windows-latest' || contains(matrix.platform.name, 'MSVC')
+    - name: Build Python binding
       run: cmake --preset ci-py-lint ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} && cmake --build build/py-lint -j
