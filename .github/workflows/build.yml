@@ -122,7 +122,7 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v4
     
-    - name: - name: Configure
+    - name: Configure
       run: |
         git submodule update --init --recursive --remote
         cmake --preset ci-lint ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
