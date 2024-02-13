@@ -30,11 +30,14 @@ FILE(GLOB_RECURSE
     "STAY/python/*.hpp"
     "STAY/python/*.cpp")
 
-# Generate target
-MESSAGE("-- Configuring Python binding target")
+# Patch minor errors
 IF (USER_DEFINED_CLANG_TIDY)
     SET(CMAKE_INTERPROCEDURAL_OPTIMIZATION OFF)
 ENDIF()
+SET_TARGET_PROPERTIES(sfml-graphics PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+
+# Generate target
+MESSAGE("-- Configuring Python binding target")
 PYBIND11_ADD_MODULE(
     ${${PROJECT_NAME}_PYTHON_MODULE}
     ${${PROJECT_NAME}_BIND_CODE}
