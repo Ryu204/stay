@@ -16,14 +16,7 @@ IF (NOT ${PROJECT_NAME}_PYTHON_MODULE)
     MESSAGE(FATAL_ERROR "Python module name is not defined")
 ENDIF()
 
-# Download `pybind11`
-FETCHCONTENT_DECLARE(
-  pybind
-  GIT_REPOSITORY        https://github.com/pybind/pybind11
-  GIT_TAG               "master"
-  SYSTEM
-)
-FETCHCONTENT_MAKEAVAILABLE(pybind)
+ADD_SUBDIRECTORY(extern/pybind11)
 
 # Generate config header file
 CONFIGURE_FILE(
