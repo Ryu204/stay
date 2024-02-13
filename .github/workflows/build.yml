@@ -52,7 +52,9 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Configure
-      run: cmake --preset ci ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
+      run: |
+        git submodule update --init --recursive --remote
+        cmake --preset ci ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
     
     - name: Build
       run: cmake --build build/default -j
@@ -120,8 +122,10 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v4
     
-    - name: Configure
-      run: cmake --preset ci-lint ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
+    - name: - name: Configure
+      run: |
+        git submodule update --init --recursive --remote
+        cmake --preset ci-lint ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
     
     - name: Build
       run: cmake --build build/clang-tidy -j
