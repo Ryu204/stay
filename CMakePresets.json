@@ -29,11 +29,12 @@
         },
         {
             "name": "py",
-            "description": "python binding for scene load process",
+            "description": "python binding",
             "inherits": "base",
             "binaryDir": "build/py",
             "cacheVariables": {
-                "USER_DEFINED_PYTHON_BINDING": "EXISTS"
+                "USER_DEFINED_PYTHON_BINDING": "EXISTS",
+                "BUILD_SHARED_LIBS": "ON"
             }
         },
         {
@@ -46,11 +47,8 @@
         },
         {
             "name": "py-lint",
-            "inherits": "clang-tidy",
-            "binaryDir": "build/py-lint",
-            "cacheVariables": {
-                "USER_DEFINED_PYTHON_BINDING": "EXISTS"
-            }
+            "inherits": ["py", "clang-tidy"],
+            "binaryDir": "build/py-lint"
         },
         {
             "name": "ci",
