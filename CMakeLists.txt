@@ -6,8 +6,12 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Build or search for dependencies
-MESSAGE("-- Fetching dependencies from GitHub")
-INCLUDE(CMakeDependencies)
+ADD_SUBDIRECTORY(extern/box2d)
+ADD_SUBDIRECTORY(extern/efsw)
+ADD_SUBDIRECTORY(extern/entt)
+ADD_SUBDIRECTORY(extern/glm)
+ADD_SUBDIRECTORY(extern/json)
+ADD_SUBDIRECTORY(extern/SFML)
 
 # Collect source files
 FILE(GLOB_RECURSE 
@@ -45,8 +49,10 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
     box2d
     efsw
 )
+
 # Specific libraries macros
 TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC "GLM_ENABLE_EXPERIMENTAL")
+
 # Add thread support
 SET(THREADS_PREFER_PTHREAD_FLAG TRUE)
 FIND_PACKAGE(Threads REQUIRED)

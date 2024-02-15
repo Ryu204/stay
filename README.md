@@ -5,13 +5,16 @@ A project for my girlfriend's birthday.
 It's a game but the "engine" part is taking over.
 
 # How to build
-You will need `CMake` with version `>= 3.24` to build the project directly.
+You will need `CMake` with version `>= 3.24` and `git` to build the project directly.
 
 Inside project directory:
 ```sh
-cmake --preset=default # This will take a while to download sources of dependencies
+git submodule update --init --recursive --remote
+cmake --preset=default
 cmake --build build/default
 ```
+If your build does not succeed, you can take a look at `.github/workflows/build.yml` to see detailed steps.
+
 Run the executable:
 ```sh
 cd build/default
