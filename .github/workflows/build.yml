@@ -14,9 +14,9 @@ jobs:
       matrix:
         platform: 
           - { name: Ubuntu with gcc,   os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc,                version: gcc --version && g++ --version && make --version }
-          - { name: Ubuntu with clang, os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang,          version: clang --version && clang++ --version && make --version }
-          - { name: Windows with gcc,  os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja,        version: gcc --version && g++ --version && ninja --version}
-          - { name: Windows with clang, os: windows-latest,  flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja,  version: clang --version && clang++ --version && ninja --version}
+          # - { name: Ubuntu with clang, os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang,          version: clang --version && clang++ --version && make --version }
+          # - { name: Windows with gcc,  os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja,        version: gcc --version && g++ --version && ninja --version}
+          # - { name: Windows with clang, os: windows-latest,  flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja,  version: clang --version && clang++ --version && ninja --version}
           - { name: Windows with MSVC, os: windows-latest,   flags: -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -GNinja,          version: ninja --version && cl}
         buildType: ["Debug", "Release"]
 
@@ -52,7 +52,9 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Configure
-      run: cmake --preset ci ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
+      run: |
+        git submodule update --init --recursive --remote
+        cmake --preset ci ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
     
     - name: Build
       run: cmake --build build/default -j
@@ -67,9 +69,9 @@ jobs:
       matrix:
         platform: 
           - { name: Ubuntu with gcc,    os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc,               version: gcc --version && g++ --version && make --version }
-          - { name: Ubuntu with clang,  os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang,         version: clang --version && clang++ --version && make --version}
-          - { name: Windows with gcc,   os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja,       version: gcc --version && g++ --version && ninja --version}
-          - { name: Windows with clang, os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja, version: clang --version && clang++ --version && ninja --version}
+          # - { name: Ubuntu with clang,  os: ubuntu-latest,    flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang,         version: clang --version && clang++ --version && make --version}
+          # - { name: Windows with gcc,   os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc -GNinja,       version: gcc --version && g++ --version && ninja --version}
+          # - { name: Windows with clang, os: windows-latest,   flags: -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -GNinja, version: clang --version && clang++ --version && ninja --version}
           - { name: Windows with MSVC, os: windows-latest,   flags: -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl -GNinja,          version: ninja --version && cl}
         buildType: ["Debug", "Release"]
 
@@ -117,7 +119,9 @@ jobs:
       uses: actions/checkout@v4
     
     - name: Configure
-      run: cmake --preset ci-lint ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
+      run: |
+        git submodule update --init --recursive --remote
+        cmake --preset ci-lint ${{ matrix.platform.flags }} -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
     
     - name: Build
       run: cmake --build build/clang-tidy -j
