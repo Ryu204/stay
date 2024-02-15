@@ -6,7 +6,6 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Build or search for dependencies
-MESSAGE("-- Fetching dependencies from GitHub")
 ADD_SUBDIRECTORY(extern/box2d)
 ADD_SUBDIRECTORY(extern/efsw)
 ADD_SUBDIRECTORY(extern/entt)
