@@ -21,15 +21,19 @@ cd build/default
 ./STAY
 ```
 
-# Dependencies
+# License and dependencies
 
-A bunch of them, actually :octocat:
+This repository is licensed under MIT license.
+
+The dependencies are provided with compatible licenses:
+
 * **SFML** with [zlib](https://github.com/SFML/SFML/blob/2.6.x/license.md) license
 * **json** with [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT) license
 * **glm** with [modified MIT](https://github.com/g-truc/glm/blob/master/manual.md#-licenses) license
 * **entt** with [MIT](https://github.com/skypjack/entt/blob/v3.12.x/LICENSE) license
 * **box2d** with [MIT](https://github.com/erincatto/box2d/blob/main/LICENSE) license
 * **efsw** with [MIT](https://github.com/SpartanJ/efsw/blob/master/LICENSE) license
+* **LDtkLoader** with [zlib](https://github.com/Madour/LDtkLoader/blob/master/LICENSE.md) license
 
 # Trivial info
 

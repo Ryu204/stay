@@ -23,9 +23,11 @@ namespace stay
         catch (std::exception& e)
         {
             auto& altLoader = detail::loader().getLoader();
+            auto res = std::make_unique<Node>(ecs::Entity{1});
+            assert(static_cast<int>(res->entity()) == 1 && "entity 1 is used");
             try
             {
-                auto res = altLoader.load(mFile/"in.ldtk");
+                altLoader.load(mFile/"in.ldtk", res.get());
                 return std::move(res);
             }
             catch (std::exception& e2)

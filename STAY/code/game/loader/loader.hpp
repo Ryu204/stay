@@ -2,15 +2,9 @@
 
 #include <filesystem>
 
-#include "ecs/type.hpp"
-#include "type/vector.hpp"
-#include "quicktypefwd.hpp"
-#include "world/node.hpp"
-#include "loader/iLoader.hpp"
+#include <LDtkLoader/Project.hpp>
 
-/*
-    This class is used in case there is no suitable file found for `SceneLoader`
-*/
+#include "loader/iLoader.hpp"
 
 namespace stay
 {
@@ -18,21 +12,18 @@ namespace stay
     class Loader : public ILoader
     {
         public:
-            using Path = typename std::filesystem::path;
-            // @return Root node if succeeded, null if failed
-            Uptr<Node> load(Path&& filename) override;
+            void load(std::filesystem::path&& filename, Node* root) override;
         private:
-            void init(const ldtk::Level& level, const ldtk::LayerInstance& layer);
-            void loadTiles(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer);
-            void loadColliders(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer);
-            void loadPlayer(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer);
-            Vector2 fileToWorld(const Vector2& pos) const;
+            struct Detail 
+            {
+                float pixelsPerMeter;
+                Vector2 worldOffset;
+            } mDetail;
 
-            std::unordered_map<ecs::Entity, ecs::Entity> mParentOf;
-            
-            float mPxPerMeter;
-            Vector2 mLayerSize;
-            Vector2 mLayerOffset;
-            float mTileSize;
+            Vector2 toWorldPosition(const Vector2& filePosition) const;
+
+            void loadTileset(Node* parent, const ldtk::Layer& layer) const;
+            void loadColliders(Node* parent, const ldtk::Layer& layer) const;
+            void loadPlayer(Node* parent, const ldtk::Layer& layer) const;
     };
 } // namespace stay

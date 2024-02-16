@@ -1,129 +1,118 @@
 #include "loader.hpp"
-#include "../component/list.hpp"
-#include "quicktype.hpp"
-#include "world/node.hpp"
 
-#include <fstream>
-#include <sstream>
+#include "components.hpp"
+#include "../component/list.hpp"
 
 namespace stay
 {
-    void Loader::init(const ldtk::Level& level, const ldtk::LayerInstance& layer)
+    void Loader::load(std::filesystem::path&& filename, Node* root)
     {
-        mPxPerMeter = level.getFieldInstances().at(0).getValue().get<float>();
-        mLayerOffset = Vector2(layer.getPxTotalOffsetX() + level.getWorldX(), layer.getPxTotalOffsetY() + level.getWorldY());
-        mTileSize = layer.getGridSize();
-        mLayerSize = Vector2(layer.getCWid(), layer.getCHei()) * mTileSize;
+        ldtk::Project project;
+        project.loadFromFile(filename.string());
+        const auto& world = project.getWorld();
+        const auto& level = world.getLevel("main");
+
+        mDetail.pixelsPerMeter = level.getField<float>("pixelsPerMeter").value();
+        mDetail.worldOffset = -0.5F * Vector2::from(level.size);
+
+        const auto& bgr = level.getLayer("background");
+        loadTileset(root, bgr);
+
+        const auto& colliders = level.getLayer("colliders");
+        loadColliders(root, colliders);
+
+        const auto& objects = level.getLayer("entities");
+        loadPlayer(root, objects);
     }
 
-    Vector2 Loader::fileToWorld(const Vector2& pos) const
+    void Loader::loadTileset(Node* parent, const ldtk::Layer& layer) const
     {
-        return Vector2(pos.x, -pos.y) / mPxPerMeter;
-    }
-
-    void Loader::loadTiles(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
-    {
-        init(level, layer);
-        for (const auto& tile : layer.getAutoLayerTiles())
+        assert(layer.hasTileset() && "not tiled layer");
+        const auto tileSize = layer.getTileset().tile_size / mDetail.pixelsPerMeter;
+        for (const auto& tile : layer.allTiles())
         {
-            auto* entity = currentRoot->createChild();
-            const auto& tilePos = Vector2(tile.getPx()[0], tile.getPx()[1]) + Vector2(0.5F, 0.5F) * mPxPerMeter + mLayerOffset;
-            entity->localTransform().setPosition(fileToWorld(tilePos));
-            entity->addComponent<Render>(Color(0x00FF00FF), Vector2(mTileSize, mTileSize) / mPxPerMeter);
+            auto* entity = parent->createChild();
+            Transform tf{toWorldPosition(Vector2::from(tile.getPosition())) 
+                + Vector2{tileSize / 2.F, -tileSize / 2.F}};
+            entity->setGlobalTransform(tf);
+            entity->addComponent<Render>(Color{0x89AA56FF}, Vector2{tileSize, tileSize});
         }
     }
 
-    void Loader::loadColliders(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
+    void Loader::loadColliders(Node* parent, const ldtk::Layer& layer) const 
     {
-        init(level, layer);
-        for (const auto& entity : layer.getEntityInstances())
+        const float tileSize = layer.getCellSize();
+        for (const auto& collider : layer.allEntities())
         {
-            const auto& list = entity.getFieldInstances().at(0).getValue();
+            assert(collider.getName() == "collider" && "not a collider entity");
             std::vector<Vector2> chainShape;
-            for (const auto& i : list)
+            const auto position = toWorldPosition(Vector2::from(collider.getPosition()));
+            for (const auto& point : collider.getArrayField<ldtk::IntPoint>("chain"))
             {
-                auto point = i.get<ldtk::GridPoint>();
-                const Vector2 filePos = Vector2(point.getCx(), point.getCy()) * mTileSize + mLayerOffset;
-                chainShape.emplace_back(fileToWorld(filePos));
+                const Vector2 gridPosition = Vector2::from(point.value()) + Vector2{0.5F, 0.5F};
+                const auto pointPosition = toWorldPosition(tileSize * gridPosition);
+                chainShape.emplace_back(pointPosition - position);
             }
-            auto* node = currentRoot->createChild();
-            node->addComponent<phys::RigidBody>(/*position = */Vector2());
-            phys::Material mat(1.F, 1.F, 0.F);
-            node->addComponent<phys::Collider>(phys::Chain(chainShape), mat);
+            auto* entity = parent->createChild();
+            phys::Material mat{1.F, 1.F, 0.F};
+            entity->addComponent<phys::RigidBody>(position);
+            entity->addComponent<phys::Collider>(phys::Chain{std::move(chainShape)}, mat);
         }
     }
 
-    void Loader::loadPlayer(Node* currentRoot, const ldtk::Level& level, const ldtk::LayerInstance& layer)
+    void Loader::loadPlayer(Node* parent, const ldtk::Layer& layer) const 
     {
-        init(level, layer);
-        // node
-        const auto& player = layer.getEntityInstances().at(0);
-        auto* node = currentRoot->createChild();
-        auto* skin = node->createChild();
-        // RigidBody
-        Vector2 pos = Vector2(player.getPx()[0], player.getPx()[1]) + mLayerOffset;
-        pos = fileToWorld(pos);
-        auto& hookBody = node->addComponent<phys::RigidBody>(pos, 0.F, phys::BodyType::DYNAMIC);
-        auto& skinBody = skin->addComponent<phys::RigidBody>(pos, 0.F, phys::BodyType::DYNAMIC);
-        skinBody.setGravityScale(player.getFieldInstances().at(2).getValue().get<float>());
-        skinBody.setHorizontalDamping(player.getFieldInstances().at(5).getValue().get<float>());
-        skinBody.setLinearDamping(player.getFieldInstances().at(8).getValue().get<float>());
-        skinBody.setFixedRotation(true);
-        // Skin
-        const auto friction = player.getFieldInstances().at(6).getValue().get<float>();
-        const auto radius = player.getWidth() / 2.F / mPxPerMeter;
-        phys::Box skinShape{Vector2{}, Vector2{1.15F * 2.F * radius, 1.35F * 2.F * radius}, 0.F};
-        phys::Material playerMat{1.F, friction, 0.F};
-        auto& skinCollider = skin->addComponent<phys::Collider>(skinShape, playerMat);
-        skinCollider.setLayer("Player");
-        skin->addComponent<phys::Joint>().start(phys::JointInfo{node->entity(), false, phys::Revolute{pos}});
-        // Hook collider
+        const auto& playerList = layer.getEntitiesByName("player");
+        assert(playerList.size() == 1 && "exactly 1 player must present");
+        const auto& player = playerList.front().get();
+        const auto position = toWorldPosition(Vector2::from(player.getPosition()));
+
+        auto* playerNode = parent->createChild();
+        
+        playerNode->addComponent<phys::RigidBody>(position, 0.F, phys::BodyType::DYNAMIC);
         phys::Material light{0.1F};
-        auto& hookCollider = node->addComponent<phys::Collider>(phys::Circle{Vector2{}, radius}, light);
-        hookCollider.setLayer("Player");
-        // Player
-        auto& cmp = node->addComponent<Player>();
-        cmp.moveStrength = player.getFieldInstances().at(0).getValue().get<float>();
-        cmp.jumpHeight = player.getFieldInstances().at(1).getValue().get<float>();
-        cmp.oppositeScale = player.getFieldInstances().at(7).getValue().get<float>();
-        cmp.airScale = player.getFieldInstances().at(9).getValue().get<float>();
-        // Hook
-        auto& hk = node->addComponent<Hook>();
-        hk.props.speed = player.getFieldInstances().at(3).getValue().get<float>();
-        hk.props.cooldown = player.getFieldInstances().at(4).getValue().get<float>();
-        hk.props.ropeLength = player.getFieldInstances().at(10).getValue().get<float>();
-        hk.props.pullSpeed = player.getFieldInstances().at(11).getValue().get<float>();
-        // Debug
-        node->addComponent<PlayerDebug>();
-        // Dash
-        auto& dash = node->addComponent<Dash>();
-        dash.velocity = player.getFieldInstances().at(12).getValue().get<float>();
-        dash.length = player.getFieldInstances().at(13).getValue().get<float>();
-        dash.cooldown = player.getFieldInstances().at(14).getValue().get<float>();
-        dash.postBrake = player.getFieldInstances().at(15).getValue().get<float>();
+        const auto radius = player.getSize().x / 2.F / mDetail.pixelsPerMeter;
+        auto& playerBody = playerNode->addComponent<phys::Collider>(phys::Circle{Vector2{}, radius}, light);
+        playerBody.setLayer("Player");
+
+        auto& stats = playerNode->addComponent<Player>();
+        stats.moveStrength = player.getField<float>("moveStrength").value();
+        stats.jumpHeight = player.getField<float>("jumpHeight").value();
+        stats.oppositeScale = player.getField<float>("oppositeScale").value();
+        stats.airScale = player.getField<float>("airScale").value();
+
+        auto& hook = playerNode->addComponent<Hook>();
+        hook.props.speed = player.getField<float>("bulletSpeed").value();
+        hook.props.cooldown = player.getField<float>("bulletCooldown").value();
+        hook.props.ropeLength = player.getField<float>("ropeLength").value();
+        hook.props.pullSpeed = player.getField<float>("pullSpeed").value();
+
+        playerNode->addComponent<PlayerDebug>();
+
+        auto& dash = playerNode->addComponent<Dash>();
+        dash.velocity = player.getField<float>("dashSpeed").value();
+        dash.length = player.getField<float>("dashLength").value();
+        dash.cooldown = player.getField<float>("dashCooldown").value();
+        dash.postBrake = player.getField<float>("postBrake").value();
+
+        auto* skin = playerNode->createChild();
+        auto& skinBody = skin->addComponent<phys::RigidBody>(position, 0.F, phys::BodyType::DYNAMIC);
+        skinBody.setGravityScale(player.getField<float>("gravityScale").value());
+        skinBody.setHorizontalDamping(player.getField<float>("HDamping").value());
+        skinBody.setLinearDamping(player.getField<float>("damping").value());
+        skinBody.setFixedRotation(true);
+
+        const phys::Material playerMaterial{1.F, player.getField<float>("friction").value(), 0.F};
+        const phys::Box skinShape{Vector2{}, Vector2{1.15F * 2.F * radius, 1.35F * 2.F * radius}};
+        auto& skinCollider = skin->addComponent<phys::Collider>(skinShape, playerMaterial);
+        skinCollider.setLayer("Player");
+        skin->addComponent<phys::Joint>().start(phys::JointInfo{playerNode->entity(), false, phys::Revolute{position}});
     }
 
-    Uptr<Node> Loader::load(Path &&filename)
+    Vector2 Loader::toWorldPosition(const Vector2& filePosition) const
     {
-        std::ifstream reader;
-        reader.open(filename);
-        std::stringstream buffer;
-        buffer << reader.rdbuf();
-        const ldtk::Coordinate coord = nlohmann::json::parse(buffer.str());
-        reader.close();
-
-        Uptr<Node> root = std::make_unique<Node>(ecs::Entity{1});
-        assert(static_cast<int>(root->entity()) == 1 && "top node must be 1, but node with value 1 exists");
-        const auto& level = coord.getLevels()[0];
-        const auto layers = level.getLayerInstances();
-        const auto& platform = layers->at(1);
-        const auto& collider = layers->at(0);
-        const auto& player = layers->at(2);
-
-        loadTiles(root.get(), level, platform);
-        loadColliders(root.get(), level, collider);
-        loadPlayer(root.get(), level, player);
-
-        return std::move(root);
+        const auto screenSpace = (filePosition + mDetail.worldOffset) / mDetail.pixelsPerMeter;
+        auto worldSpace = Vector2{screenSpace.x, -screenSpace.y};
+        return std::move(worldSpace);
     }
 } // namespace stay

@@ -12,6 +12,7 @@ ADD_SUBDIRECTORY(extern/entt)
 ADD_SUBDIRECTORY(extern/glm)
 ADD_SUBDIRECTORY(extern/json)
 ADD_SUBDIRECTORY(extern/SFML)
+ADD_SUBDIRECTORY(extern/LDtkLoader)
 
 # Collect source files
 FILE(GLOB_RECURSE 
@@ -48,6 +49,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
     EnTT::EnTT 
     box2d
     efsw
+    LDtkLoader
 )
 
 # Specific libraries macros

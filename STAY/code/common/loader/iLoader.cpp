@@ -4,16 +4,14 @@
 
 namespace stay
 {
-    Uptr<Node> ILoader::load(std::filesystem::path&& /* path */)
+    void ILoader::load(std::filesystem::path&& /* path */, Node* root)
     {
-        auto res = std::make_unique<Node>();
-        res->addComponent<Render>(Color{ 200, 100, 45, 255 }, Vector2{ 2, 3 });
-        auto& rg = res->addComponent<phys::RigidBody>(Vector2(), 45.F, phys::BodyType::KINEMATIC);
+        root->addComponent<Render>(Color{ 200, 100, 45, 255 }, Vector2{ 2, 3 });
+        auto& rg = root->addComponent<phys::RigidBody>(Vector2(), 45.F, phys::BodyType::KINEMATIC);
         rg.setAngularVelocity(360.F);
-        auto* child = res->createChild();
+        auto* child = root->createChild();
         child->addComponent<Render>(Color{ 200, 120, 230, 255}, Vector2{4, 4});
         child->localTransform().setPosition(Vector2{0.F, 6.F});
-        return std::move(res);
     }
 
     namespace detail

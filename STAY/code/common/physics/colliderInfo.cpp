@@ -6,7 +6,11 @@ namespace stay
 {
     namespace phys
     {
-        Chain::Chain(std::vector<Vector2>& points)
+        Chain::Chain(const std::vector<Vector2>& points)
+            : mPoints(points)
+        {}
+        
+        Chain::Chain(std::vector<Vector2>&& points)
             : mPoints(std::move(points))
         {}
 

@@ -36,7 +36,8 @@ namespace stay
         struct Chain : public Serializable
         {
             Chain() = default;
-            Chain(std::vector<Vector2>& points);
+            Chain(const std::vector<Vector2>& points);
+            Chain(std::vector<Vector2>&& points);
             DESERIALIZE_POSTPROCESSING(mPoints);
             void postDeserialization();
             const std::vector<b2Vec2>& data() const;
