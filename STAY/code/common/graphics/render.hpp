@@ -4,25 +4,14 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "ecs/component.hpp"
+#include "textureInfo.hpp"
 #include "type/color.hpp"
-#include "type/rect.hpp"
+#include "ecs/component.hpp"
 
 namespace stay
 {
     struct Render : public ecs::Component
     {
-        struct TextureInfo : Serializable
-        {
-            TextureInfo(std::string id = "none", Rect rect = Rect{})
-                : id{std::move(id)}
-                , rect{std::move(rect)}
-            {}
-            std::string id;
-            Rect rect;
-            SERIALIZE(id, rect);
-        };
-
         Render(Color color = Color(), Vector2 size = Vector2())
             : color{std::move(color)}
             , size{std::move(size)}
