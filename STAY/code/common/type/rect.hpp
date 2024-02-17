@@ -1,26 +1,50 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
-
 #include "serializable.hpp"
+#include "vector.hpp"
 
 namespace stay
 {
-    namespace detail
+    struct Rect : Serializable
     {
-        template <typename T>
-        struct Rect : public sf::Rect<T>, public Serializable
-        {
-            using sf::Rect<T>::Rect;
-            Rect(const sf::Rect<T>& other)
-                : sf::Rect<T>{other}
-            {}
-            Rect(sf::Rect<T>&& other)
-                : sf::Rect<T>{std::move(other)}
-            {}
-            SERIALIZE(this->top, this->left, this->width, this->height);
-        };
-    }
-    using Rect = detail::Rect<float>;
-    using RectInt = detail::Rect<int>;
+            Rect(Vector2 min = Vector2{}, Vector2 max = Vector2{})
+                : mMin{std::move(min)}
+                , mMax{std::move(max)}
+            {
+                if (mMin.x > mMax.x)
+                    std::swap(mMin.x, mMax.x);
+                if (mMin.y > mMax.y)
+                    std::swap(mMin.y, mMax.y);
+            }     
+            Vector2 center() const 
+            {
+                return (mMin + mMax) / 2.F;
+            }  
+            Vector2 size() const
+            {
+                return mMax - mMin;
+            }
+            Vector2 min() const 
+            {
+                return mMin;
+            }
+            Vector2 max() const
+            {
+                return mMax;
+            }
+            void setMin(const Vector2& min)
+            {
+                assert(min.x <= mMax.x && min.y <= mMax.y && "invalid value");
+                mMin = min;
+            }
+            void setMax(const Vector2& max)
+            {
+                assert(max.x >= mMin.x && max.y >= mMin.y && "invalid value");
+                mMax = max;
+            }
+            SERIALIZE(mMin, mMax)
+        private:
+            Vector2 mMin;
+            Vector2 mMax;
+    };
 } // namespace stay
