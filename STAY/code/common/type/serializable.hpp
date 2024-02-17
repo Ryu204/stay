@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <optional>
 
 #include <nlohmann/json.hpp>
 
@@ -45,7 +46,7 @@ namespace stay
     Serializable::Data toJSON(const std::string& t);
     bool fromJSON(std::string& t, const Serializable::Data& data);
     template <typename T>
-    inline Serializable::Data toJSON(const std::vector<T>& t)
+    Serializable::Data toJSON(const std::vector<T>& t)
     {
         Serializable::Data res;
         for (const auto& i : t)
@@ -53,7 +54,7 @@ namespace stay
         return res;
     }
     template <typename T>
-    inline bool fromJSON(std::vector<T>& t, const Serializable::Data& data)
+    bool fromJSON(std::vector<T>& t, const Serializable::Data& data)
     {
         if (!data.is_array())
             return false;
@@ -65,6 +66,24 @@ namespace stay
                 return false;
         }
         return true;
+    }
+    template <typename T>
+    Serializable::Data toJSON(const std::optional<T>& t)
+    {
+        if (!t.has_value())
+            return "none";
+        return toJSON(t.value());
+    }
+    template <typename T>
+    bool fromJSON(std::optional<T>& t, const Serializable::Data& data)
+    {
+        if (data.is_string() && data.get<std::string>() == "none")
+        {
+            t.reset();
+            return true;
+        }
+        std::make_optional<T>().swap(t);
+        return fromJSON(t.value(), data);
     }
 } // namespace stay
 #define stay_GET_JSON(x) { res[#x] = stay::toJSON(x); }
