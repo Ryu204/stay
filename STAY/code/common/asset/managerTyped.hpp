@@ -13,7 +13,7 @@ namespace stay
 {
     namespace asset 
     {
-        template <typename Type, whereIs(Type, Asset)>
+        template <typename Type, std::enable_if_t<std::is_base_of_v<Asset, Type>, bool>>
         class ManagerTyped
         {
             public:

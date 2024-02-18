@@ -3,12 +3,15 @@
 #include "asset/folderWatcher.hpp"
 #include "type.hpp"
 #include "event/event.hpp"
+#include "utility/typedef.hpp"
 
 namespace stay
 {
     namespace asset
     {
         class Manager;
+        template <typename T, whereIs(T, Asset)>
+        class ManagerTyped;
         class Asset
         {
             public:
@@ -17,7 +20,6 @@ namespace stay
                 virtual ~Asset() = default;
                 Path absolutePath() const;
                 Path relativePath() const;
-                void initPaths(Path baseDir, Path relative); 
                 Path baseFolder() const;
                 bool load();
                 bool loaded() const;
@@ -31,6 +33,11 @@ namespace stay
             protected:
                 virtual bool loadFromPath() = 0;
             private:
+                void initPaths(Path baseDir, Path relative); 
+                friend class Manager;
+                template <typename T, std::enable_if_t<std::is_base_of_v<Asset, T>, bool>>
+                friend class ManagerTyped;
+
                 friend detail::Listener;
                 event::Event<Action> mOnChange;
 
