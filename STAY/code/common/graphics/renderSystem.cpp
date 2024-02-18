@@ -1,58 +1,77 @@
-#include <SFML/System/Vector2.hpp>
+#include "renderSystem.hpp"
 
 #include "render.hpp"
-#include "ecs/system.hpp"
-#include "utility/sfutils.hpp"
 #include "utility/convert.hpp"
-
-/*
-    Render the whole scene by traversing every node using BFS
-*/
 
 namespace stay
 {
+    enum tmpName : std::size_t {
+        MOSSY,
+    };
     namespace sys
     {
-        struct RenderSystem : public ecs::RenderSystem, public ecs::System
+        RenderSystem::RenderSystem(ecs::Manager* manager)
+            : ecs::RenderSystem{0}
+            , ecs::InitSystem{0}
+            , ecs::System{manager}
+            , mTextures{nullptr}
+            , mBuffer{sf::PrimitiveType::Quads}
+        { }
+
+        void RenderSystem::init(ecs::SystemContext& context)
         {
-                REGISTER_SYSTEM(RenderSystem)
-                RenderSystem(ecs::Manager* manager)
-                    : ecs::RenderSystem(0)
-                    , ecs::System(manager)
-                {
-                    mShape.setOutlineColor(sf::Color{0xFFFFFFFF});
-                    mShape.setOutlineThickness(0.1F);
-                    utils::centerSf(mShape);
-                }
+            mTextures = &context.textures;
+            mTextures->add(tmpName::MOSSY, "tileset.png").load();
+        }
 
-                void render(RTarget* target, Node* root) override
+        void RenderSystem::render(RTarget* target, Node* root)
+        {
+            traverse(root, target);
+            drawObjects(target);
+        }
+
+        void RenderSystem::traverse(Node* node, RTarget* target)
+        {
+            assert(node != nullptr && "call on nullptr");
+            mRenderObjects.clear();
+            const auto draw = [&target, this](Node* current, const sf::Transform& tf) -> sf::Transform
+            {
+                const auto currentTf = tf * utils::transTosfTrans(current->localTransform());
+                if (current->hasComponent<Render>())
                 {
-                    drawOn(root, target);
+                    const auto& drawable = current->getComponent<Render>();
+                    mRenderObjects.emplace_back(detail::ZOrderPack::from(currentTf, drawable));
                 }
-            private:
-                // Draw `node` and its children on target with current camera config
-                void drawOn(Node* node, RTarget* target)
+                return currentTf;
+            };
+            node->visitChained(draw, sf::Transform::Identity);
+        }
+
+        void RenderSystem::drawObjects(RTarget* target)
+        {
+            std::sort(mRenderObjects.begin(), mRenderObjects.end());
+            mBuffer.clear();
+            for (auto i = 0; i < mRenderObjects.size(); ++i)
+            {
+                const auto& object = mRenderObjects[i];
+                for (const auto& v : object.vertices)
+                    mBuffer.append(v);
+                const auto isFinalObject = i == mRenderObjects.size() - 1;
+                const auto notSameCallWithLastObject = i > 0 && !object.isSameDrawCall(mRenderObjects[i - 1]);
+                const auto shouldDraw = isFinalObject || notSameCallWithLastObject;
+                if (shouldDraw) 
                 {
-                    assert(node != nullptr && "call on nullptr");
-                    
-                    const auto draw = [&target, this](Node* current, RStates states) -> RStates
+                    if (object.textureId.has_value())
                     {
-                        const auto& tf = current->localTransform();
-                        states.transform = states.transform * utils::transTosfTrans(tf);
-                        if (current->hasComponent<Render>())
-                        {
-                            const auto& drawable = current->getComponent<Render>();
-                            mShape.setSize(drawable.size.toVec2<sf::Vector2f>());
-                            utils::centerSf(mShape);
-                            mShape.setFillColor(drawable.color);
-                            target->draw(mShape, states);
-                        }
-                        return states;
-                    };
-                    node->visitChained(draw, RStates::Default);
+                        const auto& textureAsset = mTextures->get(object.textureId.value());
+                        target->draw(mBuffer, sf::RenderStates{&textureAsset.getSfmlTexture()});
+                    }
+                    else
+                    {
+                        target->draw(mBuffer);
+                    }
                 }
-
-                sf::RectangleShape mShape;
-        };
+            }
+        }
     } // namespace sys
 } // namespace stay

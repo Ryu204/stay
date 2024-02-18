@@ -21,22 +21,19 @@ namespace stay
                     : mRootDirectory{std::move(rootDirectory)}
                     , mWatcher(mRootDirectory)
                 { }
-                void add(std::size_t id, const Path& relativePath)
+                Type& add(std::size_t id, const Path& relativePath)
                 {
                     assert(mAssetsList.find(id) == mAssetsList.end() && "id added before");
                     mAssetsList.emplace(id, std::make_unique<Type>());
                     mAssetsList[id]->initPaths(mRootDirectory, relativePath);
                     mWatcher.add(*mAssetsList[id]);
+
+                    return *mAssetsList[id];
                 }
                 Type& get(std::size_t id)
                 {
                     assert(mAssetsList.find(id) != mAssetsList.end());
-                    return *mAssetsList.at(id);
-                }
-                Type& addGet(Path relativePath, std::size_t& id)
-                {
-                    id = add(relativePath);
-                    return get(id);
+                    return *mAssetsList[id];
                 }
                 void remove(std::size_t id)
                 {
@@ -45,12 +42,15 @@ namespace stay
                     mWatcher.remove(*mAssetsList[id]);
                     mAssetsList.erase(id);
                 }
+                bool has(std::size_t id) const
+                {
+                    return mAssetsList.find(id) != mAssetsList.end();
+                }
             private:
                 const Path mRootDirectory;
-                utils::IDGenerator mGenerator;
+                utils::IdGenerator mGenerator;
                 std::unordered_map<std::size_t, Uptr<Type>> mAssetsList;
                 FolderWatcher mWatcher;
         };
     } // namespace asset
-    using AssetManager = asset::Manager;
 } // namespace stay

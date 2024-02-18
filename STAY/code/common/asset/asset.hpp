@@ -17,6 +17,7 @@ namespace stay
                 virtual ~Asset() = default;
                 Path absolutePath() const;
                 Path relativePath() const;
+                void initPaths(Path baseDir, Path relative); 
                 Path baseFolder() const;
                 bool load();
                 bool loaded() const;
@@ -30,9 +31,6 @@ namespace stay
             protected:
                 virtual bool loadFromPath() = 0;
             private:
-                friend class Manager;
-                void initPaths(Path baseDir, Path relative); 
-
                 friend detail::Listener;
                 event::Event<Action> mOnChange;
 

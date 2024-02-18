@@ -18,12 +18,14 @@ namespace stay
             public:
                 Manager(Path rootDirectory);
                 template <typename Type, whereIs(Type, Asset)>
-                void add(std::size_t id, const Path& relativePath)
+                Type& add(std::size_t id, const Path& relativePath)
                 {
                     assert(mAssetsList.find(id) == mAssetsList.end() && "id added before");
                     mAssetsList.emplace(id, std::make_unique<Type>());
                     mAssetsList[id]->initPaths(mRootDirectory, relativePath);
                     mWatcher.add(*mAssetsList[id]);
+
+                    return static_cast<Type&>(*mAssetsList[id]);
                 }
                 template <typename Type, whereIs(Type, Asset)>
                 Type& get(std::size_t id)
@@ -32,12 +34,6 @@ namespace stay
                     auto* derived = dynamic_cast<Type*>(mAssetsList.at(id).get());
                     assert(derived != nullptr && "get wrong type");
                     return *derived;
-                }
-                template <typename Type, whereIs(Type, Asset)>
-                Type& addGet(Path relativePath, std::size_t& id)
-                {
-                    id = add<Type>(relativePath);
-                    return get<Type>(id);
                 }
                 void remove(std::size_t id);
             private:

@@ -42,6 +42,14 @@ namespace stay
                 assert(max.x >= mMin.x && max.y >= mMin.y && "invalid value");
                 mMax = max;
             }
+            float width() const
+            {
+                return mMax.x - mMin.x;
+            }
+            float height() const
+            {
+                return mMax.y - mMin.y;
+            }
             SERIALIZE(mMin, mMax)
         private:
             Vector2 mMin;

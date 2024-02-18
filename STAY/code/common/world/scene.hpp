@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ecs/manager.hpp"
 #include "camera.hpp"
 #include "loader/sceneLoader.hpp"
+#include "type/texture.hpp"
 
 namespace stay
 {
@@ -19,6 +19,7 @@ namespace stay
         private:
             RWin& mWindow;
             Camera mCamera;
+            TextureManager mTextures;
             Uptr<Node> mSceneRoot;
             Uptr<SceneLoader> mSceneLoader;
 
