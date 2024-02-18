@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstddef>
 #include <unordered_map>
 
 #include "utility/IDgen.hpp"
@@ -13,7 +12,7 @@ namespace stay
 {
     namespace asset 
     {
-        template <typename Type, std::enable_if_t<std::is_base_of_v<Asset, Type>, bool>>
+        template <typename Id, typename Type, std::enable_if_t<std::is_base_of_v<Asset, Type>, bool>>
         class ManagerTyped
         {
             public:
@@ -21,7 +20,7 @@ namespace stay
                     : mRootDirectory{std::move(rootDirectory)}
                     , mWatcher(mRootDirectory)
                 { }
-                Type& add(std::size_t id, const Path& relativePath)
+                Type& add(const Id& id, const Path& relativePath)
                 {
                     assert(mAssetsList.find(id) == mAssetsList.end() && "id added before");
                     mAssetsList.emplace(id, std::make_unique<Type>());
@@ -30,26 +29,26 @@ namespace stay
 
                     return *mAssetsList[id];
                 }
-                Type& get(std::size_t id)
+                Type& get(const Id& id)
                 {
                     assert(mAssetsList.find(id) != mAssetsList.end());
                     return *mAssetsList[id];
                 }
-                void remove(std::size_t id)
+                void remove(const Id& id)
                 {
                     assert(mAssetsList.find(id) != mAssetsList.end() && "invalid asset id");
                     mGenerator.erase(id);
                     mWatcher.remove(*mAssetsList[id]);
                     mAssetsList.erase(id);
                 }
-                bool has(std::size_t id) const
+                bool has(const Id& id) const
                 {
                     return mAssetsList.find(id) != mAssetsList.end();
                 }
             private:
                 const Path mRootDirectory;
                 utils::IdGenerator mGenerator;
-                std::unordered_map<std::size_t, Uptr<Type>> mAssetsList;
+                std::unordered_map<Id, Uptr<Type>> mAssetsList;
                 FolderWatcher mWatcher;
         };
     } // namespace asset

@@ -24,5 +24,5 @@ namespace stay
             sf::Texture mInternalTexture;
     };
 
-    using TextureManager = asset::ManagerTyped<Texture>;
+    using TextureManager = asset::ManagerTyped<std::string, Texture>;
 } // namespace stay

@@ -5,9 +5,6 @@
 
 namespace stay
 {
-    enum tmpName : std::size_t {
-        MOSSY,
-    };
     namespace sys
     {
         RenderSystem::RenderSystem(ecs::Manager* manager)
@@ -21,7 +18,7 @@ namespace stay
         void RenderSystem::init(ecs::SystemContext& context)
         {
             mTextures = &context.textures;
-            mTextures->add(tmpName::MOSSY, "tileset.png").load();
+            mTextures->add("mossy", "tileset.png").load();
         }
 
         void RenderSystem::render(RTarget* target, Node* root)

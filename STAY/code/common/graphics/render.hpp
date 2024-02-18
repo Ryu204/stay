@@ -17,11 +17,17 @@ namespace stay
             , size{std::move(size)}
             , zOrder{zOrder}
         {}
-        Render(Color color, Vector2 size, int zOrder, std::size_t textureId, const Rect& textureRect, const Vector2& pivot = Vector2{})
+        Render(Color color, Vector2 size, int zOrder, const std::string& textureId, const Rect& textureRect, const Vector2& pivot = Vector2{})
             : color{std::move(color)}
             , size{std::move(size)}
             , zOrder{zOrder}
             , textureInfo{std::make_optional<TextureInfo>(textureId, textureRect, pivot)}
+        {}
+        Render(Color color, Vector2 size, int zOrder, TextureInfo info)
+            : color{std::move(color)}
+            , size{std::move(size)}
+            , zOrder{zOrder}
+            , textureInfo{std::make_optional<TextureInfo>(std::move(info))}
         {}
         
         Color color;

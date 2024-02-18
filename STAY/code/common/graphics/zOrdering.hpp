@@ -15,7 +15,7 @@ namespace stay
         {
             std::array<sf::Vertex, 4> vertices;
             int order;
-            std::optional<int> textureId;
+            std::optional<std::string> textureId;
             ZOrderPack() = delete;
             ZOrderPack(const ZOrderPack&) = delete;
 
@@ -54,7 +54,7 @@ namespace stay
                 for (auto& v : res.vertices)
                     v.color = renderInfo.color;
                 res.order = renderInfo.zOrder;
-                res.textureId = hasTexture ? std::make_optional<int>(renderInfo.textureInfo->id) : std::optional<int>();
+                res.textureId = hasTexture ? std::make_optional<std::string>(renderInfo.textureInfo->id) : std::optional<std::string>();
                 return std::move(res);
             }
 

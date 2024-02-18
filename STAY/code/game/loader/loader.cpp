@@ -37,7 +37,8 @@ namespace stay
             const auto tRect = tile.getTextureRect();
             const Rect textureRect{Vector2{tRect.x, tRect.y}, Vector2{tRect.x + tRect.width, tRect.y + tRect.height}};
             const Vector2 pivot{0, 0};
-            entity->addComponent<Render>(Color{0xFFFFFFFF}, Vector2{tileSize, tileSize}, 0, 0, textureRect, pivot);
+            TextureInfo info{ "mossy", textureRect, pivot };
+            entity->addComponent<Render>(Color{0xFFFFFFFF}, Vector2{tileSize, tileSize}, 0, info);
         }
     }
 
