@@ -64,13 +64,13 @@ namespace stay
                 mMaterial.filter.categoryBits :
                 mFixture->GetFilterData().categoryBits;
             assert(mask != 0 && "zero collision mask");
-            return mCollisionLayer().name(utils::mostSignificantBit(mask));
+            return collisionLayers().name(utils::mostSignificantBit(mask));
         }
 
         void Collider::setLayer(const std::string& layer)
         {
-            auto mask = mCollisionLayer().getLayerMask(layer);
-            auto colMask = mCollisionLayer().getCollisionMask(layer);
+            auto mask = collisionLayers().getLayerMask(layer);
+            auto colMask = collisionLayers().getCollisionMask(layer);
             if (mFixture == nullptr)
             {
                 mMaterial.filter.categoryBits = mask;
@@ -87,7 +87,7 @@ namespace stay
 
         void Collider::setLayer(int id)
         {
-            setLayer(mCollisionLayer().name(id));
+            setLayer(collisionLayers().name(id));
         }
 
         Vector2 Collider::getLocalBound() const
@@ -112,7 +112,7 @@ namespace stay
                 throw std::runtime_error("attempt to access a collider with null fixture");
         }
 
-        Layer& Collider::mCollisionLayer() 
+        Layer& Collider::collisionLayers() 
         {   
             static Layer res; 
             return res;

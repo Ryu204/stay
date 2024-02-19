@@ -51,7 +51,7 @@ namespace stay
                 ColliderInfo mShapeInfo;
                 b2Fixture* mFixture;
 
-                static Layer& mCollisionLayer();
+                static Layer& collisionLayers();
 
                 friend class sys::PhysicsSystem;
 

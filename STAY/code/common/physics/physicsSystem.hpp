@@ -26,6 +26,7 @@ namespace stay
             : public ecs::InitSystem
             , public ecs::StartSystem
             , public ecs::UpdateSystem
+            , public ecs::ConfigurableSystem
             , public ecs::System
         {
                 REGISTER_SYSTEM(PhysicsSystem)
@@ -34,6 +35,7 @@ namespace stay
                 void start() override;
                 void init(ecs::SystemContext& /*context*/) override;
                 void update(float dt) override;
+                bool loadConfig(const Serializable::Data& data) override;
             private:
                 void batchSingle(ecs::Entity entity);
                 void applyHorizontalDamping(float dt);

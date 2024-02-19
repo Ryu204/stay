@@ -3,5 +3,19 @@
         "textures": {
             "mossy": "tileset.png"
         }
+    },
+    "PhysicsSystem": {
+        "layers": [
+            "Default",
+            "Player",
+            "Bullet",
+            "Isolate"
+        ],
+        "isolate": [
+            "Isolate"
+        ],
+        "disable": {
+            "Player": ["Player", "Bullet"]
+        }
     }
 }
