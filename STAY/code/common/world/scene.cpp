@@ -5,16 +5,22 @@
 #include "node.hpp"
 #include "scene.hpp"
 
+#include <fstream>
+
 namespace stay
 {
     Scene::Scene(std::filesystem::path&& filepath, RWin& window)
         : mWindow{window}
         , mCamera{40.F}
         , mTextures{"asset/texture"}
-        , PIXELS_PER_METER(100.F)
+        , PIXELS_PER_METER{100.F}
+        , SYSTEMS_CONFIG_FILE{"asset/sysConfig.json"}
     {
         phys::World::init(20.F * vectorDown);
-        ecs::manager().reset(ecs::SystemContext{ mCamera, mWindow, mTextures});
+        ecs::manager().reset(
+            ecs::SystemContext{mCamera, mWindow, mTextures},
+            getSystemConfig()
+        );
         Node::init(ecs::manager().getRegistry());
         mSceneLoader = std::make_unique<SceneLoader>(ecs::manager(), std::move(filepath));
         mSceneRoot = mSceneLoader->load();
@@ -45,5 +51,10 @@ namespace stay
     {
         mCamera.setOn(&target);
         ecs::manager().render(&target, mSceneRoot.get());
+    }
+    Serializable::Data Scene::getSystemConfig() const
+    {
+        std::ifstream reader{SYSTEMS_CONFIG_FILE};
+        return nlohmann::json::parse(reader);
     }
 } // namespace stay

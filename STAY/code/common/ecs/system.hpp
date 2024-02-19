@@ -26,6 +26,6 @@ namespace stay
 #define REGISTER_SYSTEM(className) \
     static inline struct SelfRegister final {\
         SelfRegister() {\
-            ecs::manager().registerSystem<className>();\
+            ecs::manager().registerSystem<className>(#className);\
         }\
     } selfRegister;

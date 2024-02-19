@@ -10,6 +10,7 @@ namespace stay
         RenderSystem::RenderSystem(ecs::Manager* manager)
             : ecs::RenderSystem{0}
             , ecs::InitSystem{0}
+            , ecs::ConfigurableSystem{0}
             , ecs::System{manager}
             , mTextures{nullptr}
             , mBuffer{sf::PrimitiveType::Quads}
@@ -18,13 +19,26 @@ namespace stay
         void RenderSystem::init(ecs::SystemContext& context)
         {
             mTextures = &context.textures;
-            mTextures->add("mossy", "tileset.png").load();
         }
 
         void RenderSystem::render(RTarget* target, Node* root)
         {
             traverse(root, target);
             drawObjects(target);
+        }
+
+        bool RenderSystem::loadConfig(const Serializable::Data& data) 
+        {
+            const auto hasTexturesField = data.contains("textures") && data["textures"].is_object();
+            if (!data.is_object() && hasTexturesField)
+                return false;
+            for (const auto& i : data["textures"].items()) // NOLINT
+            {
+                if(!i.value().is_string())
+                    return false;
+                mTextures->add(i.key(), i.value().get<std::string>()).load();
+            }
+            return true;
         }
 
         void RenderSystem::traverse(Node* node, RTarget* target)

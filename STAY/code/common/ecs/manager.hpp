@@ -12,17 +12,23 @@ namespace stay
         namespace detail
         {
             template <typename T>
-            struct Ordered
+            struct SystemWrapper
             {
-                int id {};
+                SystemWrapper(int updateOrder, SPtr<T> val, std::string name)
+                    : updateOrder{updateOrder}
+                    , val{val}
+                    , name{std::move(name)}
+                {}
+                int updateOrder {};
                 SPtr<T> val {};
+                std::string name{};
             };
             template <typename T>
             struct Cmpr
             {
-                bool operator () (const Ordered<T>& sml, const Ordered<T>& lgr)
+                bool operator () (const SystemWrapper<T>& sml, const SystemWrapper<T>& lgr)
                 {
-                    return sml.id < lgr.id;
+                    return sml.updateOrder < lgr.updateOrder;
                 }
             };
         } // namespace detail
@@ -34,13 +40,10 @@ namespace stay
                 Registry& getRegistryRef();
                 SPtr<Registry> getRegistry();
 
-                // @note Its overriding IDs are used to determine its order in the manager action, i.e type with lower ID called earlier
-                // @param DerivedSystem A dervied class of `ecs:*System`(s) defined in `system.hpp`, with the restriction of having a constructor taking an `ecs::Manager*`
                 template <typename DerviedSystem>
-                void registerSystem();
-                void reset(ecs::SystemContext context);
+                void registerSystem(const std::string& systemName = "unamed");
+                void reset(ecs::SystemContext context, const Serializable::Data& systemConfigs);
                 void start();
-                // Meant to be call every frame update
                 void update(float dt);
                 void render(RTarget* target, Node* root);
                 void input(const sf::Event& event);
@@ -76,15 +79,16 @@ namespace stay
                 Type& getComponent(Entity entity);
             private:
                 template <typename T>
-                using Pair = detail::Ordered<T>;
+                using Wrapper = detail::SystemWrapper<T>;
                 SPtr<Registry> mRegistry{std::make_shared<Registry>()};
-                std::vector<Pair<InitSystem>> mInitSystems{};
-                std::vector<Pair<StartSystem>> mStartSystems{};
-                std::vector<Pair<UpdateSystem>> mUpdateSystems{};
-                std::vector<Pair<PostUpdateSystem>> mPostUpdateSystems{};
-                std::vector<Pair<PreUpdateSystem>> mPreUpdateSystems{};
-                std::vector<Pair<RenderSystem>> mRenderSystems{};
-                std::vector<Pair<InputSystem>> mInputSystems{};
+                std::vector<Wrapper<InitSystem>> mInitSystems{};
+                std::vector<Wrapper<StartSystem>> mStartSystems{};
+                std::vector<Wrapper<UpdateSystem>> mUpdateSystems{};
+                std::vector<Wrapper<PostUpdateSystem>> mPostUpdateSystems{};
+                std::vector<Wrapper<PreUpdateSystem>> mPreUpdateSystems{};
+                std::vector<Wrapper<RenderSystem>> mRenderSystems{};
+                std::vector<Wrapper<InputSystem>> mInputSystems{};
+                std::vector<Wrapper<ConfigurableSystem>> mConfigurableSystems{};
         };
 
         template <typename Type, typename... Args, std::enable_if_t<std::is_base_of_v<Component, Type>, bool>>
@@ -112,50 +116,56 @@ namespace stay
         }
 
         template <typename DerivedSystem>
-        void Manager::registerSystem()
+        void Manager::registerSystem(const std::string& systemName)
         {
             SPtr<DerivedSystem> ptr = std::make_shared<DerivedSystem>(this);
             // Init
             if constexpr (std::is_base_of_v<InitSystem, DerivedSystem>)
             {
                 SPtr<InitSystem> initPtr = std::dynamic_pointer_cast<InitSystem>(ptr);
-                mInitSystems.push_back(Pair<InitSystem>{ initPtr->orderInit, initPtr });
+                mInitSystems.emplace_back(initPtr->orderInit, initPtr, systemName);
             }
             // Start
             if constexpr (std::is_base_of_v<StartSystem, DerivedSystem>)
             {
                 SPtr<StartSystem> startPtr = std::dynamic_pointer_cast<StartSystem>(ptr);
-                mStartSystems.push_back(Pair<StartSystem>{ startPtr->orderStart, startPtr });
+                mStartSystems.emplace_back(startPtr->orderStart, startPtr, systemName);
             }
             // Update
             if constexpr (std::is_base_of_v<UpdateSystem, DerivedSystem>)
             {
                 SPtr<UpdateSystem> updatePtr = std::dynamic_pointer_cast<UpdateSystem>(ptr);
-                mUpdateSystems.push_back(Pair<UpdateSystem>{updatePtr->orderUpdate, updatePtr});
+                mUpdateSystems.emplace_back(updatePtr->orderUpdate, updatePtr, systemName);
             }
             // PostUpdate
             if constexpr (std::is_base_of_v<PostUpdateSystem, DerivedSystem>)
             {
                 SPtr<PostUpdateSystem> lateUpdatePtr = std::dynamic_pointer_cast<PostUpdateSystem>(ptr);
-                mPostUpdateSystems.push_back(Pair<PostUpdateSystem>{lateUpdatePtr->orderLateUpdate, lateUpdatePtr});
+                mPostUpdateSystems.emplace_back(lateUpdatePtr->orderLateUpdate, lateUpdatePtr, systemName);
             }
             // PreUpdate
             if constexpr (std::is_base_of_v<PreUpdateSystem, DerivedSystem>)
             {
                 SPtr<PreUpdateSystem> preUpdatePtr = std::dynamic_pointer_cast<PreUpdateSystem>(ptr);
-                mPreUpdateSystems.push_back(Pair<PreUpdateSystem>{preUpdatePtr->orderPreUpdate, preUpdatePtr});
+                mPreUpdateSystems.emplace_back(preUpdatePtr->orderPreUpdate, preUpdatePtr, systemName);
             }
             // Render
             if constexpr (std::is_base_of_v<RenderSystem, DerivedSystem>)
             {
                 SPtr<RenderSystem> renderPtr = std::dynamic_pointer_cast<RenderSystem>(ptr);
-                mRenderSystems.push_back(Pair<RenderSystem>{renderPtr->orderRender, renderPtr});
+                mRenderSystems.emplace_back(renderPtr->orderRender, renderPtr, systemName);
             }
             // Input
             if constexpr (std::is_base_of_v<InputSystem, DerivedSystem>)
             {
                 SPtr<InputSystem> inputPtr = std::dynamic_pointer_cast<InputSystem>(ptr);
-                mInputSystems.push_back(Pair<InputSystem>{inputPtr->orderInput, inputPtr});
+                mInputSystems.emplace_back(inputPtr->orderInput, inputPtr, systemName);
+            }
+            // Config
+            if constexpr (std::is_base_of_v<ConfigurableSystem, DerivedSystem>)
+            {
+                SPtr<ConfigurableSystem> configPtr = std::dynamic_pointer_cast<ConfigurableSystem>(ptr);
+                mConfigurableSystems.emplace_back(configPtr->orderConfig, configPtr, systemName);
             }
         }
 

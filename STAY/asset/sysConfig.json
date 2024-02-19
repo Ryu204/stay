@@ -1,0 +1,7 @@
+{
+    "RenderSystem": {
+        "textures": {
+            "mossy": "tileset.png"
+        }
+    }
+}

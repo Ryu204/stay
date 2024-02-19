@@ -17,6 +17,8 @@ namespace stay
             static void input(const sf::Event& event);
             void render(RTarget& target);
         private:
+            Serializable::Data getSystemConfig() const;
+
             RWin& mWindow;
             Camera mCamera;
             TextureManager mTextures;
@@ -24,5 +26,6 @@ namespace stay
             Uptr<SceneLoader> mSceneLoader;
 
             const float PIXELS_PER_METER;
+            const std::string SYSTEMS_CONFIG_FILE;
     };
 } // namespace stay
