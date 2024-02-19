@@ -20,7 +20,7 @@ namespace stay
             return mRegistry;
         }
 
-        void Manager::reset(SystemContext context)
+        void Manager::reset(SystemContext context, const Serializable::Data& systemConfigs)
         {
             std::make_shared<Registry>().swap(mRegistry);
             // In the same category, system with smallest id gets called first and so on
@@ -31,10 +31,20 @@ namespace stay
             std::sort(mPostUpdateSystems.begin(), mPostUpdateSystems.end(), detail::Cmpr<PostUpdateSystem>());
             std::sort(mRenderSystems.begin(), mRenderSystems.end(), detail::Cmpr<RenderSystem>());
             std::sort(mInputSystems.begin(), mInputSystems.end(), detail::Cmpr<InputSystem>());
+            std::sort(mConfigurableSystems.begin(), mConfigurableSystems.end(), detail::Cmpr<ConfigurableSystem>());
 
+            // Configure and initialize
             for (auto& pair : mInitSystems)
             {
                 pair.val->init(context);
+            }
+            for (auto& pair : mConfigurableSystems)
+            {
+                const auto& name = pair.name;
+                if (!systemConfigs.contains(name))
+                    throw std::runtime_error{"expected system name"};
+                if (!pair.val->loadConfig(systemConfigs.at(name)))
+                    throw std::runtime_error{"error configuring system"};
             }
         }
 

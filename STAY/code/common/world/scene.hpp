@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ecs/manager.hpp"
 #include "camera.hpp"
 #include "loader/sceneLoader.hpp"
+#include "type/texture.hpp"
 
 namespace stay
 {
@@ -17,11 +17,15 @@ namespace stay
             static void input(const sf::Event& event);
             void render(RTarget& target);
         private:
+            Serializable::Data getSystemConfig() const;
+
             RWin& mWindow;
             Camera mCamera;
+            TextureManager mTextures;
             Uptr<Node> mSceneRoot;
             Uptr<SceneLoader> mSceneLoader;
 
             const float PIXELS_PER_METER;
+            const std::string SYSTEMS_CONFIG_FILE;
     };
 } // namespace stay

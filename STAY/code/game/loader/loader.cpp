@@ -32,10 +32,13 @@ namespace stay
         for (const auto& tile : layer.allTiles())
         {
             auto* entity = parent->createChild();
-            Transform tf{toWorldPosition(Vector2::from(tile.getPosition())) 
-                + Vector2{tileSize / 2.F, -tileSize / 2.F}};
+            Transform tf{toWorldPosition(Vector2::from(tile.getPosition()))};
             entity->setGlobalTransform(tf);
-            entity->addComponent<Render>(Color{0x89AA56FF}, Vector2{tileSize, tileSize});
+            const auto tRect = tile.getTextureRect();
+            const Rect textureRect{Vector2{tRect.x, tRect.y}, Vector2{tRect.x + tRect.width, tRect.y + tRect.height}};
+            const Vector2 pivot{0, 0};
+            TextureInfo info{ "mossy", textureRect, pivot };
+            entity->addComponent<Render>(Color{0xFFFFFFFF}, Vector2{tileSize, tileSize}, 0, info);
         }
     }
 

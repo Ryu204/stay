@@ -3,6 +3,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "asset/asset.hpp"
+#include "asset/managerTyped.hpp"
 
 namespace stay 
 {
@@ -10,7 +11,7 @@ namespace stay
     {
         public:
             Texture() = default;
-            const sf::Texture& getSfmlTexture()
+            const sf::Texture& getSfmlTexture() const
             {
                 return mInternalTexture;
             }
@@ -22,4 +23,6 @@ namespace stay
         private:
             sf::Texture mInternalTexture;
     };
+
+    using TextureManager = asset::ManagerTyped<std::string, Texture>;
 } // namespace stay

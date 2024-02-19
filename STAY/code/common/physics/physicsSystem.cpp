@@ -60,20 +60,12 @@ namespace stay
         } // namespace detail
 
         PhysicsSystem::PhysicsSystem(ecs::Manager* manager)
-            : ecs::InitSystem(0)
-            , ecs::StartSystem(0)
-            , ecs::UpdateSystem(-1)
+            : ecs::InitSystem{0}
+            , ecs::StartSystem{0}
+            , ecs::UpdateSystem{-2}
+            , ecs::ConfigurableSystem{0}
             , ecs::System(manager)
-        { 
-            phys::Collider::mCollisionLayer()
-                .set(0, "Default")
-                .set(1, "Player")
-                .set(2, "Bullet")
-                .set(3, "Isolate")
-                .set("Player", "Bullet", false)
-                .set("Player", "Player", false)
-                .isolate("Isolate");
-        }
+        {}
 
         PhysicsSystem::~PhysicsSystem()
         {
@@ -116,6 +108,31 @@ namespace stay
             mBatched.clear();
             for (auto entity : view)
                 batchSingle(entity);
+        }
+
+        bool PhysicsSystem::loadConfig(const Serializable::Data& data)
+        {
+            const auto valid = data.contains("layers") && data.contains("isolate") && data.contains("disable")
+                && data["layers"].is_array() && data["isolate"].is_array() && data["disable"].is_object();
+            if (!valid)
+                return false;
+            auto& collisionSettings = phys::Collider::collisionLayers();
+            for (auto i = 0; i < data["layers"].size(); ++i)
+            {
+                for (auto j = i; j < data["layers"].size(); ++j)
+                    collisionSettings.set(i, j, true);
+                collisionSettings.set(i, data["layers"][i].get<std::string>());
+            }
+            for (const auto& i : data["isolate"])
+                collisionSettings.isolate(i.get<std::string>());
+            for (const auto& i : data["disable"].items())
+            {
+                if (!i.value().is_array())
+                    return false;
+                for (const auto& j : i.value())
+                    collisionSettings.set(i.key(), j.get<std::string>(), false);
+            }
+            return true;
         }
 
         void PhysicsSystem::batchSingle(ecs::Entity entity)

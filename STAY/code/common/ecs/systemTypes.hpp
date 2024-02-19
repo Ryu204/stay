@@ -1,6 +1,7 @@
 #pragma once
 
 #include "systemContext.hpp"
+#include "type/serializable.hpp"
 
 namespace stay
 {
@@ -56,6 +57,12 @@ namespace stay
             virtual ~InputSystem() = default;
             int orderInput;
             virtual void input(const sf::Event&/*event*/) = 0;
+        };
+        struct ConfigurableSystem
+        {
+            ConfigurableSystem(int order);
+            int orderConfig;
+            virtual bool loadConfig(const Serializable::Data& data) = 0;
         };
     }
 } // namespace stay

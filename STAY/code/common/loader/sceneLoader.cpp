@@ -106,7 +106,7 @@ namespace stay
     void SceneLoader::save(Node* root, bool overrideIn) const
     {
         auto output = overrideIn ? mFile/"in" : mFile/"out";
-        std::ofstream(output) << createSaveObject(root).dump(1, '\t', true) << '\n';
+        std::ofstream(output) << createSaveObject(root).dump(2, ' ', true) << '\n';
     }
 
     Serializable::Data SceneLoader::createSaveObject(Node* topNode) const
