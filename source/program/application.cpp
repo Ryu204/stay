@@ -68,7 +68,7 @@ namespace stay
             // Write
             root["window"] = mAppInfo.serialize();
             std::ofstream dataWriter(INIT_FILE);
-            dataWriter << root;
+            dataWriter << root.dump(2, ' ');
         }
 
         void Application::run()

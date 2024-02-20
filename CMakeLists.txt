@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.24)
 
-PROJECT(STAY VERSION 0.1)
+PROJECT(stay VERSION 0.1)
 
 SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,7 +16,6 @@ ADD_SUBDIRECTORY(extern/entt)
 ADD_SUBDIRECTORY(extern/glm)
 ADD_SUBDIRECTORY(extern/json)
 ADD_SUBDIRECTORY(extern/SFML)
-ADD_SUBDIRECTORY(extern/LDtkLoader)
 
 # Collect source files
 FILE(GLOB_RECURSE 
@@ -25,14 +24,19 @@ FILE(GLOB_RECURSE
     "source/*.cpp"
     "source/*.hpp"
     "include/*.hpp"
-    "STAY/code/common/program/main.cpp"
-    "STAY/code/game/*.hpp"
-    "STAY/code/game/*.cpp"
 )
+
+# Clang-tidy analyzer
+OPTION(${PROJECT_NAME}_CLANG_TIDY "Enable clang-tidy checks" OFF)
+IF (${PROJECT_NAME}_CLANG_TIDY)
+    SET(CMAKE_CXX_CLANG_TIDY "clang-tidy" "--config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy" "--header-filter=${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp")
+ENDIF()
 
 # Add target and link libraries
 ADD_LIBRARY(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCE_CODE})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC 
+
+# Create target
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} PRIVATE
     nlohmann_json::nlohmann_json 
     sfml-graphics 
     sfml-audio
@@ -40,11 +44,10 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
     EnTT::EnTT 
     box2d
     efsw
-    LDtkLoader
 )
 
 # Specific libraries macros
-TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC "GLM_ENABLE_EXPERIMENTAL")
+TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PRIVATE "GLM_ENABLE_EXPERIMENTAL")
 
 # Add thread support
 SET(THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -52,4 +55,4 @@ FIND_PACKAGE(Threads REQUIRED)
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PRIVATE Threads::Threads)
 
 # Add common header to include directory
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
