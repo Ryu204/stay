@@ -74,8 +74,8 @@ namespace stay
         
         playerNode->addComponent<phys::RigidBody>(position, 0.F, phys::BodyType::DYNAMIC);
         phys::Material light{0.1F};
-        const auto radius = player.getSize().x / 2.F / mDetail.pixelsPerMeter;
-        auto& playerBody = playerNode->addComponent<phys::Collider>(phys::Circle{Vector2{}, radius}, light);
+        const auto size = Vector2{player.getSize().x / 1.15F, player.getSize().y} / mDetail.pixelsPerMeter;
+        auto& playerBody = playerNode->addComponent<phys::Collider>(phys::Circle{Vector2{}, size.x / 2.F / 1.2F}, light);
         playerBody.setLayer("Player");
 
         auto& stats = playerNode->addComponent<Player>();
@@ -106,10 +106,19 @@ namespace stay
         skinBody.setFixedRotation(true);
 
         const phys::Material playerMaterial{1.F, player.getField<float>("friction").value(), 0.F};
-        const phys::Box skinShape{Vector2{}, Vector2{1.15F * 2.F * radius, 1.35F * 2.F * radius}};
+        const phys::Box skinShape{Vector2{}, size};
         auto& skinCollider = skin->addComponent<phys::Collider>(skinShape, playerMaterial);
         skinCollider.setLayer("Player");
         skin->addComponent<phys::Joint>().start(phys::JointInfo{playerNode->entity(), false, phys::Revolute{position}});
+
+        const auto playerRect = [&player](){
+            const auto& tmp = player.getTextureRect();
+            return Rect{Vector2{tmp.x, tmp.y}, Vector2{tmp.x + tmp.width, tmp.y + tmp.height}};
+        }();
+        TextureInfo skinTexture{
+            "player", playerRect, Vector2{0.5F, 0.5F}
+        };
+        skin->addComponent<Render>(Color{0xFFFFFFFF}, size, -2, skinTexture);
     }
 
     Vector2 Loader::toWorldPosition(const Vector2& filePosition) const

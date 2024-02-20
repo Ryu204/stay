@@ -11,7 +11,7 @@
 	"iid": "a01570b0-3b70-11ee-83e9-29a381a47e5f",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473731,
-	"nextUid": 97,
+	"nextUid": 98,
 	"identifierStyle": "Free",
 	"toc": [],
 	"worldLayout": "Free",
@@ -1659,15 +1659,15 @@
 			"maxHeight": null,
 			"keepAspectRatio": true,
 			"tileOpacity": 1,
-			"fillOpacity": 1,
-			"lineOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
 			"hollow": false,
 			"color": "#2F4DBE",
-			"renderMode": "Ellipse",
+			"renderMode": "Tile",
 			"showName": true,
-			"tilesetId": null,
-			"tileRenderMode": "FitInside",
-			"tileRect": null,
+			"tilesetId": 97,
+			"tileRenderMode": "Cover",
+			"tileRect": { "tilesetUid": 97, "x": 0, "y": 0, "w": 64, "h": 64 },
 			"uiTileRect": null,
 			"nineSliceBorders": [],
 			"maxCount": 0,
@@ -2314,6 +2314,25 @@
 				"opaqueTiles": "0000000010000000000000000000000000000000000000000",
 				"averageColors": "c323d323c333b434f111f111f111d212f000d212c323f111f111e111a323d323a3238434e212e212f2125434b43455359435e222e212e212d222d222d323d323c434d333c434d222d222c323c323d323e222d323e222e222e212f212a323c323a323"
 			}
+		},
+		{
+			"__cWid": 1,
+			"__cHei": 1,
+			"identifier": "cat",
+			"uid": 97,
+			"relPath": "../texture/cat.png",
+			"embedAtlas": null,
+			"pxWid": 64,
+			"pxHei": 64,
+			"tileGridSize": 64,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "4649" }
 		}
 	], "enums": [{ "identifier": "Collision", "uid": 46, "values": [{ "id": "Collision0", "tileRect": { "tilesetUid": 6, "x": 128, "y": 0, "w": 64, "h": 64 }, "color": 12470831 }], "iconTilesetUid": 6, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [
 		{
@@ -3607,7 +3626,7 @@
 							"height": 16,
 							"defUid": 48,
 							"px": [1048,744],
-							"fieldInstances": [{ "__identifier": "chain", "__type": "Array<Point>", "__value": [ { "cx": 67, "cy": 16 }, { "cx": 64, "cy": 16 }, { "cx": 65, "cy": 73 }, { "cx": 67, "cy": 73 } ], "__tile": null, "defUid": 49, "realEditorValues": [ {
+							"fieldInstances": [{ "__identifier": "chain", "__type": "Array<Point>", "__value": [ { "cx": 67, "cy": 16 }, { "cx": 64, "cy": 16 }, { "cx": 65, "cy": 65 }, { "cx": 66, "cy": 65 } ], "__tile": null, "defUid": 49, "realEditorValues": [ {
 								"id": "V_String",
 								"params": ["67,16"]
 							}, {
@@ -3615,10 +3634,10 @@
 								"params": ["64,16"]
 							}, {
 								"id": "V_String",
-								"params": ["65,73"]
+								"params": ["65,65"]
 							}, {
 								"id": "V_String",
-								"params": ["67,73"]
+								"params": ["66,65"]
 							} ] }],
 							"__worldX": 4120,
 							"__worldY": 104
@@ -3703,9 +3722,9 @@
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,
-						0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,1,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,
 						0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,
@@ -4003,17 +4022,15 @@
 						{ "px": [1024,960], "src": [192,64], "f": 0, "t": 10, "d": [60,976], "a": 1 },
 						{ "px": [3968,960], "src": [192,64], "f": 0, "t": 10, "d": [60,1022], "a": 1 },
 						{ "px": [768,1024], "src": [192,64], "f": 0, "t": 10, "d": [60,1036], "a": 1 },
-						{ "px": [1024,1024], "src": [192,64], "f": 0, "t": 10, "d": [60,1040], "a": 1 },
 						{ "px": [3968,1024], "src": [192,64], "f": 0, "t": 10, "d": [60,1086], "a": 1 },
 						{ "px": [768,1088], "src": [192,64], "f": 0, "t": 10, "d": [60,1100], "a": 1 },
-						{ "px": [1024,1088], "src": [192,64], "f": 0, "t": 10, "d": [60,1104], "a": 1 },
 						{ "px": [3968,1088], "src": [192,64], "f": 0, "t": 10, "d": [60,1150], "a": 1 },
 						{ "px": [768,1152], "src": [192,64], "f": 0, "t": 10, "d": [60,1164], "a": 1 },
 						{ "px": [768,1216], "src": [192,64], "f": 0, "t": 10, "d": [60,1228], "a": 1 },
 						{ "px": [1792,1408], "src": [192,64], "f": 0, "t": 10, "d": [60,1436], "a": 1 },
 						{ "px": [2304,1408], "src": [192,64], "f": 0, "t": 10, "d": [60,1444], "a": 1 },
 						{ "px": [3456,256], "src": [192,128], "f": 0, "t": 17, "d": [52,310], "a": 1 },
-						{ "px": [1024,1152], "src": [192,128], "f": 0, "t": 17, "d": [52,1168], "a": 1 },
+						{ "px": [1024,1024], "src": [192,128], "f": 0, "t": 17, "d": [52,1040], "a": 1 },
 						{ "px": [960,1472], "src": [192,128], "f": 0, "t": 17, "d": [52,1487], "a": 1 },
 						{ "px": [1984,1472], "src": [192,128], "f": 0, "t": 17, "d": [52,1503], "a": 1 },
 						{ "px": [2112,1472], "src": [192,128], "f": 0, "t": 17, "d": [52,1505], "a": 1 },
@@ -4080,16 +4097,16 @@
 					"entityInstances": [
 						{
 							"__identifier": "player",
-							"__grid": [57,11],
+							"__grid": [58,35],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
-							"__tile": null,
+							"__tile": { "tilesetUid": 97, "x": 0, "y": 0, "w": 64, "h": 64 },
 							"__smartColor": "#2F4DBE",
 							"iid": "75808270-6280-11ee-a7f4-fbec962c8ab9",
-							"width": 80,
-							"height": 80,
+							"width": 112,
+							"height": 112,
 							"defUid": 74,
-							"px": [920,184],
+							"px": [936,568],
 							"fieldInstances": [
 								{ "__identifier": "moveStrength", "__type": "Float", "__value": 30, "__tile": null, "defUid": 75, "realEditorValues": [{ "id": "V_Float", "params": [30] }] },
 								{ "__identifier": "jumpHeight", "__type": "Float", "__value": 4.6, "__tile": null, "defUid": 76, "realEditorValues": [{ "id": "V_Float", "params": [4.6] }] },
@@ -4108,8 +4125,8 @@
 								{ "__identifier": "dashCooldown", "__type": "Float", "__value": 0.6, "__tile": null, "defUid": 94, "realEditorValues": [{ "id": "V_Float", "params": [0.6] }] },
 								{ "__identifier": "postBrake", "__type": "Float", "__value": 0.05, "__tile": null, "defUid": 95, "realEditorValues": [{ "id": "V_Float", "params": [0.05] }] }
 							],
-							"__worldX": 3992,
-							"__worldY": -456
+							"__worldX": 4008,
+							"__worldY": -72
 						}
 					]
 				}

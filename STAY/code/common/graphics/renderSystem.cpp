@@ -60,7 +60,7 @@ namespace stay
 
         void RenderSystem::drawObjects(RTarget* target)
         {
-            std::sort(mRenderObjects.begin(), mRenderObjects.end());
+            std::sort(mRenderObjects.rbegin(), mRenderObjects.rend());
             mBuffer.clear();
             for (auto i = 0; i < mRenderObjects.size(); ++i)
             {
@@ -68,8 +68,8 @@ namespace stay
                 for (const auto& v : object.vertices)
                     mBuffer.append(v);
                 const auto isFinalObject = i == mRenderObjects.size() - 1;
-                const auto notSameCallWithLastObject = i > 0 && !object.isSameDrawCall(mRenderObjects[i - 1]);
-                const auto shouldDraw = isFinalObject || notSameCallWithLastObject;
+                const auto notSameCallWithNextObject = !isFinalObject && !object.isSameDrawCall(mRenderObjects[i + 1]);
+                const auto shouldDraw = isFinalObject || notSameCallWithNextObject;
                 if (shouldDraw) 
                 {
                     if (object.textureId.has_value())
@@ -81,6 +81,7 @@ namespace stay
                     {
                         target->draw(mBuffer);
                     }
+                    mBuffer.clear();
                 }
             }
         }

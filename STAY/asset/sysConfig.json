@@ -1,7 +1,8 @@
 {
     "RenderSystem": {
         "textures": {
-            "mossy": "tileset.png"
+            "mossy": "tileset.png",
+            "player": "cat.png"
         }
     },
     "PhysicsSystem": {
