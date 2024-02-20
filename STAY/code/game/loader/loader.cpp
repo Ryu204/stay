@@ -1,7 +1,11 @@
 #include "loader.hpp"
 
-#include "components.hpp"
-#include "../component/list.hpp"
+#include "stay/ecs/component.hpp"
+#include "stay/components.hpp"
+#include "../component/player.hpp"
+#include "../component/dash.hpp"
+#include "../component/playerDebug.hpp"
+#include "../component/hook.hpp"
 
 namespace stay
 {

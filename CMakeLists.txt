@@ -22,11 +22,13 @@ ADD_SUBDIRECTORY(extern/LDtkLoader)
 FILE(GLOB_RECURSE 
     ${PROJECT_NAME}_SOURCE_CODE
     CONFIGURE_DEPENDS
-    "STAY/code/*.cpp"
-    "STAY/code/*.hpp"
-    "STAY/code/*.c"
-    "STAY/code/*.h"
-    "STAY/code/*.inl")
+    "source/*.cpp"
+    "source/*.hpp"
+    "include/*.hpp"
+    "STAY/code/common/program/main.cpp"
+    "STAY/code/game/*.hpp"
+    "STAY/code/game/*.cpp"
+)
 
 # Add target and link libraries
 ADD_LIBRARY(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCE_CODE})
@@ -50,4 +52,4 @@ FIND_PACKAGE(Threads REQUIRED)
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PRIVATE Threads::Threads)
 
 # Add common header to include directory
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/STAY/code/common)
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)

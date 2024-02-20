@@ -1,4 +1,4 @@
-#include "ecs/system.hpp"
+#include "stay/ecs/system.hpp"
 #include "../loader/loader.hpp"
 
 namespace stay

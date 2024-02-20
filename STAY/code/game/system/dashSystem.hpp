@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "ecs/system.hpp"
+#include "stay/ecs/system.hpp"
 
 namespace stay
 {

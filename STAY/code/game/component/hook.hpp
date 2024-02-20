@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../common/ecs/component.hpp"
-#include "../../common/type/vector.hpp"
+#include "stay/ecs/component.hpp"
+#include "stay/type/vector.hpp"
 
 namespace stay
 {

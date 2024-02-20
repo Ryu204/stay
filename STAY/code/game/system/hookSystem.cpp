@@ -1,10 +1,10 @@
 #include "hookSystem.hpp"
 #include "../component/hook.hpp"
-#include "physics/collider.hpp"
+#include "stay/physics/collider.hpp"
 #include "../component/player.hpp"
-#include "physics/joint.hpp"
-#include "type/vector.hpp"
-#include "utility/math.hpp"
+#include "stay/physics/joint.hpp"
+#include "stay/type/vector.hpp"
+#include "stay/utility/math.hpp"
 
 namespace 
 {

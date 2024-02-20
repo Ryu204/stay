@@ -1,7 +1,7 @@
 #pragma once 
 
-#include "ecs/system.hpp"
-#include "utility/typedef.hpp"
+#include "stay/ecs/system.hpp"
+#include "stay/utility/typedef.hpp"
 
 namespace stay
 {

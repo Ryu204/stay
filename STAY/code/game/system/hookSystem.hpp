@@ -2,8 +2,8 @@
 
 #include <unordered_map>
 
-#include "ecs/system.hpp"
-#include "world/node.hpp"
+#include "stay/ecs/system.hpp"
+#include "stay/world/node.hpp"
 
 namespace stay
 {

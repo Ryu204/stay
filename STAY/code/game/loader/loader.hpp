@@ -4,7 +4,7 @@
 
 #include <LDtkLoader/Project.hpp>
 
-#include "loader/iLoader.hpp"
+#include "stay/loader/iLoader.hpp"
 
 namespace stay
 {

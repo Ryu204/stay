@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../common/physics/rigidBody.hpp"
+#include "stay/physics/rigidBody.hpp"
 
 namespace stay
 {

@@ -2,11 +2,11 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include "../component/dash.hpp"
-#include "physics/rigidBody.hpp"
-#include "utility/invoke.hpp"
+#include "stay/physics/rigidBody.hpp"
+#include "stay/utility/invoke.hpp"
 #include "../component/player.hpp"
 #include "../component/hook.hpp"
-#include "world/node.hpp"
+#include "stay/world/node.hpp"
 
 namespace stay 
 {

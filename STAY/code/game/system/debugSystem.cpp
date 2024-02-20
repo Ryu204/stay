@@ -1,8 +1,8 @@
 #include "debugSystem.hpp"
-#include "../../common/physics/rigidBody.hpp"
+#include "stay/physics/rigidBody.hpp"
 #include "../component/player.hpp"
 #include "../component/playerDebug.hpp"
-#include "../../common/world/camera.hpp"
+#include "stay/world/camera.hpp"
 #include <SFML/Window/Keyboard.hpp>
 #include <cassert>
 

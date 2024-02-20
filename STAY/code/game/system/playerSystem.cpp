@@ -1,7 +1,7 @@
 #include "playerSystem.hpp"
 
 #include "../component/player.hpp"
-#include "physics/collider.hpp"
+#include "stay/physics/collider.hpp"
 
 namespace 
 {
