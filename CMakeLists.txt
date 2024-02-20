@@ -36,7 +36,7 @@ ENDIF()
 ADD_LIBRARY(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCE_CODE})
 
 # Create target
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PRIVATE
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
     nlohmann_json::nlohmann_json 
     sfml-graphics 
     sfml-audio
