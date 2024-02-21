@@ -1,24 +1,40 @@
 # Stay
 
-A project for my girlfriend's birthday.
+Core frameworks/utilities for developing games in C++.
 
-It's a game but the "engine" part is taking over.
+Features:
+* ECS and scene graph system
+* Scene/Node serialization and configure game with JSON
+* Box2D as physics backend
 
-# How to build
+# How to use
+
 You will need `CMake` with version `>= 3.24` and `git` to build the project directly.
 
-Inside project directory:
+Build:
 ```sh
 git submodule update --init --recursive --remote
 cmake --preset=default
 cmake --build build/default
 ```
-If your build does not succeed, you can take a look at `.github/workflows/build.yml` to see detailed steps.
-
-Run the executable:
-```sh
-cd build/default
-./STAY
+Use as a dependency:
+```bash
+# Your projejct directory
+git submodule add https://github.com/Ryu204/stay.git extern/stay
+```
+```cmake
+# CMakeLists.txt
+add_subdirectory(extern/stay)
+target_link_libraries(<your_target> PUBLIC stay)
+```
+```cpp
+// main.cpp
+#include <stay/program/application.hpp>
+using namespace stay;
+int main() {
+    program::Application app;
+    app.run();
+}
 ```
 
 # License and dependencies
@@ -33,7 +49,6 @@ The dependencies are provided with compatible licenses:
 * **entt** with [MIT](https://github.com/skypjack/entt/blob/v3.12.x/LICENSE) license
 * **box2d** with [MIT](https://github.com/erincatto/box2d/blob/main/LICENSE) license
 * **efsw** with [MIT](https://github.com/SpartanJ/efsw/blob/master/LICENSE) license
-* **LDtkLoader** with [zlib](https://github.com/Madour/LDtkLoader/blob/master/LICENSE.md) license
 
 # Trivial info
 
@@ -42,9 +57,8 @@ The dependencies are provided with compatible licenses:
 * Entity behaviours are defined via systems
 * There is currently 2 builtin systems: render and physics
 * Each entity along with components is able to be serialized to and deserialized from json
-* Currently the loading process uses generated quicktype file from [LDtk's website](https://ldtk.io/docs/game-dev/json-overview/json-schema/)'s schema, so it's very ugly.
 
-# Usage
+# Ignore
 
 > for future reference
 
