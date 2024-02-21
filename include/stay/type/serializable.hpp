@@ -17,6 +17,8 @@ namespace stay
             using Data = nlohmann::json;
             virtual Data serialize() const = 0;
             virtual bool deserialization(const Data& /*data*/) = 0;
+
+            constexpr Serializable() = default;
     };
 
     template <typename T, whereIs(T, Serializable)>

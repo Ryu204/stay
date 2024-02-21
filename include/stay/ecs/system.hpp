@@ -28,4 +28,4 @@ namespace stay
         SelfRegister() {\
             ecs::manager().registerSystem<className>(#className);\
         }\
-    } selfRegister;
+    } const selfRegister;

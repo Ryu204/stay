@@ -30,7 +30,7 @@ namespace stay
         SelfRegister() {\
             stay::ecs::componentsLoader().registerComponent<className>(#className);\
         }\
-    } selfRegister;
+    } const selfRegister;
 
 // Only a syntatic sugar
 // If you want to perform additional operations, use `REGISTER_COMPONENT` with corresponding serde macro
