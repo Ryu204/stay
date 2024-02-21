@@ -32,8 +32,10 @@ IF (${PROJECT_NAME}_CLANG_TIDY)
     SET(CMAKE_CXX_CLANG_TIDY 
         "clang-tidy" 
         "--config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy" 
-        "--header-filter=${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
-        "--extra-arg=/EHsc")
+        "--header-filter=${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp")
+    IF(MSVC)
+        LIST(APPEND CMAKE_CXX_CLANG_TIDY "--extra-arg=/EHsc")
+    ENDIF()
 ENDIF()
 
 # Add target and link libraries
