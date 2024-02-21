@@ -29,7 +29,11 @@ FILE(GLOB_RECURSE
 # Clang-tidy analyzer
 OPTION(${PROJECT_NAME}_CLANG_TIDY "Enable clang-tidy checks" OFF)
 IF (${PROJECT_NAME}_CLANG_TIDY)
-    SET(CMAKE_CXX_CLANG_TIDY "clang-tidy" "--config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy" "--header-filter=${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp")
+    SET(CMAKE_CXX_CLANG_TIDY 
+        "clang-tidy" 
+        "--config-file=${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy" 
+        "--header-filter=${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
+        "--extra-arg=/EHsc")
 ENDIF()
 
 # Add target and link libraries
