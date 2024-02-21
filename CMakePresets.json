@@ -32,7 +32,7 @@
             "inherits" : "default",
             "binaryDir" : "build/clang-tidy",
             "cacheVariables": {
-                "USER_DEFINED_CLANG_TIDY" : "clang-tidy;--header-filter=${sourceDir}/*.hpp"
+                "stay_CLANG_TIDY": "ON"
             }
         },
         {
