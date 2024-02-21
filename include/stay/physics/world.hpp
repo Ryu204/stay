@@ -13,7 +13,7 @@ namespace stay
 {
     namespace phys
     {
-        namespace details
+        namespace detail
         {
             struct WorldWrapper : b2World
             {
@@ -21,8 +21,8 @@ namespace stay
                     : b2World(gravity.toVec2<b2Vec2>())
                 {}
             };
-        } // namespace details
+        } // namespace detail
         
-        using World = utils::Singleton<details::WorldWrapper>;
+        using World = utils::Singleton<detail::WorldWrapper>;
     } // namespace phys
 } // namespace stay

@@ -1,4 +1,5 @@
 #include "stay/ecs/manager.hpp"
+#include "stay/program/builtinSystems.hpp"
 
 namespace stay
 {
@@ -22,6 +23,7 @@ namespace stay
 
         void Manager::reset(SystemContext context, const Serializable::Data& systemConfigs)
         {
+            stay::detail::registerBuiltinSystems();
             std::make_shared<Registry>().swap(mRegistry);
             // In the same category, system with smallest id gets called first and so on
             std::sort(mInitSystems.begin(), mInitSystems.end(), detail::Cmpr<InitSystem>());

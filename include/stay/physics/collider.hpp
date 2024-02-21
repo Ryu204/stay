@@ -10,10 +10,7 @@
 
 namespace stay
 {
-    namespace sys
-    {
-        class PhysicsSystem;
-    } // namespace sys
+    class PhysicsSystem;
     namespace phys
     {
         class RigidBody;
@@ -51,9 +48,8 @@ namespace stay
                 ColliderInfo mShapeInfo;
                 b2Fixture* mFixture;
 
+                friend class stay::PhysicsSystem;
                 static Layer& collisionLayers();
-
-                friend class sys::PhysicsSystem;
 
                 void check() const;
                 friend class DestructRegister;
