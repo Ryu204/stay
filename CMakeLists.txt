@@ -62,3 +62,9 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} PRIVATE Threads::Threads)
 
 # Add common header to include directory
 TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Build the editor
+OPTION(${PROJECT_NAME}_BUILD_EDITOR "Build the in-house editior" OFF)
+IF (${PROJECT_NAME}_BUILD_EDITOR)
+    ADD_SUBDIRECTORY(editor)
+ENDIF()
