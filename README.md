@@ -25,11 +25,7 @@ git submodule add https://github.com/Ryu204/stay.git extern/stay
 ```cmake
 # CMakeLists.txt
 add_subdirectory(extern/stay)
-if (BUILD_SHARED_LIBS)
-    target_link_libraries(<your_target> PUBLIC stay)
-elseif(BUILD_STATIC_LIBS)
-    target_link_libraries(<your_target> PUBLIC "$<LINK_LIBRARY:WHOLE_ARCHIVE,stay>")
-endif()
+target_link_libraries(<your_target> PUBLIC stay)
 ```
 ```cpp
 // main.cpp
@@ -40,7 +36,6 @@ int main() {
     app.run();
 }
 ```
-**Note:** Because this library relies on some self-registration macros with global variables, user must pass the `--whole-archive` option to the linker when building static library. Have a look at above CMake snippet.
 
 # License and dependencies
 
