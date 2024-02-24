@@ -22,3 +22,11 @@
 	path = extern/json
 	url = https://github.com/nlohmann/json.git
 	branch = master
+[submodule "extern/imgui"]
+	path = extern/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = master
+[submodule "extern/imgui-sfml"]
+	path = extern/imgui-sfml
+	url = https://github.com/SFML/imgui-sfml.git
+	branch = 2.6.x

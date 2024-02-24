@@ -28,6 +28,14 @@
             "binaryDir" : "build/default"
         },
         {
+            "name": "default-with-editor",
+            "description": "also build the editor",
+            "inherits": "default",
+            "cacheVariables": {
+                "stay_BUILD_EDITOR": "ON"
+            }
+        },
+        {
             "name": "clang-tidy",
             "inherits" : "default",
             "binaryDir" : "build/clang-tidy",
@@ -37,7 +45,7 @@
         },
         {
             "name": "ci",
-            "inherits" : "default"
+            "inherits" : "default-with-editor"
         },
         {
             "name" : "ci-lint",
