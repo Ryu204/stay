@@ -16,7 +16,7 @@ namespace stay
             std::array<sf::Vertex, 4> vertices;
             int order;
             std::optional<std::string> textureId;
-            ZOrderPack() = delete;
+            ZOrderPack() = default;
             ZOrderPack(const ZOrderPack&) = delete;
 
             ZOrderPack(ZOrderPack&&) = default;

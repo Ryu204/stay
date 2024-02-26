@@ -21,9 +21,9 @@ ADD_SUBDIRECTORY(extern/SFML)
 FILE(GLOB_RECURSE 
     ${PROJECT_NAME}_SOURCE_CODE
     CONFIGURE_DEPENDS
-    "source/*.cpp"
-    "source/*.hpp"
-    "include/*.hpp"
+    "source/stay/*.cpp"
+    "source/stay/*.hpp"
+    "include/stay/*.hpp"
 )
 
 # Clang-tidy analyzer
@@ -53,7 +53,7 @@ TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
 )
 
 # Specific libraries macros
-TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PRIVATE "GLM_ENABLE_EXPERIMENTAL")
+TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PUBLIC "GLM_ENABLE_EXPERIMENTAL")
 
 # Add thread support
 SET(THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -66,5 +66,5 @@ TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 # Build the editor
 OPTION(${PROJECT_NAME}_BUILD_EDITOR "Build the in-house editior" OFF)
 IF (${PROJECT_NAME}_BUILD_EDITOR)
-    ADD_SUBDIRECTORY(editor)
+    INCLUDE(cmake/Editor.cmake)
 ENDIF()
