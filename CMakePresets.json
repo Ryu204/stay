@@ -49,7 +49,7 @@
         },
         {
             "name" : "ci-lint",
-            "inherits" : "clang-tidy"
+            "inherits" : ["clang-tidy", "default-with-editor"]
         }
     ]
 }
