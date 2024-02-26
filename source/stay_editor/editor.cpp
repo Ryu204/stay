@@ -11,6 +11,11 @@ namespace stay::editor
         initialize();
     }
 
+    Editor::~Editor()
+    {
+        ImGui::SFML::Shutdown(*mWindow);
+    }
+
     void Editor::initialize()
     {
         ApplicationInfo info;
@@ -52,14 +57,22 @@ namespace stay::editor
                 mWindow->close();
         }
         ImGui::SFML::Update(*mWindow, dt);
-
-        ImGui::DockSpaceOverViewport();
-        ImGui::ShowDemoWindow();
     }
 
     void Editor::render()
     {
         mWindow->clear();
+        mGameCanvas.clear();
+        
+        ImGui::DockSpaceOverViewport();
+        ImGui::ShowDemoWindow();
+
+        static sf::CircleShape shape{4.F, 8};
+        shape.setOrigin(sf::Vector2f{4.F, 4.F});
+        shape.setFillColor(sf::Color::White);
+        shape.setPosition(sf::Vector2f{});
+        mGameCanvas.draw(shape);
+        mGameCanvas.update();
         ImGui::SFML::Render(*mWindow);
         mWindow->display();
     }
