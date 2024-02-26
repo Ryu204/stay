@@ -10,8 +10,12 @@ namespace stay::editor
     {
         public:
             Editor();
+            void run();
         private:
             void initialize();
-            std::unique_ptr<sf::RenderWindow> window;
+            void input(sf::Time dt);
+            void render();
+
+            std::unique_ptr<sf::RenderWindow> mWindow;
     };
 }
