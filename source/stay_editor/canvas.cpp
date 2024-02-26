@@ -9,11 +9,14 @@ namespace stay::editor
     {
         if (ImGui::Begin("Canvas"))
         {
-            auto currentWindowSize = ImGui::GetWindowSize();
+            auto currentWindowSize = Vector2Int::from(ImGui::GetWindowSize());
             currentWindowSize.y -= 2 * ImGui::GetFrameHeightWithSpacing();
+            currentWindowSize.y = std::max(currentWindowSize.y, 1);
+            currentWindowSize.x = std::max(currentWindowSize.x, 1);
             const bool resized = currentWindowSize.x != mWidth || currentWindowSize.y != mHeight;
             mWidth = currentWindowSize.x;
             mHeight = currentWindowSize.y;
+
             if (resized)
             {
                 if (!mTexture.create(mWidth, mHeight))
