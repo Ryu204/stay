@@ -9,7 +9,7 @@
 
 namespace stay
 {
-    Scene::Scene(std::filesystem::path&& filepath, RWin& window)
+    Scene::Scene(std::filesystem::path&& filepath, RWin& window, Builtin systems)
         : mWindow{window}
         , mCamera{40.F}
         , mTextures{"asset/texture"}
@@ -19,7 +19,8 @@ namespace stay
         phys::World::init(20.F * vectorDown);
         ecs::manager().reset(
             ecs::SystemContext{mCamera, mWindow, mTextures},
-            getSystemConfig()
+            getSystemConfig(),
+            systems
         );
         Node::init(ecs::manager().getRegistry());
         mSceneLoader = std::make_unique<SceneLoader>(ecs::manager(), std::move(filepath));

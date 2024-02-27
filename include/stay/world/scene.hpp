@@ -3,13 +3,14 @@
 #include "camera.hpp"
 #include "stay/loader/sceneLoader.hpp"
 #include "stay/type/texture.hpp"
+#include "stay/program/builtinSystems.hpp"
 
 namespace stay
 {
     class Scene
     {
         public:
-            Scene(std::filesystem::path&& filepath, RWin& window);
+            Scene(std::filesystem::path&& filepath, RWin& window, Builtin systems = Builtin::All);
             ~Scene();
             static void update(float dt);
             static void start();

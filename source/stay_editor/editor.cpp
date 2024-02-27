@@ -60,8 +60,10 @@ namespace stay::editor
             ImGui::SFML::ProcessEvent(*mWindow, event);
             if (event.type == sf::Event::Closed)
                 mWindow->close();
+            mWorld->input(event);
         }
         ImGui::SFML::Update(*mWindow, dt);
+        mWorld->update(dt);
 
         ImGui::DockSpaceOverViewport();
         MenuBuilder(*mWorld).build();

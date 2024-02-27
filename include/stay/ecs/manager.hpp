@@ -6,6 +6,7 @@
 
 namespace stay
 {
+    enum class Builtin;
     class Component;
     namespace ecs
     {        
@@ -42,7 +43,7 @@ namespace stay
 
                 template <typename DerviedSystem>
                 void registerSystem(const std::string& systemName = "unamed");
-                void reset(ecs::SystemContext context, const Serializable::Data& systemConfigs);
+                void reset(ecs::SystemContext context, const Serializable::Data& systemConfigs, Builtin systems);
                 void start();
                 void update(float dt);
                 void render(RTarget* target, Node* root);

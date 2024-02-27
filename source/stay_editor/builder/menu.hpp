@@ -17,13 +17,7 @@ namespace stay::editor
         {}
         MenuBuilder& build()
         {
-            const auto windowFlags = ImGuiWindowFlags_MenuBar;
-            if (!ImGui::Begin("Menu", nullptr, windowFlags))
-            {
-                ImGui::End();
-                return *this;
-            }
-            if (ImGui::BeginMenuBar())
+            if (ImGui::BeginMainMenuBar())
             {
                 if (ImGui::BeginMenu("File"))
                 {
@@ -32,11 +26,11 @@ namespace stay::editor
                         openWorldFile();
                         ImGui::EndMenu();
                     }
+                    closeWorldFile();
                     ImGui::EndMenu();
                 }
-                ImGui::EndMenuBar();
+                ImGui::EndMainMenuBar();
             }
-            ImGui::End();
 
             return *this;
         }
@@ -61,6 +55,16 @@ namespace stay::editor
                     badState = false;
                 ImGui::PopStyleColor(1);
             }
+        }
+        void closeWorldFile()
+        {
+            if (!context.world.isOpen())
+            {
+                ImGui::TextDisabled("Close");
+                return;
+            }
+            if (ImGui::MenuItem("Close"))
+                context.world.close();
         }
 
         BuilderContext context;

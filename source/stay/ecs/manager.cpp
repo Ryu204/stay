@@ -23,12 +23,12 @@ namespace stay
             return mRegistry;
         }
 
-        void Manager::reset(SystemContext context, const Serializable::Data& systemConfigs)
+        void Manager::reset(SystemContext context, const Serializable::Data& systemConfigs, Builtin systems)
         {
             static std::atomic_bool builtinSystemsRegistered{false};
             if (!builtinSystemsRegistered.load())
             {
-                stay::detail::registerBuiltinSystems();
+                stay::detail::registerBuiltinSystems(systems);
                 builtinSystemsRegistered.store(true);
             }
             std::make_shared<Registry>().swap(mRegistry);
