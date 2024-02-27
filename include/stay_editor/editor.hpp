@@ -8,6 +8,7 @@
 
 namespace stay::editor
 {
+    class World;
     class Editor
     {
         public:
@@ -21,5 +22,6 @@ namespace stay::editor
 
             std::unique_ptr<sf::RenderWindow> mWindow;
             Canvas mGameCanvas;
+            std::unique_ptr<World> mWorld;
     };
 }
