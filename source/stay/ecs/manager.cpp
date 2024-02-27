@@ -1,6 +1,8 @@
 #include "stay/ecs/manager.hpp"
 #include "stay/program/builtinSystems.hpp"
 
+#include <atomic>
+
 namespace stay
 {
     namespace ecs
@@ -23,7 +25,12 @@ namespace stay
 
         void Manager::reset(SystemContext context, const Serializable::Data& systemConfigs)
         {
-            stay::detail::registerBuiltinSystems();
+            static std::atomic_bool builtinSystemsRegistered{false};
+            if (!builtinSystemsRegistered.load())
+            {
+                stay::detail::registerBuiltinSystems();
+                builtinSystemsRegistered.store(true);
+            }
             std::make_shared<Registry>().swap(mRegistry);
             // In the same category, system with smallest id gets called first and so on
             std::sort(mInitSystems.begin(), mInitSystems.end(), detail::Cmpr<InitSystem>());
