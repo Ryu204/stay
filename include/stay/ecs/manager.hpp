@@ -3,6 +3,7 @@
 #include "systemTypes.hpp"
 #include "stay/utility/typedef.hpp"
 #include "stay/world/node.hpp"
+#include "stay/program/builtinSystems.hpp"
 
 namespace stay
 {
@@ -42,7 +43,7 @@ namespace stay
 
                 template <typename DerviedSystem>
                 void registerSystem(const std::string& systemName = "unamed");
-                void reset(ecs::SystemContext context, const Serializable::Data& systemConfigs);
+                void reset(ecs::SystemContext context, const Serializable::Data& systemConfigs, int systems = systems::Type::All);
                 void start();
                 void update(float dt);
                 void render(RTarget* target, Node* root);
