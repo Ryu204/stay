@@ -8,11 +8,14 @@ namespace stay
 {
     namespace detail
     {
-        void registerBuiltinSystems()
+        void registerBuiltinSystems(int systems)
         {
-            ecs::manager().registerSystem<RenderSystem>("RenderSystem");
-            ecs::manager().registerSystem<PhysicsDebugSystem>("PhysicsDebugSystem");
-            ecs::manager().registerSystem<PhysicsSystem>("PhysicsSystem");
+            if ((systems & systems::Render) != 0)
+                ecs::manager().registerSystem<RenderSystem>("RenderSystem");
+            if ((systems & systems::PhysicsDebug) != 0)
+                ecs::manager().registerSystem<PhysicsDebugSystem>("PhysicsDebugSystem");
+            if ((systems & systems::Physics) != 0)
+                ecs::manager().registerSystem<PhysicsSystem>("PhysicsSystem");
         }
     } // namespace detail
 } // namespace stay
