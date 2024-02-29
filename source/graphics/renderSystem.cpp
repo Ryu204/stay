@@ -2,6 +2,8 @@
 
 #include "stay/graphics/render.hpp"
 #include "stay/utility/convert.hpp"
+#include "stay/graphics/cameraController.hpp"
+#include "stay/world/camera.hpp"
 
 namespace stay
 {
@@ -11,18 +13,32 @@ namespace stay
         , ecs::ConfigurableSystem{0}
         , ecs::System{manager}
         , mTextures{nullptr}
+        , mCamera{nullptr}
         , mBuffer{sf::PrimitiveType::Quads}
     { }
 
     void RenderSystem::init(ecs::SystemContext& context)
     {
         mTextures = &context.textures;
+        mCamera = &context.camera;
     }
 
     void RenderSystem::render(RTarget* target, Node* root)
     {
+        checkCameraControls();
         traverse(root, target);
         drawObjects(target);
+    }
+
+    void RenderSystem::checkCameraControls() 
+    {
+        for (const auto& [entity, cameraProps] : mManager->getRegistryRef().view<CameraController>().each())
+        {
+            mCamera->setHeight(cameraProps.height);
+            auto position = Node::getNode(entity)->globalTransform().getPosition();
+            mCamera->getView().setCenter(position.x, position.y);
+            break;
+        }
     }
 
     bool RenderSystem::loadConfig(const Serializable::Data& data) 

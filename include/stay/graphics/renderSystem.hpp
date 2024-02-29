@@ -26,8 +26,10 @@ namespace stay
         private:
             void drawObjects(RTarget* target);
             void traverse(Node* node, RTarget* target);
+            void checkCameraControls();
 
             TextureManager* mTextures;
+            Camera* mCamera;
             std::vector<detail::ZOrderPack> mRenderObjects;
             sf::VertexArray mBuffer;
     };

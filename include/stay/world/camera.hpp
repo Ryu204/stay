@@ -20,6 +20,12 @@ namespace stay
                 adaptTo(Vector2(1.F, 1.F));
             }
 
+            void setHeight(float height) 
+            {
+                assert(height > 0.F && "invalid camera height");
+                mHeight = height;
+            }
+
             // @return A reference to internal `sf::View` for modification
             // @note If you change the scale, it won't be automatically recomputed. Use `adaptTo(...)` to recompute the right ratio
             View& getView()
