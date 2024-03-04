@@ -132,10 +132,10 @@ namespace stay
         /      
       Z- <-- (PLAYER)
     */
-    inline constexpr Vector3 vectorUp(0.F, 1.F, 0.F);
-    inline constexpr Vector3 vectorDown(0.F, -1.F, 0.F);
-    inline constexpr Vector3 vectorLeft(-1.F, 0.F, 0.F);
-    inline constexpr Vector3 vectorRight(1.F, 0.F, 0.F);
-    inline constexpr Vector3 vectorBack(0.F, 0.F, -1.F);
-    inline constexpr Vector3 vectorForward(0.F, 0.F, 1.F);
+    inline const Vector3 vectorUp(0.F, 1.F, 0.F);
+    inline const Vector3 vectorDown(0.F, -1.F, 0.F);
+    inline const Vector3 vectorLeft(-1.F, 0.F, 0.F);
+    inline const Vector3 vectorRight(1.F, 0.F, 0.F);
+    inline const Vector3 vectorBack(0.F, 0.F, -1.F);
+    inline const Vector3 vectorForward(0.F, 0.F, 1.F);
 } // namespace stay

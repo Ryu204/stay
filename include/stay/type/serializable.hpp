@@ -19,6 +19,7 @@ namespace stay
             virtual bool deserialization(const Data& /*data*/) = 0;
 
             constexpr Serializable() = default;
+            virtual ~Serializable() = default;
     };
 
     template <typename T, whereIs(T, Serializable)>
