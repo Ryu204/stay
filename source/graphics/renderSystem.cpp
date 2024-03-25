@@ -35,7 +35,7 @@ namespace stay
         for (const auto& [entity, cameraProps] : mManager->getRegistryRef().view<CameraController>().each())
         {
             mCamera->setHeight(cameraProps.height);
-            auto position = Node::getNode(entity)->globalTransform().getPosition();
+            const auto position = Node::getNode(entity)->globalTransform().getPosition();
             mCamera->getView().setCenter(position.x, position.y);
             break;
         }

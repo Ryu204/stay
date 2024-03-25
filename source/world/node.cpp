@@ -188,7 +188,7 @@ namespace stay
         mLocalTransform = transform;
     }
 
-    void Node::setGlobalTransform(Transform& transform)
+    void Node::setGlobalTransform(const Transform& transform)
     {
         if (stray())
         {

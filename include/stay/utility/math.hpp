@@ -39,5 +39,10 @@ namespace stay
         {
             return clamp(t, 0.F, 1.F);
         }
+        template <typename T>
+        T lerp(const T& begin, const T& end, float t) 
+        {
+            return T{ begin * (1.F - t) + end * t };
+        }
     } // namespace utils
 } // namespace stay

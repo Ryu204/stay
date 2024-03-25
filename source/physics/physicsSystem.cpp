@@ -135,28 +135,22 @@ namespace stay
 
     void PhysicsSystem::batchSingle(ecs::Entity entity)
     {
-        if (mBatched.count(entity) > 0)
+        if (mBatched.count(entity) > 0) 
+        {
             return;
-        if (!mManager->hasComponent<phys::RigidBody>(entity))
+        }
+        auto* node = Node::getNode(entity);
+        if (!node->stray() && mBatched.count(node->parent()->entity()) == 0) 
+        {
+            batchSingle(node->parent()->entity());
+        }
+        if (!node->hasComponent<phys::RigidBody>())
         {
             mBatched.insert(entity);
             return;
         }
         const auto& rgbody = mManager->getComponent<phys::RigidBody>(entity);
-        Transform tf;
-        tf.setPosition(rgbody.getPosition());
-        tf.setRotation(rgbody.getAngle());
-        auto* node = Node::getNode(entity);
-
-        if (node->stray())
-        {
-            node->setLocalTransform(tf);
-            mBatched.insert(entity);
-            return;
-        }
-        const bool parentIsBatched = mBatched.count(node->parent()->entity()) > 0;
-        if (!parentIsBatched)
-            batchSingle(node->parent()->entity());
+        Transform tf{rgbody.getPosition(), rgbody.getAngle()};
         node->setGlobalTransform(tf);
         mBatched.insert(entity);
     }

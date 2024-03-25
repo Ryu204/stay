@@ -36,7 +36,7 @@ namespace stay
             Transform& localTransform();
             Transform globalTransform() const;
             void setLocalTransform(const Transform& transform);
-            void setGlobalTransform(Transform& transform);
+            void setGlobalTransform(const Transform& transform);
 
             template <typename Func, typename... Args>
             void visit(const Func& func, Args&&... args);
