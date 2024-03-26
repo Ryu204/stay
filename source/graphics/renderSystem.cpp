@@ -34,11 +34,28 @@ namespace stay
 
     void RenderSystem::checkCameraControls() 
     {
+        static const auto adjustCenter = [](const Rect& bounds, const Vector2& size, Vector2 center) -> Vector2 {
+            const auto halfSize = Vector2{ size / 2.F };
+            center.x = std::max(
+                bounds.min().x + halfSize.x,
+                std::min(center.x, bounds.max().x - halfSize.x)
+            );
+            center.y = std::max(
+                bounds.min().y + halfSize.y,
+                std::min(center.y, bounds.max().y - halfSize.y)
+            );
+            return center;
+        };
         for (const auto& [entity, cameraProps] : mManager->getRegistryRef().view<CameraController>().each())
         {
             mCamera->setHeight(cameraProps.height);
-            const auto position = Node::getNode(entity)->globalTransform().getPosition();
-            mCamera->getView().setCenter(position.x, position.y);
+            auto tf = Node::getNode(entity)->globalTransform();
+            const auto adjustedPosition = adjustCenter(
+                cameraProps.bounds, 
+                Vector2::from(mCamera->getView().getSize()), 
+                tf.getPosition()
+            );
+            mCamera->getView().setCenter(adjustedPosition.toVec2<sf::Vector2f>());
             break;
         }
     }
