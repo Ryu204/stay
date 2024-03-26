@@ -74,6 +74,7 @@ namespace stay
 
     void RenderSystem::drawObjects(RTarget* target)
     {
+        target->setView(mCamera->getView());
         std::sort(mRenderObjects.rbegin(), mRenderObjects.rend());
         mBuffer.clear();
         for (auto i = 0; i < mRenderObjects.size(); ++i)

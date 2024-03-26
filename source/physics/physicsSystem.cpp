@@ -155,6 +155,16 @@ namespace stay
         mBatched.insert(entity);
     }
 
+    // This method and the horizontal damping field is to create smooth movement.
+    //
+    // Explaination:
+    // Set [a, 1 - b, t] = [acceleration when user presses move, horizontal damping, delta time]
+    // If user presses move button, the maximum velocity is calculated by a, b, t.
+    //
+    // v_0 = 0
+    // v_{n + 1} = (v_{n} + at) * (1 - b)^t
+    // 
+    // This sequence converges.
     void PhysicsSystem::applyHorizontalDamping(float dt)
     {
         auto view = mManager->getRegistryRef().view<phys::RigidBody>();
