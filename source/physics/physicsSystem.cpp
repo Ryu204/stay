@@ -161,8 +161,9 @@ namespace stay
         for (auto [entity, rgbody] : view.each())
         {
             const float lostRatio = 1 - utils::clamp01(rgbody.horizontalDamping());
-            const auto vel = rgbody.getVelocity();
-            rgbody.setVelocity(vel * std::pow(lostRatio, dt));
+            auto vel = rgbody.getVelocity();
+            vel.x *= std::pow(lostRatio, dt);
+            rgbody.setVelocity(vel);
         }
     }
 } // namespace stay
