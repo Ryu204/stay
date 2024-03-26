@@ -4,6 +4,7 @@
 #include "stay/utility/convert.hpp"
 #include "stay/graphics/cameraController.hpp"
 #include "stay/world/camera.hpp"
+#include "stay/utility/sfutils.hpp"
 
 namespace stay
 {
@@ -15,6 +16,7 @@ namespace stay
         , mTextures{nullptr}
         , mCamera{nullptr}
         , mBuffer{sf::PrimitiveType::Quads}
+        , mBackground{std::make_unique<sf::RectangleShape>()}
     { }
 
     void RenderSystem::init(ecs::SystemContext& context)
@@ -52,6 +54,9 @@ namespace stay
                 return false;
             mTextures->add(i.key(), i.value().get<std::string>()).load();
         }
+        const auto& bgr = mTextures->get("background");
+        mBackground->setTexture(&bgr.getSfmlTexture());
+        mBackground->setScale(sf::Vector2f{1, -1});
         return true;
     }
 
@@ -75,6 +80,13 @@ namespace stay
     void RenderSystem::drawObjects(RTarget* target)
     {
         target->setView(mCamera->getView());
+
+        mBackground->setPosition(mCamera->getView().getCenter());
+        const auto bgrSize = mCamera->getView().getSize();
+        mBackground->setSize(bgrSize);
+        utils::centerSf(*mBackground);
+        target->draw(*mBackground);
+
         std::sort(mRenderObjects.rbegin(), mRenderObjects.rend());
         mBuffer.clear();
         for (auto i = 0; i < mRenderObjects.size(); ++i)

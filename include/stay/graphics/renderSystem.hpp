@@ -32,5 +32,6 @@ namespace stay
             Camera* mCamera;
             std::vector<detail::ZOrderPack> mRenderObjects;
             sf::VertexArray mBuffer;
+            std::unique_ptr<sf::RectangleShape> mBackground;
     };
 } // namespace stay
