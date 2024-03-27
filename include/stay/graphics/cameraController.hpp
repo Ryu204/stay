@@ -10,8 +10,8 @@ namespace stay
     struct CameraController : ecs::Component
     {
         CameraController(float height = 5.F, Rect bounds = Rect{
-            Vector2{1, 1} * std::numeric_limits<float>::min(),
-            Vector2{1, 1} * std::numeric_limits<float>::max()
+            Vector2{-1e9, -1e9},
+            Vector2{1e9, 1e9}
         })
             : height{height}
             , bounds{std::move(bounds)}

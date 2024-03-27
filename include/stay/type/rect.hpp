@@ -50,6 +50,14 @@ namespace stay
             {
                 return mMax.y - mMin.y;
             }
+            bool contain(const Vector2& point) const
+            {
+                return 
+                    mMax.x >= point.x && 
+                    mMax.y >= point.y && 
+                    mMin.x <= point.x && 
+                    mMin.y <= point.y;
+            }
             SERIALIZE(mMin, mMax)
         private:
             Vector2 mMin;

@@ -46,12 +46,12 @@ namespace stay
             );
             return center;
         };
-        for (const auto& [entity, cameraProps] : mManager->getRegistryRef().view<CameraController>().each())
+        for (const auto& [entity, camController] : mManager->getRegistryRef().view<CameraController>().each())
         {
-            mCamera->setHeight(cameraProps.height);
+            mCamera->setHeight(camController.height);
             auto tf = Node::getNode(entity)->globalTransform();
             const auto adjustedPosition = adjustCenter(
-                cameraProps.bounds, 
+                camController.bounds, 
                 Vector2::from(mCamera->getView().getSize()), 
                 tf.getPosition()
             );
