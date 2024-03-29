@@ -17,7 +17,7 @@ namespace stay
                 Layer();
                 // @brief Set name of a layer
                 // @param layer an interger in range [0, 16)
-                Layer& set(int layer, std::string&& name);
+                Layer& set(int layer, const std::string& name);
                 // @brief Set `layer1` and `layer2` to collide in scene
                 Layer& set(int layer1, int layer2, bool collide = false);
                 Layer& set(const std::string& name1, const std::string& name2, bool collide = false);

@@ -10,11 +10,11 @@ namespace stay
             : mMatrix(16, 0xFFFF)
         { }
 
-        Layer& Layer::set(int layer, std::string&& name)
+        Layer& Layer::set(int layer, const std::string& name)
         {
             assert(layer >= 0 && layer < 16 && "physics layer out of range");
-            mLayerBits.emplace(std::forward<std::string>(name), layer);
-            mLayerNames.emplace(layer, std::forward<std::string>(name));
+            mLayerBits.emplace(name, layer);
+            mLayerNames.emplace(layer, name);
             return *this;
         }
 

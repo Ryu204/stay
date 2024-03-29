@@ -25,6 +25,9 @@ namespace stay
         void Collider::connect()
         {
             assert(getNode()->hasComponent<RigidBody>() && "Collider created without a rigidbody");
+            const auto connected = mFixture != nullptr;
+            if (connected)
+                return;
             attachToRigidBody();
         }
 
@@ -64,6 +67,7 @@ namespace stay
                 mMaterial.filter.categoryBits :
                 mFixture->GetFilterData().categoryBits;
             assert(mask != 0 && "zero collision mask");
+            const auto& l = collisionLayers();
             return collisionLayers().name(utils::mostSignificantBit(mask));
         }
 
