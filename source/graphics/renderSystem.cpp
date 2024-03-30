@@ -27,6 +27,7 @@ namespace stay
 
     void RenderSystem::render(RTarget* target, Node* root)
     {
+        mCamera->adaptTo(target);
         checkCameraControls();
         traverse(root, target);
         drawObjects(target);
@@ -34,7 +35,15 @@ namespace stay
 
     void RenderSystem::checkCameraControls() 
     {
-        static const auto adjustCenter = [](const Rect& bounds, const Vector2& size, Vector2 center) -> Vector2 {
+        // Return adjusted size and center
+        const auto adjustView = [](const Rect& bounds, float maxHeight, Vector2 size, Vector2 center) 
+            -> std::tuple<Vector2, Vector2> {
+            const auto scaleRatio = std::min<float>({
+                maxHeight / size.y,
+                bounds.height() / size.y, 
+                bounds.width() / size.x
+            });
+            size = size * scaleRatio;
             const auto halfSize = Vector2{ size / 2.F };
             center.x = std::max(
                 bounds.min().x + halfSize.x,
@@ -44,18 +53,20 @@ namespace stay
                 bounds.min().y + halfSize.y,
                 std::min(center.y, bounds.max().y - halfSize.y)
             );
-            return center;
+            return std::make_tuple(size, center);
         };
         for (const auto& [entity, camController] : mManager->getRegistryRef().view<CameraController>().each())
         {
-            mCamera->setHeight(camController.height);
             auto tf = Node::getNode(entity)->globalTransform();
-            const auto adjustedPosition = adjustCenter(
+            auto [size, pos] = adjustView(
                 camController.bounds, 
-                Vector2::from(mCamera->getView().getSize()), 
+                camController.height,
+                Vector2::from(mCamera->getView().getSize()),
                 tf.getPosition()
             );
-            mCamera->getView().setCenter(adjustedPosition.toVec2<sf::Vector2f>());
+            
+            mCamera->getView().setCenter(pos.toVec2<sf::Vector2f>());
+            mCamera->getView().setSize(size.toVec2<sf::Vector2f>());
             break;
         }
     }
