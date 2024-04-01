@@ -24,7 +24,9 @@ namespace stay
                     bool operator < (const Info& other) const;
                 };
                 static std::optional<Info> nearest(const Vector2& begin, const Vector2& direction, float length);
+                static std::optional<Info> nearest(const Vector2& begin, const Vector2& end);
                 static std::vector<Info> all(const Vector2& begin, const Vector2& direction, float length);
+                static std::vector<Info> all(const Vector2& begin, const Vector2& end);
             private:
                 static b2World& getWorld();
         };

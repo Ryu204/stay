@@ -20,7 +20,7 @@ namespace stay
             Color color{};
             SERIALIZE(start, end, color);
         };
-        void addLine(const Vector2& start = {}, const Vector2& end = Vector2{4, 4}, const Color& color = Color{0xFF00FF})
+        void addLine(const Vector2& start = {}, const Vector2& end = Vector2{4, 4}, const Color& color = Color{0xFF0000FF})
         {
             lines.emplace_back(start, end, color);
         }
@@ -34,7 +34,7 @@ namespace stay
             Color color{};
             SERIALIZE(bounds, color);
         };
-        void addRectangle(const Rect& rect, const Color& color = Color{0xFF00FF})
+        void addRectangle(const Rect& rect, const Color& color = Color{0x0000FFFF})
         {
             rectangles.emplace_back(rect, color);
         }
