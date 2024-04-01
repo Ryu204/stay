@@ -1,6 +1,8 @@
 #include "stay/physics/physicsDebugSystem.hpp"
 #include "stay/physics/world.hpp"
 
+#include "stay/physics/debugShape.hpp"
+
 namespace stay
 {
     PhysicsDebugSystem::PhysicsDebugSystem(ecs::Manager* manager)
@@ -44,5 +46,36 @@ namespace stay
             return;
         mDrawer->setRenderTarget(target);
         phys::World::get().DebugDraw();
+        renderDebugShapes(target);
+    }
+    void PhysicsDebugSystem::renderDebugShapes(RTarget* target)
+    {
+        std::vector<sf::RectangleShape> rects{};
+        sf::VertexArray lines{sf::PrimitiveType::Lines};
+        for (const auto [e, shape] : mManager->getRegistryRef().view<DebugShape>().each())
+        {
+            for (const auto& line : shape.lines)
+            {
+                lines.append(sf::Vertex{
+                    line.start.toVec2<sf::Vector2f>(),
+                    line.color,
+                });
+                lines.append(sf::Vertex{
+                    line.end.toVec2<sf::Vector2f>(),
+                    line.color,
+                });
+            }
+            for (const auto& rect : shape.rectangles)
+            {
+                const auto position = rect.bounds.min().toVec2<sf::Vector2f>();
+                const sf::Vector2f size{rect.bounds.width(), rect.bounds.height()};
+                auto& r = rects.emplace_back(size);
+                r.setPosition(position);
+                r.setFillColor(rect.color);
+            }
+        }
+        target->draw(lines);
+        for (const auto& rect : rects)
+            target->draw(rect);
     }
 } // namespace stay

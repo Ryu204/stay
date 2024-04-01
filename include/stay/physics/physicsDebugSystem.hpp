@@ -22,6 +22,7 @@ namespace stay
             void input(const sf::Event& event) override;
             void render(RTarget* target, Node* /*root*/) override;
         private:
+            void renderDebugShapes(RTarget* target);
             Uptr<phys::DebugDraw> mDrawer;
             bool mShouldDraw;
     };
