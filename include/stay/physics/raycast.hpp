@@ -1,14 +1,15 @@
 #pragma once
 
+#include <functional>
 #include <optional>
 
 #include <box2d/box2d.h>
 
 #include "stay/type/vector.hpp"
+#include "collider.hpp"
 
 namespace stay 
 {
-    class Collider;
     namespace phys
     {
         class Raycast
