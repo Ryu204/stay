@@ -41,5 +41,6 @@ namespace stay
             detail::ContactListener mContactListener;
             phys::DestructRegister mDestructListener;
             std::unordered_set<ecs::Entity> mBatched;
+            Vector2 mGravity{};
     };
 } // namespace stay

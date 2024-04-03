@@ -76,6 +76,7 @@ namespace stay
 
     void PhysicsSystem::start()
     {
+        phys::World::get().SetGravity(mGravity.toVec2<b2Vec2>());
         auto colView = mManager->getRegistryRef().view<phys::Collider>();
         for (auto entity : colView)
         {
@@ -110,9 +111,13 @@ namespace stay
 
     bool PhysicsSystem::loadConfig(const Serializable::Data& data)
     {
-        const auto valid = data.contains("layers") && data.contains("isolate") && data.contains("disable")
-            && data["layers"].is_array() && data["isolate"].is_array() && data["disable"].is_object();
+        const auto valid = 
+            data.contains("layers") && data.contains("isolate") && data.contains("disable")
+            && data["layers"].is_array() && data["isolate"].is_array() && data["disable"].is_object()
+            && data.contains("gravity");
         if (!valid)
+            return false;
+        if (!mGravity.deserialization(data["gravity"]))
             return false;
         auto& collisionSettings = phys::Collider::collisionLayers();
         for (auto i = 0; i < data["layers"].size(); ++i)
