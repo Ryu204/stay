@@ -88,6 +88,11 @@ namespace stay
             mBody->ApplyForceToCenter(force.toVec2<b2Vec2>(), true);
         }
 
+        void RigidBody::applyTorque(float torque) 
+        {
+            mBody->ApplyTorque(torque, true);
+        }
+
         void RigidBody::setVelocity(const Vector2& velocity) 
         {
             mBody->SetLinearVelocity(velocity.toVec2<b2Vec2>());
@@ -156,6 +161,11 @@ namespace stay
         void RigidBody::setLinearDamping(float damp)
         {
             mBody->SetLinearDamping(damp);
+        }
+
+        void RigidBody::setAngularDamping(float damp)
+        {
+            mBody->SetAngularDamping(damp);
         }
         
         b2Fixture* RigidBody::attachFixture(const b2FixtureDef& properties)

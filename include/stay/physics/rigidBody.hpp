@@ -47,6 +47,7 @@ namespace stay
                 void setAngle(float angle);
                 float getAngle() const;
                 void applyForce(const Vector2& force);
+                void applyTorque(float torque);
                 void setVelocity(const Vector2& velocity);
                 Vector2 getVelocity() const;
                 // @ param `velocity` the angular velocity between OY+ and object's local OY+ in degree, positive if rotating clockwise
@@ -60,6 +61,7 @@ namespace stay
                 void setBullet(bool isBullet);
                 float linearDamping() const;
                 void setLinearDamping(float damp);
+                void setAngularDamping(float damp);
                 float horizontalDamping() const;
                 void setHorizontalDamping(float damp);
                 b2Fixture* attachFixture(const b2FixtureDef& properties);
