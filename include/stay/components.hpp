@@ -6,3 +6,4 @@
 #include "stay/physics/rigidBody.hpp" // IWYU pragma: export
 #include "stay/physics/joint.hpp" // IWYU pragma: export
 #include "stay/physics/collider.hpp" // IWYU pragma: export
+#include "stay/physics/debugShape.hpp" // IWYU pragma: export

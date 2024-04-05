@@ -39,6 +39,10 @@ namespace stay
             this->action = action;
             setIndex(data.actions[action].begin);
         }
+        const std::string& getAction() const 
+        {
+            return action;
+        }
         COMPONENT(Animation, data);
         
         private:
