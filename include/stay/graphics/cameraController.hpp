@@ -1,7 +1,5 @@
 #pragma once
 
-#include <limits>
-
 #include "stay/ecs/component.hpp"
 #include "stay/type/rect.hpp"
 

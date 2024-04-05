@@ -27,6 +27,7 @@ namespace stay
                 gravityScale = body.GetGravityScale();
                 linearDamping = body.GetLinearDamping();
                 fixedRotation = body.IsFixedRotation();
+                angularDamping = body.GetAngularDamping();
             }
         } // namespace detail
 
@@ -191,6 +192,7 @@ namespace stay
             setGravityScale(mBodyDefCache.gravityScale);
             setLinearDamping(mBodyDefCache.linearDamping);
             setFixedRotation(mBodyDefCache.fixedRotation);
+            setAngularDamping(mBodyDefCache.angularDamping);
         }
     } // namespace phys
 } // namespace stay

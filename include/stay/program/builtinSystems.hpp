@@ -9,8 +9,9 @@ namespace stay
             Render          = 1,
             Physics         = 2,    
             PhysicsDebug    = 4,
+            Animation       = 8,
             
-            All = Render | Physics | PhysicsDebug
+            All = Render | Physics | PhysicsDebug | Animation
         };
     } // namespace systems
     namespace detail

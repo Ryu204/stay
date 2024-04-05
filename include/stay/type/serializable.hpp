@@ -32,6 +32,7 @@ namespace stay
     {
         return t.deserialization(data);
     }
+    // Basic types
     Serializable::Data toJSON(const ecs::Entity& t);
     bool fromJSON(ecs::Entity& t, const Serializable::Data& data);
     Serializable::Data toJSON(const int& t);
@@ -48,6 +49,8 @@ namespace stay
     bool fromJSON(bool& t, const Serializable::Data& data);
     Serializable::Data toJSON(const std::string& t);
     bool fromJSON(std::string& t, const Serializable::Data& data);
+
+    // Container types
     template <typename T>
     Serializable::Data toJSON(const std::vector<T>& t)
     {
@@ -87,6 +90,25 @@ namespace stay
         }
         std::make_optional<T>().swap(t);
         return fromJSON(t.value(), data);
+    }
+    template <typename T>
+    Serializable::Data toJSON(const std::unordered_map<std::string, T>& m)
+    {
+        Serializable::Data res;
+        for (const auto& [name, val] : m) 
+            res[name] = toJSON(val);
+        return res;
+    }
+    template <typename T>
+    bool fromJSON(std::unordered_map<std::string, T>& t, const Serializable::Data& data)
+    {
+        for (const auto& itr : data.items()) 
+        {
+            auto& val = t[itr.key()];
+            if (!fromJSON(val, itr.value()))
+                return false;
+        }
+        return true;
     }
 } // namespace stay
 #define stay_GET_JSON(x) { res[#x] = stay::toJSON(x); }

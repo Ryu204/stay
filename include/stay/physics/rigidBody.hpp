@@ -22,7 +22,7 @@ namespace stay
                 public: 
                     using b2BodyDef::b2BodyDef;
                     BodyDef(const b2BodyDef& other);
-                    SERIALIZE_PROCESSING(mBodyType, mPosition, angle, gravityScale, linearDamping, fixedRotation);
+                    SERIALIZE_PROCESSING(mBodyType, mPosition, angle, gravityScale, linearDamping, fixedRotation, angularDamping);
                     void postDeserialization();
                     void preSerialization() const;
                     void fromBody(b2Body& body);

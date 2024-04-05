@@ -1,6 +1,7 @@
 #include "stay/program/builtinSystems.hpp"
 
 #include "stay/graphics/renderSystem.hpp"
+#include "stay/graphics/animationSystem.hpp"
 #include "stay/physics/physicsDebugSystem.hpp"
 #include "stay/physics/physicsSystem.hpp"
 
@@ -12,6 +13,8 @@ namespace stay
         {
             if ((systems & systems::Render) != 0)
                 ecs::manager().registerSystem<RenderSystem>("RenderSystem");
+            if ((systems & systems::Animation) != 0)
+                ecs::manager().registerSystem<AnimationSystem>("AnimationSystem");
             if ((systems & systems::PhysicsDebug) != 0)
                 ecs::manager().registerSystem<PhysicsDebugSystem>("PhysicsDebugSystem");
             if ((systems & systems::Physics) != 0)
