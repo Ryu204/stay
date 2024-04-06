@@ -10,6 +10,11 @@
 
 namespace stay
 {
+    enum class RenderPrimitive
+    {
+        TRIANGLE_STRIP = sf::PrimitiveType::TriangleStrip, 
+        LINE_STRIP = sf::PrimitiveType::LineStrip,
+    };
     struct Render : public ecs::Component
     {
         Render(Color color = Color(), Vector2 size = Vector2(), int zOrder = 0)
@@ -35,5 +40,53 @@ namespace stay
         int zOrder;
         std::optional<TextureInfo> textureInfo;
         COMPONENT(Render, color, size, textureInfo);
+    };
+    struct RenderVertex : Serializable
+    {
+        Vector2 texCoords;
+        Vector2 position;
+        Color color;
+        RenderVertex(Vector2 texCoords = {}, Vector2 position = {}, Color color = Color{0xFFFFFFFF})
+            : texCoords{std::move(texCoords)}
+            , position{std::move(position)}
+            , color{std::move(color)}
+        {}
+        SERIALIZE(texCoords, position, color);
+    };
+    struct RenderArray : ecs::Component 
+    {
+        RenderArray(std::string textureId, int zOrder = {}, RenderPrimitive type = {})
+            : textureId{std::make_optional<std::string>(std::move(textureId))}
+            , zOrder{zOrder}
+        {
+            setType(type);
+        }
+        RenderArray(int zOrder = {}, RenderPrimitive type = {})
+            : zOrder{zOrder}
+        {
+            setType(type);
+        }
+        void setColor(const Color& color) 
+        {
+            for (auto & v : vertices) 
+                v.color = color;
+        }
+        RenderPrimitive type() const 
+        {
+            return static_cast<RenderPrimitive>(mType);
+        }
+        void setType(RenderPrimitive t)
+        {
+            mType = static_cast<int>(t);
+        }
+
+        COMPONENT(RenderArray, vertices, textureId, zOrder, mType);
+
+        std::vector<RenderVertex> vertices{};
+        std::optional<std::string> textureId{};
+        int zOrder;
+
+        private:
+            int mType{static_cast<int>(RenderPrimitive::TRIANGLE_STRIP)};
     };
 } // namespace stay

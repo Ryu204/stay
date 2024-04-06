@@ -15,7 +15,6 @@ namespace stay
         , ecs::System{manager}
         , mTextures{nullptr}
         , mCamera{nullptr}
-        , mBuffer{sf::PrimitiveType::Quads}
         , mBackground{std::make_unique<sf::RectangleShape>()}
     { }
 
@@ -100,6 +99,11 @@ namespace stay
                 const auto& drawable = current->getComponent<Render>();
                 mRenderObjects.emplace_back(detail::ZOrderPack::from(currentTf, drawable));
             }
+            if (current->hasComponent<RenderArray>())
+            {
+                const auto& drawable = current->getComponent<RenderArray>();
+                mRenderObjects.emplace_back(detail::ZOrderPack::from(currentTf, drawable));
+            }
             return currentTf;
         };
         node->visitChained(draw, sf::Transform::Identity);
@@ -127,6 +131,8 @@ namespace stay
             const auto shouldDraw = isFinalObject || notSameCallWithNextObject;
             if (shouldDraw) 
             {
+                const auto prim = static_cast<sf::PrimitiveType>(object.type);
+                mBuffer.setPrimitiveType(prim);
                 if (object.textureId.has_value())
                 {
                     const auto& textureAsset = mTextures->get(object.textureId.value());
