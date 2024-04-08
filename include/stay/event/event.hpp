@@ -26,7 +26,7 @@ namespace stay
                 {
                     auto newID = mIDGen.generate();
                     mSubcribers.emplace(newID,
-                        [action = std::forward<Func>(action)](EventArgs&&... args)
+                        [action = std::forward<Func>(action)](EventArgs... args)
                         {
                             action(std::forward<EventArgs>(args)...);
                         }
@@ -38,7 +38,7 @@ namespace stay
                     mIDGen.erase(index);
                     mSubcribers.erase(index);
                 }
-                void invoke(EventArgs&&... args) const
+                void invoke(EventArgs... args) const
                 {
                     for (const auto& action : mSubcribers)
                     {
