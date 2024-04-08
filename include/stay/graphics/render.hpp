@@ -13,6 +13,7 @@ namespace stay
     enum class RenderPrimitive
     {
         TRIANGLE_STRIP = sf::PrimitiveType::TriangleStrip, 
+        TRIANGLES = sf::PrimitiveType::Triangles,
         LINE_STRIP = sf::PrimitiveType::LineStrip,
     };
     struct Render : public ecs::Component

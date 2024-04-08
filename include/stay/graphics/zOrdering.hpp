@@ -55,9 +55,16 @@ namespace stay
 
                 for (auto& v : res.vertices)
                     v.color = renderInfo.color;
+
+                // a b
+                // c d
+                // [a, b, c, d] (triangle_strip) -> [a, b, c, b, c, d] (triangles)
+                res.vertices.insert(res.vertices.cbegin() + 3, res.vertices[1]);
+                res.vertices.insert(res.vertices.cbegin() + 4, res.vertices[2]);
+
                 res.order = renderInfo.zOrder;
                 res.textureId = hasTexture ? std::make_optional<std::string>(renderInfo.textureInfo->id) : std::optional<std::string>();
-                res.type = RenderPrimitive::TRIANGLE_STRIP;
+                res.type = RenderPrimitive::TRIANGLES;
                 return std::move(res);
             }
 
