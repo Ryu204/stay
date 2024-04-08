@@ -59,5 +59,6 @@ namespace stay
             float elapsedTime{};
             // Empty is uninitialized
             std::string action{};
+            bool initialized{false};
     };
 } // namespace stay

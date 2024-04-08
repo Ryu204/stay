@@ -16,13 +16,7 @@ namespace stay
     {
         for (const auto& [e, anim, rd] : mManager->getRegistryRef().view<Animation, Render>().each())
         {
-            assert(rd.textureInfo.has_value() && "cannot animate plain color");
-            const auto& texture = mTextures->get(rd.textureInfo->id);
-            Vector2Int wholeSize = Vector2Int::from(texture.getSfmlTexture().getSize());
-            assert(anim.data.dimension.x != 0 && anim.data.dimension.y != 0 && "probably did not serialize or set dimension");
-            assert(wholeSize.x % anim.data.dimension.x == 0 && wholeSize.y % anim.data.dimension.y == 0 && "cannot cut to `dimension`");
-            anim.frameSize.x = wholeSize.x / anim.data.dimension.x;
-            anim.frameSize.y = wholeSize.y / anim.data.dimension.y;
+            initialize(anim);
         }
     }
 
@@ -41,8 +35,9 @@ namespace stay
     {
         for (const auto [e, anim] : mManager->getRegistryRef().view<Animation>().each())
         {
-            const auto uninitialized = anim.action.empty();
-            if (uninitialized) 
+            if (!anim.initialized)
+                initialize(anim);
+            if (anim.action.empty()) 
             {
                 anim.setIndex(0);
                 continue;
@@ -69,7 +64,7 @@ namespace stay
     {
         for (const auto [e, anim, rd] : mManager->getRegistryRef().view<Animation, Render>().each())
         {
-            if (!anim.indexChanged)
+            if (!anim.initialized || !anim.indexChanged)
                 continue;
             anim.indexChanged = false;
             const auto row = anim.index / anim.frameSize.x;
@@ -81,5 +76,18 @@ namespace stay
             assert(rd.textureInfo.has_value() && "cannot animate plain color");
             rd.textureInfo->rect = rect;
         }
+    }
+
+    void AnimationSystem::initialize(Animation& anim)
+    {
+        const auto& rd = anim.getNode()->getComponent<Render>();
+        assert(rd.textureInfo.has_value() && "cannot animate plain color");
+        const auto& texture = mTextures->get(rd.textureInfo->id);
+        Vector2Int wholeSize = Vector2Int::from(texture.getSfmlTexture().getSize());
+        assert(anim.data.dimension.x != 0 && anim.data.dimension.y != 0 && "probably did not serialize or set dimension");
+        assert(wholeSize.x % anim.data.dimension.x == 0 && wholeSize.y % anim.data.dimension.y == 0 && "cannot cut to `dimension`");
+        anim.frameSize.x = wholeSize.x / anim.data.dimension.x;
+        anim.frameSize.y = wholeSize.y / anim.data.dimension.y;
+        anim.initialized = true;
     }
 } // namespace stay

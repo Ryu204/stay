@@ -8,6 +8,7 @@
 
 namespace stay
 {
+    class Animation;
     struct AnimationSystem
         : public ecs::UpdateSystem
         , public ecs::StartSystem
@@ -19,6 +20,7 @@ namespace stay
             void update(float dt) override;
             void init(ecs::SystemContext& context) override;
         private:
+            void initialize(Animation& anim);
             void setIndices(float dt);
             void setTextureRects();
             TextureManager* mTextures{nullptr};
