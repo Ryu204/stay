@@ -1,3 +1,5 @@
+The project is being rewritten at [stay3](https://github.com/Ryu204/stay3)
+
 # Stay
 
 Core frameworks/utilities for developing games in C++.
